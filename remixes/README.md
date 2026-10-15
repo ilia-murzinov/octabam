@@ -16,6 +16,7 @@ A remix is a named selection of modules; `make image REMIX=<name> BUILD=<n>` bui
 
 | remix | contains | proof |
 |---|---|---|
+| [`minimal`](minimal/README.md) | CORE (BRAIN…) + Dark Rev + Tape Echo + SYNTH + sidechain + USB out TRACKS MAIN CUE + STEM REC; no USB in. | local render: CORE + Dark Rev, Tape Echo, FM synth, sidechain, USB out TRACKS MAIN CUE, STEM REC. |
 | [`octabam-core`](octabam-core/README.md) | The core ColdFire modules on the 14 stock effects, with LOFI AMF FIX. | port-gated |
 | [`octabam-inserts`](octabam-inserts/README.md) | CORE + SPECTRUM, CHARACTER, MODULATION, TRANSIENT and EUCLID on FX1 and FX2, LOFI2 (FX2), the stock DELAY and GATE VERB on FX2. | port-gated |
 
