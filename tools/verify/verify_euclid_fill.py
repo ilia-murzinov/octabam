@@ -87,6 +87,12 @@ def check_ui(src: str) -> None:
     check("ef_nudge edits PULSE/ROT only",
           "lea     ef_pulses" in nudge and "lea     ef_rot" in nudge
           and "lea     ef_steps" not in nudge)
+    # ef_sync_len clobbers d0-d3; delta must survive on the stack (hw:
+    # encoders one-way + L/R dead when parked in d2 alone).
+    check("ef_nudge parks delta across ef_sync_len",
+          re.search(
+              r"movel\s+%d0,-\(%sp\).*?bsr\.w\s+ef_sync_len.*?movel\s+\(%sp\)\+,%d2",
+              nudge, re.S) is not None)
 
     # Cursor is 0=PULSE / 1=ROT (two rows), not three including STEPS
     check("cursor toggles 0<->1 (eoril #1)",

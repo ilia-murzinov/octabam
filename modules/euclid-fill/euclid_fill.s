@@ -260,9 +260,13 @@ ef_level:
         beq.w   ef_nudge_rts
         bra.w   ef_nudge
 | LEFT/RIGHT enter with d0 = ±1 already. Edits PULSE or ROT only.
+| ef_sync_len clobbers d0-d3/a0/a1 — park the signed delta on the stack
+| first. Without that, L/R become the track index (dead on T1) and every
+| encoder turn nudges upward only.
 ef_nudge:
-        movel   %d0,%d2                 | signed delta
+        movel   %d0,-(%sp)              | park signed delta
         bsr.w   ef_sync_len             | STEPS stays = pattern length
+        movel   (%sp)+,%d2              | restore delta
         movel   ef_cursor,%d1
         lea     ef_pulses,%a0
         tstl    %d1
