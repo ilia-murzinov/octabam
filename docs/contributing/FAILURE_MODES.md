@@ -7,7 +7,7 @@ a mode is seen on hardware.
 
 - **Seen:** MKI, 16 Oct 2026, remix with `RELOAD_FROM_PROJECT`: holding CUE and pressing a TRACK key reloaded that track's sequence and showed the RELOAD toast. Gone when the module was removed; Euclid was not involved (A/B flashes).
 - **Cause (measured from the stock image):** the eight refs to the `0x40083dc4` detour are CUE's held-modifier TRACK slots (`0x400bf122`, from CUE key `0x2a`'s sub-map `0x400bf2a0`), not a `[PTN]` overlay. The unit treated arrival as `[PTN]`+`[TRACK]` with no held test. `[PTN]`+`[TRACK]` itself lands on the base TRACK handler (`0x40040250`) and tests `PTN_HELD_FLAG`.
-- **Fix:** `rl3_ptn_trk` gates on the panel matrix PTN bit (`0x46100b18[5]` bit 6) before reloading; otherwise stock. Local unit in `modules/reload-from-project/patch_reload3.s` until the same gate is in kyoti-fw.
+- **Fix:** `rl3_ptn_trk` gates on the panel matrix PTN bit (`0x46100b18[5]` bit 6) before reloading; otherwise stock. In kyoti-fw `3480a48` (fork branch `cue-trk-guard`); octabam pins that until Zac merges.
 
 ## MIDI TRACK → CHROMATIC halts at the LCD surface descriptor (#741)
 

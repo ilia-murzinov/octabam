@@ -3,14 +3,13 @@
 Reload one track's sequence from the CF card without stopping the transport: `[PTN]` + `[TRACK n]` reloads that track's card-saved sequence with the Part untouched; `[BANK]` + `[TRACK n]` also re-applies the saved Part. A toast confirms.
 
 Built from [Zac-Kyoti/octatrack-kyoti-fw](https://github.com/Zac-Kyoti/octatrack-kyoti-fw)
-(submodule `upstream/`, pinned to `329b801`). `Kind.CF_PATCH`. One DRAM unit (`patch_reload3.s` beside this README — octabam-local since 16 Oct 2026; see Notes, `Linked(dram=True)`) and six `jmp` detours. A remix with this module carries the platform loader and its 10 MiB arena reserve, unless another DRAM module already brings them.
+(submodule `upstream/`, pinned to `3480a48` — [cue-trk-guard](https://github.com/ilia-murzinov/octatrack-kyoti-fw/tree/cue-trk-guard) until Zac merges). `Kind.CF_PATCH`. One DRAM unit (`patch_reload3.s`, `Linked(dram=True)`) and six `jmp` detours. A remix with this module carries the platform loader and its 10 MiB arena reserve, unless another DRAM module already brings them.
 `upstream/octabam-modules/reload-from-project/README.md` is the full description, with what was measured and what was inferred.
 
 ## Measured
 
 - Every build re-links each cave or unit and compares it with the author's
-  own bytes (`reference`); a difference refuses the build. The local unit's
-  oracle is the bytes of this tree's `patch_reload3.s` at `0x400d6500`.
+  own bytes (`reference`); a difference refuses the build.
 - `make check REMIX=reload-from-project` (`remixes/test/reload-from-project/`) builds and boots the
   image under the ColdFire port.
 
@@ -18,10 +17,9 @@ Built from [Zac-Kyoti/octatrack-kyoti-fw](https://github.com/Zac-Kyoti/octatrack
 
 - On the author's MKI, including that the sequencer and the internal metronome keep their phase.
 - 1 Oct 2026: from DRAM, in an octabam image with all six KYOTI modules (OBKYOTI6), both chords; and (OBKYOTI7) the knobs now show the reloaded Part's values straight after `[BANK]` + `[TRACK n]`.
-- 16 Oct 2026: `[CUE]` + `[TRACK n]` no longer reloads (was toasting `TRK SEQ RELOADED`). Cause: the eight stock refs to the `0x40083dc4` detour are CUE's held-modifier TRACK slots (`0x400bf122` from sub-map `0x400bf2a0`), not a `[PTN]` overlay; the unit had treated arrival as `[PTN]`+`[TRACK]` with no held test. Fix: gate that path on the panel matrix PTN bit (`0x46100b18[5]` bit 6).
+- 16 Oct 2026 (MKII): `[CUE]` + `[TRACK n]` no longer reloads (was toasting `TRK SEQ RELOADED`). Cause: the eight stock refs to the `0x40083dc4` detour are CUE's held-modifier TRACK slots (`0x400bf122` from sub-map `0x400bf2a0`), not a `[PTN]` overlay; the unit had treated arrival as `[PTN]`+`[TRACK]` with no held test. Fix: gate that path on the panel matrix PTN bit (`0x46100b18[5]` bit 6). Flashed and confirmed: CUE+TRACK stock; PTN+TRACK and BANK+TRACK still reload.
 
 ## Notes
 
 - All-tracks and whole-bank reload are not implemented.
 - Octakit's conflict is dropped: Octakit is not in octabam since 6 Oct 2026 (KITS replaces it and plays through the stock Part slots), so `[BANK]` + `[TRACK n]` calls stock Part RELOAD (`0x4004aab4`) from the unit untouched. The call is not a `Detour`, so the ledger cannot see it; the handoff record is `upstream/reference/handoffs/DIRECTJUMP_OCTAKIT_SCOPE.md`.
-- The CUE+TRACK gate lives in this module's `patch_reload3.s` until the same change is in kyoti-fw; then drop the local unit and restore the upstream Linked source.
