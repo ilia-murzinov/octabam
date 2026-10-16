@@ -24,10 +24,12 @@ MODULE = Module(
     key="EUCLID FILL",
     kind=Kind.CF_PATCH,
     category=Category.MACHINES,
-    author="octabam",
-    author_url="https://github.com/sambanks/octabam",
+    author="ilia-murzinov",
+    author_url="https://github.com/ilia-murzinov",
     proof=Proof.HARDWARE,
-    proof_note="cursory testing on Sam's MKII (owner report, 16 Oct 2026); "
+    proof_note="YES/CUE with RAND PTCH>0 on sample + FM (+ SY encoding path), "
+               "SCALE on/off, relative RAND VEL (author, CF, 16 Oct 2026); "
+               "also cursory on Sam's MKII (owner report, 16 Oct 2026); "
                "builds and boots under the port; fill math gated in verify_euclid_fill",
     doc="TRACK + PAGE: Euclidean sample-trig fill (STEPS=pattern len / PULSE / ROT / "
         "RAND VEL / RAND PTCH; CUE = random k-subset; RAND VEL = VOL locks; "
