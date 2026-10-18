@@ -5,8 +5,8 @@
 ; Insert: frames in place at x:(r0)/x:(r0+n0), knobs from r6, state in r7.
 ; No bus, no buffers, no shared window.
 ;
-;   fb  = FDBK * tone_lp * polarity      (NOT driven — drive×fb self-oscillates)
-;   d   = dry * (1 + 8*DRV) + fb         DRV 0 = unity; 127 ≈ ×9 on dry only
+;   in  = dry + FDBK * fb * polarity
+;   d   = in * (1 + DRV)                 DRV 0 skips (unity)
 ;   f   = fold(d) or d                   FOLD 0 skips
 ;   c   = hard/soft clip(f)              MODE HARD / SOFT / CHAOS
 ;   w   = srr then brr(c)                CRSH (LOFI2-style $400000 phase)
@@ -43,8 +43,8 @@ init:
 
 proc:
 ; ---- knobs (mask LFO dirt) ------------------------------------------------
-        move    x:(r6+$0),a             ; DRV (×8 applied in sample loop)
-        and     #>$7f0000,a             ; LFO low byte must not leak
+        move    x:(r6+$0),a             ; DRV -> gain addend DRV/128
+        and     #>$7fffff,a
         move    a,x:(r7+$10)
         move    x:(r6+$1),a             ; FOLD
         and     #>$7fffff,a
@@ -156,27 +156,21 @@ shc0:
 sh00:
         move    #$1,n0
         do      n7,>sh16
-; ---- dry * (1+8*DRV) + feedback (fb not driven) ---------------------------
-; Quiet dry: kill FDBK and skip FOLD so hush + FOLD doesn't self-oscillate.
-        move    x:(r0),a                ; dry L
-        move    a,x0
-        abs     a
-        move    #>$1000,y1              ; ~ -66 dBFS gate
-        cmp     y1,a
-        blt     sh28
-        move    x:(r7+$10),y0           ; DRV
-        mpy     y0,x0,a
-        asl     #$3,a,a
-        add     x0,a                    ; dry * (1 + 8*DRV)
-        move    a,b
-        move    x:(r7+$00),x0           ; fb tone L
-        move    x:(r7+$14),y1           ; fdbk
+; ---- dry + feedback -------------------------------------------------------
+        move    x:(r0),b                ; dry L
+        move    x:(r7+$00),x0           ; fb L
+        move    x:(r7+$14),y1           ; fdbk (>=0)
         mpy     x0,y1,a
         move    a,x0
-        move    x:(r7+$07),y1           ; polarity
+        move    x:(r7+$07),y1           ; polarity (+/-1), mpy x0,y1 signed
         mpy     x0,y1,a
-        add     b,a
-        move    a,y0
+        add     b,a                     ; in L
+; ---- DRV ------------------------------------------------------------------
+        move    a,x0
+        move    x:(r7+$10),y0           ; DRV (>=0)
+        mpy     y0,x0,a                 ; signed
+        add     x0,a                    ; in * (1 + DRV/128)
+        move    a,y0                    ; driven L
 ; ---- FOLD (skip at 0) -----------------------------------------------------
         move    x:(r7+$11),a
         tst     a
@@ -191,21 +185,6 @@ sh00:
         sub     b,a
         asl     a
         move    a,y0                    ; folded L in [-1,1)
-        bra     sh01
-sh28:
-; decay loop state; driven dry only; no fold
-        move    x:(r7+$00),a
-        asr     #$2,a,a
-        move    a,x:(r7+$00)
-        move    x:(r7+$05),a
-        asr     #$2,a,a
-        move    a,x:(r7+$05)
-        move    x:(r0),x0
-        move    x:(r7+$10),y0
-        mpy     y0,x0,a
-        asl     #$3,a,a
-        add     x0,a
-        move    a,y0
 sh01:
 ; ---- CLIP (skip at 0; leave y0 alone) ------------------------------------
         move    x:(r7+$12),a            ; raw CLIP
@@ -293,17 +272,7 @@ sh08:
         add     b,a
         move    a,x:(r0)+n0             ; out L; r0 -> R
 ; ============================= R channel ===================================
-        move    x:(r0),a                ; dry R
-        move    a,x0
-        abs     a
-        move    #>$1000,y1
-        cmp     y1,a
-        blt     sh29
-        move    x:(r7+$10),y0           ; DRV
-        mpy     y0,x0,a
-        asl     #$3,a,a
-        add     x0,a
-        move    a,b
+        move    x:(r0),b                ; dry R
         move    x:(r7+$01),x0
         move    x:(r7+$14),y1
         mpy     x0,y1,a
@@ -311,6 +280,10 @@ sh08:
         move    x:(r7+$07),y1
         mpy     x0,y1,a
         add     b,a
+        move    a,x0
+        move    x:(r7+$10),y0
+        mpy     y0,x0,a
+        add     x0,a
         move    a,y0
         move    x:(r7+$11),a
         tst     a
@@ -324,20 +297,6 @@ sh08:
         abs     a
         sub     b,a
         asl     a
-        move    a,y0
-        bra     sh09
-sh29:
-        move    x:(r7+$01),a
-        asr     #$2,a,a
-        move    a,x:(r7+$01)
-        move    x:(r7+$06),a
-        asr     #$2,a,a
-        move    a,x:(r7+$06)
-        move    x:(r0),x0
-        move    x:(r7+$10),y0
-        mpy     y0,x0,a
-        asl     #$3,a,a
-        add     x0,a
         move    a,y0
 sh09:
 ; CLIP R

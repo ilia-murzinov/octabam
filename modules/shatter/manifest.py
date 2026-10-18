@@ -29,7 +29,7 @@ MODULE = Module(
     ),
     params=(
         Param(b"DRV", 0, active=True, formatter=_P,
-              doc="pre-gain into the folder (~×9 at 127); 0 = unity"),
+              doc="pre-gain into the folder; 0 skips drive"),
         Param(b"FOLD", 0, active=True, formatter=_P,
               doc="wavefolder drive; 0 skips the fold"),
         Param(b"CLIP", 0, active=True, formatter=_P,
