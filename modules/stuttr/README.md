@@ -11,9 +11,9 @@ wet path wins; MIX 0 is bit-exact dry.
 |---|---|---|---|---|
 | 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×32 words; FX1: (kn+1)×8) |
 | 1 | 1 | RATE | 0–127 | re-grab clock (slow→fast; SIZE loops between grabs) |
-| 1 | 2 | CHNC | 0–127 | wet window inside a grab (0 = dry stage) |
+| 1 | 2 | CHNC | 0–127 | 0 = dry; any other = stutter after first grab |
 | 1 | 3 | FDBK | 0–127 | recirculate into the write head |
-| 1 | 4 | DECY | 0–127 | fade between retrigs |
+| 1 | 4 | DECY | 0–127 | fade between grabs (0 = hold) |
 | 1 | 5 | MIX | 0–127 | dry/wet |
 | 2 | 6 | MODE | LOOP / REV / DROP / SCRAM | playback flavour |
 | 2 | 7 | SYNC | FREE / 16 / 8 / 4 | internal clock divisions |

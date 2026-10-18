@@ -11,7 +11,8 @@
 ;    $33 slice start (absolute); read = start + offset, folded into ring
 ; Labels st00.. only. mpy x0,y1 / y0,x0 / x0,x0 only. init keeps r1. No rep.
 ; SIZE words (integer): FX2 (kn+1)*32, FX1 (kn+1)*8. Min 8, even.
-; RATE clock step: 0x100+(kn<<9) -> ~1.5s .. ~128 samples between re-grabs.
+; RATE clock step: 0x400+(kn<<10) -> ~372ms .. ~64 samples between re-grabs.
+; Wet only after a grab (never loop the cleared base). CHNC is on/off.
 ; ---------------------------------------------------------------------------
 
 init:
@@ -28,7 +29,7 @@ st00:
         move    x:(r4),a
         move    a,x:(r7+$20)
         move    a,x:(r7+$21)
-        move    a,x:(r7+$33)            ; slice start = base until first grab
+        move    a,x:(r7+$33)
         move    #>$80,a
         move    a,x:(r7+$22)
         move    #>$4000,x0
@@ -43,7 +44,7 @@ st00:
         move    x0,x:(r7+$2c)
         move    #>$1,x0
         move    x0,x:(r7+$2d)
-        move    x0,x:(r7+$2b)            ; armed: loop before first RATE grab
+        ; $2b active stays 0 until first grab (wet must not read cleared Y)
         rts
 
 proc:
@@ -88,12 +89,12 @@ st21:
         and     #>$fffffe,a
         move    a,x:(r7+$24)
 ; RATE -> clock step. Overflow at 0x800000 ≈ re-grab period.
-; step = 0x100 + (kn<<9): kn0 ≈ 1.5s, kn127 ≈ 128 samples.
+; step = 0x400 + (kn<<10): kn0 ≈ 372ms, kn127 ≈ 64 samples.
         move    x:(r6+$1),a
         and     #>$7f0000,a
         asr     #$10,a,a                ; kn 0..127
-        asl     #$9,a,a                 ; kn*512
-        add     #>$100,a
+        asl     #$a,a,a                 ; kn*1024
+        add     #>$400,a
         move    x:(r6+$7),b             ; SYNC 0=FREE 1=/16 2=/8 3=/4
         and     #>$7f0000,b
         asr     #$10,b,b
@@ -115,8 +116,8 @@ st15:
         asr     #$2,a,a
 st17:
         move    a,x:(r7+$25)
-        move    x:(r6+$2),a             ; CHNC
-        and     #>$7fffff,a
+        move    x:(r6+$2),a             ; CHNC: 0 = dry stage, else wet when active
+        and     #>$7f0000,a
         move    a,x:(r7+$26)
         move    x:(r6+$3),a             ; FDBK
         and     #>$7fffff,a
@@ -161,14 +162,24 @@ st17:
         move    x:(r7+$20),r4
 st03:
         move    r4,x:(r7+$21)
-; clock + retrigger
+; clock + retrigger (also first grab once the ring holds a full SIZE)
         move    x:(r7+$29),a
         move    x:(r7+$25),x0
         add     x0,a
         move    a,x:(r7+$29)
         move    a1,b
         tst     b
-        bpl     st04
+        bmi     st26                    ; RATE overflow -> grab
+        move    x:(r7+$2b),b            ; already active?
+        tst     b
+        bne     st04
+        move    x:(r7+$21),a            ; fill: write-base >= size?
+        move    x:(r7+$20),x0
+        sub     x0,a
+        move    x:(r7+$24),x0
+        cmp     x0,a
+        blt     st04
+st26:
         clr     a
         move    a,x:(r7+$29)
         move    #>$7fffff,x0
@@ -207,14 +218,13 @@ st04:
         move    a,x:(r7+$2f)
         move    x:(r0+n0),a
         move    a,x:(r7+$30)
-        move    x:(r7+$26),a            ; CHNC
+        move    x:(r7+$26),a            ; CHNC 0 = dry
         tst     a
         beq     st10
-        move    x:(r7+$29),b
-        and     #>$7fffff,b
-        cmp     a,b
-        bgt     st10
-        move    x:(r7+$2b),a
+        move    x:(r7+$2b),a            ; need a grab first
+        tst     a
+        beq     st10
+        move    x:(r7+$2c),a            ; gain 0 -> dry (not muted hole)
         tst     a
         beq     st10
 ; addr = start + offset (+ SCRAM), fold into ring, read
