@@ -1,7 +1,8 @@
 # minimal
 
 Your flash remix: upstream stock + CORE ColdFire set + Dark Rev + Tape Echo
-+ SYNTH + sidechain + USB out TRACKS MAIN CUE + STEM REC. No USB in.
++ SYNTH + sidechain + SHATTER + STUTTR + USB out TRACKS MAIN CUE + STEM REC.
+No USB in. PLATE REV is harvested (its words hold the glitch inserts).
 
 ## Layout
 
