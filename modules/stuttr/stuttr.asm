@@ -6,9 +6,11 @@
 ; Clock retriggers a slice; CHNC gates wet; MODE LOOP/REV/DROP/SCRAM.
 ;
 ; r7 $20 base $21 write $22 clear $23 maxlen $24 size $25 rate
-;    $26 chnc $27 mix $28 mode $29 clock $2a read $2b active $2c gain
+;    $26 chnc $27 mix $28 mode $29 clock $2a offset $2b active $2c gain
 ;    $2d dir $2e scram $2f wetL $30 wetR $31 fdbk $32 decy
+;    $33 slice start (absolute); read = start + offset, folded into ring
 ; Labels st00.. only. mpy x0,y1 / y0,x0 / x0,x0 only. init keeps r1. No rep.
+; SIZE is integer words (never fractional mpy): FX2 (kn+1)<<7, FX1 (kn+1)*24.
 ; ---------------------------------------------------------------------------
 
 init:
@@ -17,7 +19,7 @@ init:
         move    #>$20,n4
         move    (r4)+n4
         clr     a
-        do      #20,>st00
+        do      #22,>st00
         move    a,x:(r4)+
 st00:
         nop
@@ -59,17 +61,31 @@ st02:
         nop
         rts
 st01:
-        move    x:(r6+$0),a             ; SIZE -> 8..maxlen words (even)
-        and     #>$7fffff,a
-        asr     #$10,a,a
-        add     #>$1,a
+; SIZE -> slice length in words (stereo pairs = size/2). Integer, not mpy:
+; FX2 maxlen 16384: (kn+1)<<7 ; FX1 maxlen 3072: (kn+1)*24. Min 8, even.
+        move    x:(r6+$0),a
+        and     #>$7f0000,a             ; LFO low byte must not leak
+        asr     #$10,a,a                ; kn 0..127
+        add     #>$1,a                  ; 1..128
         move    a,x0
-        move    x:(r7+$23),y1
-        mpy     x0,y1,a
-        asr     #$7,a,a
+        move    x:(r7+$23),b            ; maxlen
+        move    #>$4000,y0
+        cmp     y0,b
+        bne     st20                    ; FX1 path
+        asl     #$7,a,a                 ; FX2: (kn+1)*128
+        bra     st21
+st20:
+        move    x0,b                    ; (kn+1)*24 = <<4 + <<3
+        asl     #$4,a,a
+        asl     #$3,b,b
+        add     b,a
+st21:
         move    #>$8,x0
         cmp     x0,a
         tlt     x0,a
+        move    x:(r7+$23),x0           ; clamp to maxlen
+        cmp     x0,a
+        tgt     x0,a
         and     #>$fffffe,a
         move    a,x:(r7+$24)
         move    x:(r6+$1),a             ; RATE
@@ -167,7 +183,9 @@ st03:
         move    x:(r7+$23),x0
         add     x0,a
 st05:
-        move    a,x:(r7+$2a)
+        move    a,x:(r7+$33)            ; slice start (absolute)
+        clr     a
+        move    a,x:(r7+$2a)            ; offset 0 within slice
         move    #>$1,a                  ; dir +1
         move    #>$1,x0
         move    x:(r7+$28),b
@@ -198,48 +216,61 @@ st04:
         move    x:(r7+$2b),a
         tst     a
         beq     st10
-; read slice (SCRAM offsets the pointer); DROP zeros after gain
-        move    x:(r7+$2a),r4
+; addr = start + offset (+ SCRAM), fold into ring, read
+        move    x:(r7+$33),a
+        move    x:(r7+$2a),x0
+        add     x0,a
         move    x:(r7+$28),b
         move    #>$3,x0
         cmp     x0,b
         bne     st07
-        move    x:(r7+$2e),a
+        move    x:(r7+$2e),b
+        and     #>$00ffff,b
         move    x:(r7+$24),x0
-        and     #>$00ffff,a
-        cmp     x0,a
-        tgt     x0,a
-        and     #>$fffffe,a
-        move    r4,b
-        add     a,b
-        move    b,r4
+        cmp     x0,b
+        tgt     x0,b
+        and     #>$fffffe,b
+        add     b,a
 st07:
+        move    x:(r7+$20),x0           ; fold into [base, base+maxlen)
+        cmp     x0,a
+        bge     st24
+        move    x:(r7+$23),x0
+        add     x0,a
+st24:
+        move    x:(r7+$20),x0
+        move    x:(r7+$23),b
+        add     x0,b
+        cmp     b,a
+        blt     st25
+        move    x:(r7+$23),x0
+        sub     x0,a
+st25:
+        move    a,r4
         move    #>$ffffff,m4
         move    y:(r4)+,a
         move    a,x:(r7+$2f)
         move    y:(r4)+,a
         move    a,x:(r7+$30)
-; advance read by 2*dir without bra (tpl selects forward vs reverse)
+; advance offset ±2, wrap in [0, size)
         move    x:(r7+$2a),a
         add     #>$2,a
-        move    a,x1                      ; forward candidate
+        move    a,x1
         move    x:(r7+$2a),a
-        sub     #>$2,a                    ; reverse candidate (kept if dir < 0)
+        sub     #>$2,a
         move    x:(r7+$2d),b
         tst     b
         tpl     x1,a
-        move    x:(r7+$20),x0
+        move    #>$0,x0
         cmp     x0,a
         bge     st12
-        move    x:(r7+$23),x0
-        add     x0,a
+        move    x:(r7+$24),a
+        sub     #>$2,a
 st12:
-        move    x:(r7+$20),x0
-        move    x:(r7+$23),b
-        add     x0,b
-        cmp     b,a
+        move    x:(r7+$24),x0
+        cmp     x0,a
         blt     st13
-        move    x:(r7+$20),a
+        move    #>$0,a
 st13:
         move    a,x:(r7+$2a)
 ; gain * DECY step
