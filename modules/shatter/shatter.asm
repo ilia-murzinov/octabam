@@ -5,8 +5,8 @@
 ; Insert: frames in place at x:(r0)/x:(r0+n0), knobs from r6, state in r7.
 ; No bus, no buffers, no shared window.
 ;
-;   in  = dry + FDBK * fb * polarity
-;   d   = in * (1 + DRV)                 DRV 0 skips (unity)
+;   fb  = FDBK * tone_lp * polarity      (NOT driven — drive×fb self-oscillates)
+;   d   = dry * (1 + 8*DRV) + fb         DRV 0 = unity; 127 ≈ ×9 on dry only
 ;   f   = fold(d) or d                   FOLD 0 skips
 ;   c   = hard/soft clip(f)              MODE HARD / SOFT / CHAOS
 ;   w   = srr then brr(c)                CRSH (LOFI2-style $400000 phase)
@@ -43,14 +43,14 @@ init:
 
 proc:
 ; ---- knobs (mask LFO dirt) ------------------------------------------------
-        move    x:(r6+$0),a             ; DRV -> gain addend DRV/128
-        and     #>$7fffff,a
+        move    x:(r6+$0),a             ; DRV (×8 applied in sample loop)
+        and     #>$7f0000,a             ; LFO low byte must not leak
         move    a,x:(r7+$10)
         move    x:(r6+$1),a             ; FOLD
-        and     #>$7fffff,a
+        and     #>$7f0000,a             ; LFO low byte must not arm the stage
         move    a,x:(r7+$11)
         move    x:(r6+$2),a             ; CLIP -> thresh = 1 - CLIP*0.875/128
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         move    a,x:(r7+$12)            ; raw CLIP (0 = skip stage)
         move    a,x0
         move    #>$700000,y1            ; 0.875
@@ -62,7 +62,7 @@ proc:
         tlt     x0,b
         move    b,x:(r7+$0c)            ; thresh
         move    x:(r6+$3),a             ; CRSH
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         move    a,x:(r7+$13)
 ; BRR depth n = 1 + kn/8 (1..16), clamp 12 -- asr n / asl n keeps level
         asr     #$13,a,a                ; kn>>3 → 0..15
@@ -74,7 +74,7 @@ proc:
 ; SRR inc: $400000 = 1.0. CRSH>0 starts at $200000 (hold ~2), then
 ; asr by kn/16 more. Floor $008000 (~128-sample hold).
         move    x:(r7+$13),a
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         asr     #$14,a,a                ; kn>>4 → 0..7
         move    #>$200000,b             ; at least 2-sample hold
         tst     a
@@ -110,7 +110,7 @@ shc0:
         tlt     x0,b
         move    b,x:(r7+$0b)
         move    x:(r6+$4),a             ; FDBK / 2 (headroom)
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         asr     #$1,a,a
         move    a,x:(r7+$14)
         move    x:(r6+$5),a             ; MIX; 127 -> full scale
@@ -125,13 +125,13 @@ shc0:
         asr     #$10,a,a
         move    a,x:(r7+$16)
         move    x:(r6+$7),a             ; TONE -> lp coeff ~ TONE/256 + small
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         asr     #$1,a,a
         move    #>$040000,x0            ; floor so dark still moves
         add     x0,a
         move    a,x:(r7+$17)
         move    x:(r6+$8),a             ; RATE -> chaos step
-        and     #>$7fffff,a
+        and     #>$7f0000,a
         asr     #$4,a,a                 ; /16 so wraps are audible
         move    #>$001000,x0
         add     x0,a
@@ -156,21 +156,21 @@ shc0:
 sh00:
         move    #$1,n0
         do      n7,>sh16
-; ---- dry + feedback -------------------------------------------------------
-        move    x:(r0),b                ; dry L
-        move    x:(r7+$00),x0           ; fb L
+; ---- dry * (1+8*DRV) + feedback (fb not driven) ---------------------------
+        move    x:(r0),x0               ; dry L
+        move    x:(r7+$10),y0           ; DRV (>=0)
+        mpy     y0,x0,a                 ; DRV * dry
+        asl     #$3,a,a                 ; 8 * DRV * dry
+        add     x0,a                    ; dry * (1 + 8*DRV)
+        move    a,b
+        move    x:(r7+$00),x0           ; fb tone L
         move    x:(r7+$14),y1           ; fdbk (>=0)
         mpy     x0,y1,a
         move    a,x0
-        move    x:(r7+$07),y1           ; polarity (+/-1), mpy x0,y1 signed
+        move    x:(r7+$07),y1           ; polarity (+/-1)
         mpy     x0,y1,a
-        add     b,a                     ; in L
-; ---- DRV ------------------------------------------------------------------
-        move    a,x0
-        move    x:(r7+$10),y0           ; DRV (>=0)
-        mpy     y0,x0,a                 ; signed
-        add     x0,a                    ; in * (1 + DRV/128)
-        move    a,y0                    ; driven L
+        add     b,a                     ; driven dry + undriven fb
+        move    a,y0
 ; ---- FOLD (skip at 0) -----------------------------------------------------
         move    x:(r7+$11),a
         tst     a
@@ -272,18 +272,19 @@ sh08:
         add     b,a
         move    a,x:(r0)+n0             ; out L; r0 -> R
 ; ============================= R channel ===================================
-        move    x:(r0),b                ; dry R
+        move    x:(r0),x0               ; dry R
+        move    x:(r7+$10),y0           ; DRV
+        mpy     y0,x0,a
+        asl     #$3,a,a                 ; 8 * DRV * dry
+        add     x0,a                    ; dry * (1 + 8*DRV)
+        move    a,b
         move    x:(r7+$01),x0
         move    x:(r7+$14),y1
         mpy     x0,y1,a
         move    a,x0
         move    x:(r7+$07),y1
         mpy     x0,y1,a
-        add     b,a
-        move    a,x0
-        move    x:(r7+$10),y0
-        mpy     y0,x0,a
-        add     x0,a
+        add     b,a                     ; driven dry + undriven fb
         move    a,y0
         move    x:(r7+$11),a
         tst     a
