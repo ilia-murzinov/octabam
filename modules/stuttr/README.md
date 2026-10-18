@@ -9,9 +9,9 @@ wet path wins; MIX 0 is bit-exact dry.
 
 | page | slot | name | range | what it does |
 |---|---|---|---|---|
-| 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×128 words; FX1: (kn+1)×24) |
-| 1 | 1 | RATE | 0–127 | retrigger clock |
-| 1 | 2 | CHNC | 0–127 | stutter chance (0 = dry stage) |
+| 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×32 words; FX1: (kn+1)×8) |
+| 1 | 1 | RATE | 0–127 | re-grab clock (slow→fast; SIZE loops between grabs) |
+| 1 | 2 | CHNC | 0–127 | wet window inside a grab (0 = dry stage) |
 | 1 | 3 | FDBK | 0–127 | recirculate into the write head |
 | 1 | 4 | DECY | 0–127 | fade between retrigs |
 | 1 | 5 | MIX | 0–127 | dry/wet |
@@ -20,18 +20,18 @@ wet path wins; MIX 0 is bit-exact dry.
 
 ## Measured
 
-Local render gates only (`verify_stuttr`). Not flashed.
+Local render gates (`verify_stuttr`): SIZE sets spike repeat gaps exactly
+((kn+1)×16 samples on FX2). RATE re-grabs; between grabs SIZE loops.
 
 ## On the unit
 
-Not flashed.
+Shipped in `rms` (CHNC default was 0 / RATE too fast until the feel retune).
 
 ## Open
 
 - Project-BPM tempo sync
-- FX1 ring length voicing (shorter max SIZE)
 
 ## Gates
 
-`tools/verify/verify_stuttr.py`: MIX 0 bit-exact; CHNC 0 passthrough; LOOP
-energy on a tone; REV / DROP / SCRAM non-silent when engaged.
+`tools/verify/verify_stuttr.py`: MIX 0; CHNC 0 passthrough; LOOP / REV /
+SCRAM / DROP; SIZE loop gaps; SIZE changes gap.
