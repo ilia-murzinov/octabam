@@ -9,8 +9,9 @@ form: JOS two-zero constant-peak-gain resonator / Spectrum VOWL):
   a2 = R^2
   b0 = (1 - a2) / 2
 
-PIT1..PIT4 each set one mode's pitch (~40 Hz .. ~4 kHz). DECY sets shared
-bandwidth (high = long ring). MIX blends. Equal per-mode L/R gains.
+PIT1..PIT4 each set one mode's pitch (~40 Hz .. ~4 kHz). DECY is Rings-style
+damping: high = shorter ring (wider bw). MIX blends. Per-mode gain + wet
+makeup so MIX 127 is audibly wet, not a quiet fog under dry.
 """
 from __future__ import annotations
 
@@ -21,7 +22,11 @@ BLOCK = 16
 N_MODES = 4
 NYQ = FS * 0.5
 F_MIN, F_MAX = 40.0, 4000.0
+# Bandwidth span for R table: never near |R|=1 (self-osc / inaudible drive).
+BW_MIN, BW_MAX = 30.0, 2000.0
 PITCH_KEYS = ("PIT1", "PIT2", "PIT3", "PIT4")
+MODE_GAIN = 0.7
+WET_MAKEUP = 4.0
 
 
 def _q23(v: float) -> int:
@@ -41,9 +46,10 @@ def cos_table(n: int = 33) -> list[float]:
 
 
 def r_table(n: int = 33) -> list[float]:
+    """R = exp(-pi*bw/fs); index 0 = long (BW_MIN), index n-1 = short (BW_MAX)."""
     out = []
     for i in range(n):
-        bw = 2.0 * (400.0 / 2.0) ** (i / (n - 1))
+        bw = BW_MIN * (BW_MAX / BW_MIN) ** (i / (n - 1))
         out.append(math.exp(-math.pi * bw / FS))
     return out
 
@@ -63,22 +69,20 @@ def mix(k: int) -> float:
 
 
 class Resonator:
-    def __init__(self, PIT1=32, PIT2=48, PIT3=64, PIT4=80, DECY=100, MIX=64):
+    def __init__(self, PIT1=32, PIT2=48, PIT3=64, PIT4=80, DECY=40, MIX=90):
         self.k = dict(PIT1=PIT1, PIT2=PIT2, PIT3=PIT3, PIT4=PIT4, DECY=DECY, MIX=MIX)
         self.fu = freq_u_table()
         self.cos = cos_table()
         self.rt = r_table()
-        # per channel: x1, x2, then 4*(y1, y2)
         self.st = [[0.0] * (2 + 2 * N_MODES) for _ in range(2)]
-        self.coeffs = None  # list of (b0, m1, a2, gL, gR, mix)
+        self.coeffs = None
 
     def block(self):
         k = self.k
-        decy = k["DECY"] / 128.0
-        r0 = table_read(self.rt, 1.0 - decy)
-        r0 = max(0.5, min(0.9995, r0))
+        # high DECY = more damping = higher R-table index = shorter ring
+        r0 = table_read(self.rt, k["DECY"] / 128.0)
         m = mix(k["MIX"])
-        g = 0.25
+        g = MODE_GAIN
         coeffs = []
         for key in PITCH_KEYS:
             u = table_read(self.fu, k[key] / 128.0)
@@ -111,7 +115,7 @@ class Resonator:
                     st[yi] = y
                     g = gL if ch == 0 else gR
                     acc += g * y
-                acc = max(-1.0, min(1.0, acc))
+                acc = max(-1.0, min(1.0, acc * WET_MAKEUP))
                 m = self.coeffs[0][5]
                 outs.append(x + m * (acc - x))
             outL.append(outs[0])

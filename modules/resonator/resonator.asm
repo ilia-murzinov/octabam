@@ -9,7 +9,8 @@
 ; P table (build rewrites the one table-base literal below), 99 words:
 ;   +0 FREQ_U 33  +33 COS 33  +66 R 33
 ;
-; Knobs: r6+0..3 = PIT1..PIT4, r6+4 = DECY, r6+5 = MIX
+; Knobs: r6+0..3 = PIT1..PIT4, r6+4 = DECY (high=short), r6+5 = MIX
+; Wet = mode-sum * 4 before dry/wet blend; g per mode = 0.7.
 ;
 ; r7: $00..$09 L (x1 x2 + 4*(y1 y2)), $0a..$13 R same,
 ;     $20 dry, $21 MIX, $30..$43 4*(b0 m1 a2 gL gR),
@@ -51,12 +52,8 @@ proc:
         move    #>$7fffff,x0
         teq     x0,a
         move    a,x:(r7+$21)
-; DECY -> R0 (high DECY = long ring = low bw index)
+; DECY -> R0 (high DECY = more damping = higher bw index = shorter)
         move    x:(r6+$4),a
-        and     #>$7f0000,a
-        move    a,x1
-        move    #>$7f0000,a
-        sub     x1,a
         and     #>$7f0000,a
         move    x:(r7+$5a),r5
         move    #$42,n5                 ; +66 = R table
@@ -101,6 +98,7 @@ rs_bld:
         move    #$30,n3
         move    (r3)+n3
         bsr     rs_chan
+        asl     #$2,a,a                 ; wet makeup x4 (store limits)
         move    a,y0
         move    x:(r0),a
         move    y0,b
@@ -120,6 +118,7 @@ rs_bld:
         move    #$30,n3
         move    (r3)+n3
         bsr     rs_chan
+        asl     #$2,a,a                 ; wet makeup x4
         move    a,y0
         move    x:(r0),a
         move    y0,b
@@ -267,7 +266,7 @@ rs_chan:
         move    b,a
         rts
 
-; Build mode $4b: read PITn from r6+$4b, LUT u / cos, shared R0, g=0.25.
+; Build mode $4b: read PITn from r6+$4b, LUT u / cos, shared R0, g=0.7.
 rs_build:
         move    r6,r5
         move    x:(r7+$4b),a
@@ -331,7 +330,7 @@ rs_build:
         move    x0,x:(r1)+
         move    x:(r7+$51),x0
         move    x0,x:(r1)+
-        move    #>$200000,x0            ; gL = gR = 0.25
+        move    #>$59999a,x0            ; gL = gR = 0.7
         move    x0,x:(r1)+
         move    x0,x:(r1)+
         rts
