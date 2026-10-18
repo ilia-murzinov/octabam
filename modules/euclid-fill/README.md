@@ -66,11 +66,23 @@ FUNC + PAGE (SCALE SETUP) and PAGE alone stay stock.
   recipe from ERASE_EMPTY_TRIGLESS_LOCKS; the window stack follows TUNER.
 - `make check REMIX=euclid-fill` builds and boots under the ColdFire port.
 - `tools/verify/verify_euclid_fill.py` checks the Euclidean bit pattern
-  against the same `(i·k) % n < k` law as `modules/euclid/control.c`.
+  against the same `(i·k) % n < k` law as `modules/euclid/control.c`, plus
+  the CUE/`ef_rng` d1-clobber hang model and relative RAND VEL / RAND PTCH
+  math.
 
 ## On the unit
 
-Not hardware-tested.
+Author, CF, 16 Oct 2026. Tried:
+
+| | sample track | FM track | SY track |
+|---|---|---|---|
+| YES, RAND PTCH > 0, SCALE on | yes — locks in-scale around Part PTCH | yes — encoding was ±60 until the sample/FM split; after fix, ±range around Part PTCH | yes — Part `"SY",1` uses the same `64+st` branch as FM |
+| CUE, RAND PTCH > 0 | yes — earlier hang (d1/`ef_rng`) fixed | yes | yes |
+| SCALE off | yes — no PTCH locks written | yes | yes |
+| RAND VEL relative to Part AMP VOL + `%` draw | yes | yes | yes |
+
+Unit class not recorded here. Also: cursory testing on Sam's MKII (owner
+report, 16 Oct 2026) for the STEPS / PULSE / ROT base page.
 
 ## Gates
 

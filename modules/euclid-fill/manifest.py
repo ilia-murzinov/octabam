@@ -26,9 +26,14 @@ MODULE = Module(
     category=Category.MACHINES,
     author="iliamurzinov",
     author_url="https://github.com/iliamurzinov",
-    proof=Proof.CHECK,
-    proof_note="builds and boots under the port; fill math gated in verify_euclid_fill",
-    doc="TRACK + PAGE: Euclidean sample-trig fill (STEPS=pattern len / PULSE / ROT / RAND VEL / RAND PTCH; CUE = random k-subset; RAND VEL/RAND PTCH = optional VOL/PTCH locks).",
+    proof=Proof.HARDWARE,
+    proof_note="YES/CUE with RAND PTCH>0 on sample + FM (+ SY encoding path), "
+               "SCALE on/off, relative RAND VEL (author, CF, 16 Oct 2026); "
+               "also cursory on Sam's MKII (owner report, 16 Oct 2026); "
+               "builds and boots under the port; fill math gated in verify_euclid_fill",
+    doc="TRACK + PAGE: Euclidean sample-trig fill (STEPS=pattern len / PULSE / ROT / "
+        "RAND VEL / RAND PTCH; CUE = random k-subset; RAND VEL = VOL locks; "
+        "RAND PTCH = in-scale range around Part PLAYBACK PTCH).",
     linked=(Linked("ef", "modules/euclid-fill/euclid_fill.s", dram=True),),
     detours=(
         Detour(PAGE, PAGE_STOCK, "ef", "ef_page",
