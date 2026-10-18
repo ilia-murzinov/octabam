@@ -14,6 +14,8 @@ time (`.incbin`, `make os`).
 | Roland SDD-320 Dimension D service notes + published measurements | laws only | — | `modules/modulation` DIM (the mix amounts were voiced here, not taken from the notes) |
 | J. Dattorro, *Effect Design Part 2*, JAES 45(10), 1997 | paper (laws) | AES | `modules/modulation` FLNG (Table 6) |
 | Mutable Instruments Rings `string.h` / `string.cc` | MIT | Emilie Gillet | `modules/modulation` COMB |
+| Mutable Instruments Rings modal resonator (design / voicing; not a line port) | MIT | Emilie Gillet | `modules/resonator` |
+| JOS two-zero constant-peak-gain resonator (via Spectrum VOWL form) | MIT | Julius O. Smith / audiojs | `modules/resonator` (same form as `modules/spectrum` VOWL) |
 | Mutable Instruments Clouds `clouds/dsp/fx/reverb.h`, `fx_engine.h` (Griesinger plate) | MIT | Emilie Gillet | `modules/gateverb` |
 | Mutable Instruments Clouds (the published design; no code) | MIT | Emilie Gillet | `modules/busdelay` GRAIN (the grain readers, by way of the removed `modules/nimbus`) |
 | ChowDSP ChowPhaser (Schulte Compact Phasing A model) | BSD-3-Clause | Jatin Chowdhury | `modules/modulation` PHSR |
