@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""RESONATOR render gates against predictable arithmetic and the float ref.
+"""RESONATOR render gates against predictable arithmetic.
 
 Gates:
   MIX=0       bit-exact passthrough with modes live
-  defaults    MIX 0 default -> bit-exact on a ramp
+  defaults    MIX 64 default still runs (not bit-exact)
   both signs  negated in -> negated out within a few LSB
   impulse     energy after the hit > silence floor (rings)
   DECY        longer DECY keeps more late energy than short DECY
+  PIT         moving one pitch changes the wet output
   FX2 dry     r7 FX2 alloc -> bit-exact dry
   refuse SEND alias
 """
-import importlib.util, math, pathlib, struct, subprocess, sys
-
-import numpy as np
+import importlib.util, pathlib, struct, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import toolpath  # noqa: E402,F401
@@ -55,16 +54,10 @@ def params(**kw):
     return v
 
 
-def q23(x):
-    return [max(-(1 << 23), min((1 << 23) - 1, int(round(s * (1 << 23)))))
-            for s in x]
-
-
 def render(samples, fx2=False, **kw):
     n = len(samples) - len(samples) % FRAMES
     src, out = TMP / "in.raw", TMP / "out.raw"
     src.write_bytes(b"".join(struct.pack("<i", m) for m in samples[:n]))
-    # FX1: -r7 1 -alloc 0; FX2 dry: alloc base >= 0x4000
     cmd = [HOST, "-mem", MEM, "-init", f"{init:x}", "-proc", f"{proc:x}",
            "-inst", "1", "-r7", "1",
            "-alloc", "4000" if fx2 else "0",
@@ -91,40 +84,36 @@ def check(label, ok, detail=""):
 N = 4096
 ramp = [int((i * 2 * (1 << 23) // N) - (1 << 23)) for i in range(N)]
 
-L, R = render(ramp)
-check("defaults (MIX 0): bit-exact passthrough", L == ramp[:len(L)] and R == ramp[:len(R)])
-
-L, R = render(ramp, MIX=0, FREQ=90, STRU=127, DECY=127, BRIT=127, POS=90, BODY=1)
+L, R = render(ramp, MIX=0, PIT1=90, PIT2=100, PIT3=110, PIT4=120, DECY=127)
 check("MIX 0 with modes driven: bit-exact", L == ramp[:len(L)] and R == ramp[:len(R)])
+
+L, R = render(ramp)
+check("defaults render", len(L) == len(ramp) - len(ramp) % FRAMES)
 
 # both signs
 imp = [0] * 64 + [int(0.5 * (1 << 23))] + [0] * (N - 65)
-Lp, _ = render(imp, MIX=127, FREQ=50, DECY=100, BRIT=100, BODY=0)
-Ln, _ = render([-s for s in imp], MIX=127, FREQ=50, DECY=100, BRIT=100, BODY=0)
-# Truncation through the 4-mode bank is not bit-antisymmetric; an mpysu on
-# a negative second operand would be off by millions of LSB.
+Lp, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=100)
+Ln, _ = render([-s for s in imp], MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=100)
 sdev = max(abs(a + b) for a, b in zip(Lp, Ln))
 check(f"both signs within 2048 LSB (max {sdev})", sdev <= 2048)
 
-# rings: late energy after impulse
 late = sum(abs(x) for x in Lp[200:800])
 check(f"impulse rings (late energy {late})", late > 1000)
 
-# DECY: longer decay keeps more late energy
-Lshort, _ = render(imp, MIX=127, FREQ=50, DECY=20, BRIT=100, BODY=0)
-Llong, _ = render(imp, MIX=127, FREQ=50, DECY=120, BRIT=100, BODY=0)
+Lshort, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=20)
+Llong, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=120)
 e_s = sum(abs(x) for x in Lshort[400:1200])
 e_l = sum(abs(x) for x in Llong[400:1200])
 check(f"DECY longer keeps more late energy ({e_l} > {e_s})", e_l > e_s * 1.05)
 
-# FX2 dry
-L, R = render(ramp, fx2=True, MIX=127, FREQ=90, DECY=127)
-check("FX2 instance: bit-exact dry", L == ramp[:len(L)] and R == ramp[:len(R)])
+# one pitch change moves the wet output
+La, _ = render(imp, MIX=127, PIT1=20, PIT2=20, PIT3=20, PIT4=20, DECY=100)
+Lb, _ = render(imp, MIX=127, PIT1=100, PIT2=20, PIT3=20, PIT4=20, DECY=100)
+diff = sum(abs(a - b) for a, b in zip(La, Lb))
+check(f"PIT1 change moves wet (diff {diff})", diff > 1000)
 
-# every BODY renders
-for body in range(3):
-    L, R = render(imp, MIX=64, BODY=body, FREQ=40, DECY=80)
-    check(f"BODY {body} renders", len(L) == len(imp) - len(imp) % FRAMES)
+L, R = render(ramp, fx2=True, MIX=127, PIT1=90, DECY=127)
+check("FX2 instance: bit-exact dry", L == ramp[:len(L)] and R == ramp[:len(R)])
 
 if FAILS:
     sys.exit(f"{len(FAILS)} FAIL: {FAILS}")

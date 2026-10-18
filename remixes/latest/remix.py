@@ -3,7 +3,7 @@
 CORE + STEM REC (AUDIO/STEMS/<project>/time) + COPY PROJECT + RECBUF PERSIST
 + EUCLID FILL / RND NAME / reload CUE+TRACK gate + glitch inserts + synth/FX.
 SYNTH MACHINE at fc24064: LFO 1 / LFO 2 assign VOIC and CHRD (LFO 3 muted).
-RESONATOR on FX1 (id 0x1e); DARK REV harvested so the modal bank fits.
+RESONATOR on FX1 (id 0x1b; PIT1–4 + DECY + MIX); DARK REV harvested so it fits.
 """
 
 from remix.schema import Pin, Proof, Remix
