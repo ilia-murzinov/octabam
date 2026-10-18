@@ -117,12 +117,12 @@ Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2)
 check("DROP renders", len(Ld) == len(tone) - len(tone) % FRAMES)
 
 # Spike after clear; auto-grab once the ring holds SIZE. SIZE = loop period.
-# FX2 words=(kn+1)*32 -> stereo frames=(kn+1)*16.
-Nspike = CLEAR + 6000
+# FX2 words=(kn+1)*128 -> stereo frames=(kn+1)*64.
+Nspike = CLEAR + 12000
 
 
 def size_frames(kn):
-    return (kn + 1) * 16
+    return (kn + 1) * 64
 
 
 def spike_in(kn):
@@ -132,7 +132,7 @@ def spike_in(kn):
     return s
 
 
-for kn in (0, 3, 7):
+for kn in (0, 2, 4):
     expect = size_frames(kn)
     Lw, _ = render(spike_in(kn), SIZE=kn, RATE=0, CHNC=127, MIX=127, MODE=0,
                    DECY=0, FDBK=0)
@@ -140,20 +140,30 @@ for kn in (0, 3, 7):
     good = [g for g in gaps if abs(g - expect) <= 2]
     check(f"SIZE={kn} loop gap~{expect}",
           len(peaks) >= 3 and len(good) >= 2,
-          f"peaks={len(peaks)} gaps={gaps[:8]} matched={len(good)}")
+          f"peaks={len(peaks)} gaps={gaps[:6]} matched={len(good)}")
 
 g0 = peak_gaps(render(spike_in(0), SIZE=0, RATE=0, CHNC=127, MIX=127, MODE=0,
                       DECY=0, FDBK=0)[0])[1]
-g7 = peak_gaps(render(spike_in(7), SIZE=7, RATE=0, CHNC=127, MIX=127, MODE=0,
+g4 = peak_gaps(render(spike_in(4), SIZE=4, RATE=0, CHNC=127, MIX=127, MODE=0,
                       DECY=0, FDBK=0)[0])[1]
 med = lambda gs: sorted(gs)[len(gs) // 2] if gs else 0
-check("SIZE changes gap", med(g0) < med(g7) and med(g0) > 0,
-      f"med0={med(g0)} med7={med(g7)}")
+check("SIZE changes gap", med(g0) < med(g4) and med(g0) > 0,
+      f"med0={med(g0)} med4={med(g4)}")
 
-# Continuous tone must stay audible with defaults (not muted by DECY/empty loop)
-Lt, _ = render(tone + tone, SIZE=16, RATE=96, CHNC=127, MIX=127, MODE=0, DECY=0)
+# RATE must not be faster than SIZE or the loop never completes (the unit bug).
+# SIZE=4 -> 320 frames; RATE=40 step=0x80+(40<<5)=0x580 -> period ~5958 samples.
+Lt, _ = render(tone + tone, SIZE=40, RATE=40, CHNC=127, MIX=127, MODE=0, DECY=0)
 check("tone stays loud", max(abs(x) for x in Lt[CLEAR:]) > (1 << 20),
       f"peak={max(abs(x) for x in Lt[CLEAR:])}")
+
+# At SIZE max-ish with slow RATE, gap stays near SIZE (not collapsed to ~2ms).
+Lbig, _ = render(spike_in(4), SIZE=4, RATE=20, CHNC=127, MIX=127, MODE=0,
+                 DECY=0, FDBK=0)
+gaps_r = peak_gaps(Lbig)[1]
+good_r = [g for g in gaps_r if abs(g - size_frames(4)) <= 2]
+check("RATE=20 keeps SIZE loop",
+      len(good_r) >= 2,
+      f"gaps={gaps_r[:6]} expect~{size_frames(4)}")
 
 for name in K:
     render(ramp[:FRAMES * 8], **{name: 64})

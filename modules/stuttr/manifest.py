@@ -29,10 +29,10 @@ MODULE = Module(
         build_tag=True,
     ),
     params=(
-        Param(b"SIZE", 16, active=True, formatter=_P,
-              doc="slice length (FX2: (kn+1)*32 words); short = machine-gun"),
-        Param(b"RATE", 96, active=True, formatter=_P,
-              doc="re-grab speed (slow left, fast right)"),
+        Param(b"SIZE", 40, active=True, formatter=_P,
+              doc="slice length (FX2: (kn+1)*128 words, ~3..186 ms)"),
+        Param(b"RATE", 40, active=True, formatter=_P,
+              doc="re-grab speed (slow left, fast right); keep below SIZE"),
         Param(b"CHNC", 127, active=True, formatter=_P,
               doc="0 = dry stage; non-zero = stutter when a slice is held"),
         Param(b"FDBK", 0, active=True, formatter=_P,
@@ -61,6 +61,6 @@ MODULE = Module(
     claims=Claims(stock_instance_buffer=True, buffer_words=16384),
     harness=Harness(layout_char="M", is_server=False),
     gates=(Gate("tools/verify/verify_stuttr.py", remix_arg=False),),
-    dear={"SIZE": 12, "RATE": 100, "CHNC": 127, "FDBK": 0, "DECY": 0,
+    dear={"SIZE": 48, "RATE": 36, "CHNC": 127, "FDBK": 0, "DECY": 0,
           "MIX": 127, "MODE": 0, "SYNC": 0},
 )

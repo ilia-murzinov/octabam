@@ -9,8 +9,8 @@ effect after a flash if an old Part still has CHNC at 0.
 
 | page | slot | name | range | what it does |
 |---|---|---|---|---|
-| 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×32 words; FX1: (kn+1)×8) |
-| 1 | 1 | RATE | 0–127 | re-grab clock (slow→fast; SIZE loops between grabs) |
+| 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×128 words ≈ 3–186 ms) |
+| 1 | 1 | RATE | 0–127 | re-grab clock (slow→fast). If RATE is faster than SIZE, SIZE never finishes a loop |
 | 1 | 2 | CHNC | 0–127 | 0 = dry; any other = stutter after first grab |
 | 1 | 3 | FDBK | 0–127 | recirculate into the write head |
 | 1 | 4 | DECY | 0–127 | fade between grabs (0 = hold) |
