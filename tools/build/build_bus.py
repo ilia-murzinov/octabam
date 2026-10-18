@@ -3549,7 +3549,12 @@ hostquit:
         _appends[_platform_at] = (
             "octabam loader + payloads (" + ", ".join(_pnames) + ")", _pappend)
         _raw = pathlib.Path("out/platform/runtime.raw").read_bytes()
-        if any(_lo <= int.from_bytes(_raw[_o:_o + 4], "big") < _hi
+        # Even offsets only; skip odd values (a DRAM pointer whose low half is
+        # 0x4011 next to a 0001 word reads as 0x40110001 spanning the pair —
+        # not a clone pointer). Real staging refs are even and inside a clone.
+        if any((_lo <= (v := int.from_bytes(_raw[_o:_o + 4], "big")) < _hi)
+               and (v & 1) == 0
+               and (v - _lo) % CLONE_STRIDE < DESC_LEN
                for _o in range(0, len(_raw) - 3, 2)):
             sys.exit("descriptor clones: the DRAM runtime still holds a staging address")
 
