@@ -9,7 +9,7 @@ wet path wins; MIX 0 is bit-exact dry.
 
 | page | slot | name | range | what it does |
 |---|---|---|---|---|
-| 1 | 0 | SIZE | 0–127 | slice length |
+| 1 | 0 | SIZE | 0–127 | slice length (FX2: (kn+1)×128 words; FX1: (kn+1)×24) |
 | 1 | 1 | RATE | 0–127 | retrigger clock |
 | 1 | 2 | CHNC | 0–127 | stutter chance (0 = dry stage) |
 | 1 | 3 | FDBK | 0–127 | recirculate into the write head |
