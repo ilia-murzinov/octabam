@@ -12,7 +12,7 @@ this one is self-modulating destruction.
 
 | page | slot | name | range | what it does |
 |---|---|---|---|---|
-| 1 | 0 | DRV | 0–127 | pre-gain (~×2 / +6 dB at 127); 0 = unity |
+| 1 | 0 | DRV | 0–127 | pre-gain into the folder; 0 skips drive |
 | 1 | 1 | FOLD | 0–127 | wavefolder; 0 skips |
 | 1 | 2 | CLIP | 0–127 | clip amount (0 open, 127 brick) |
 | 1 | 3 | CRSH | 0–127 | bit + sample-rate crush |
