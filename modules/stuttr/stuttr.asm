@@ -126,8 +126,8 @@ st17:
         and     #>$7fffff,a
         move    a,x:(r7+$31)
         move    x:(r6+$4),a             ; DECY -> step (0 = hold)
-        and     #>$7fffff,a
-        asr     #$8,a,a
+        and     #>$7f0000,a
+        asr     #$7,a,a                 ; kn<<9: kn64 fades ~6 ms, kn16 ~23 ms
         move    a,x:(r7+$32)
         move    x:(r6+$5),a             ; MIX
         and     #>$7f0000,a
@@ -216,7 +216,7 @@ st05:
         add     #>$2d,a
         move    a,x:(r7+$2e)
 st04:
-; default wet = dry
+; default wet = dry (CHNC off / not yet grabbed)
         move    x:(r0),a
         move    a,x:(r7+$2f)
         move    x:(r0+n0),a
@@ -227,9 +227,14 @@ st04:
         move    x:(r7+$2b),a            ; need a grab first
         tst     a
         beq     st10
-        move    x:(r7+$2c),a            ; gain 0 -> dry (not muted hole)
+        move    x:(r7+$2c),a            ; gain 0 -> silence (NOT dry)
         tst     a
-        beq     st10
+        bne     st27
+        clr     a
+        move    a,x:(r7+$2f)
+        move    a,x:(r7+$30)
+        bra     st10
+st27:
 ; addr = start + offset (+ SCRAM), fold into ring, read
         move    x:(r7+$33),a
         move    x:(r7+$2a),x0
