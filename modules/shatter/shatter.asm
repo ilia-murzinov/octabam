@@ -6,7 +6,7 @@
 ; No bus, no buffers, no shared window.
 ;
 ;   in  = dry + FDBK * fb * polarity
-;   d   = in * (1 + DRV)                 DRV 0 skips (unity)
+;   d   = in * (1 + 8*DRV)               DRV 0 = unity; 127 ≈ ×9 (+19 dB)
 ;   f   = fold(d) or d                   FOLD 0 skips
 ;   c   = hard/soft clip(f)              MODE HARD / SOFT / CHAOS
 ;   w   = srr then brr(c)                CRSH (LOFI2-style $400000 phase)
@@ -43,8 +43,8 @@ init:
 
 proc:
 ; ---- knobs (mask LFO dirt) ------------------------------------------------
-        move    x:(r6+$0),a             ; DRV -> gain addend DRV/128
-        and     #>$7fffff,a
+        move    x:(r6+$0),a             ; DRV (×8 applied in sample loop)
+        and     #>$7f0000,a             ; LFO low byte must not leak
         move    a,x:(r7+$10)
         move    x:(r6+$1),a             ; FOLD
         and     #>$7fffff,a
@@ -168,8 +168,9 @@ sh00:
 ; ---- DRV ------------------------------------------------------------------
         move    a,x0
         move    x:(r7+$10),y0           ; DRV (>=0)
-        mpy     y0,x0,a                 ; signed
-        add     x0,a                    ; in * (1 + DRV/128)
+        mpy     y0,x0,a                 ; DRV * in
+        asl     #$3,a,a                 ; 8 * DRV * in
+        add     x0,a                    ; in * (1 + 8*DRV) ≈ ×9 at 127
         move    a,y0                    ; driven L
 ; ---- FOLD (skip at 0) -----------------------------------------------------
         move    x:(r7+$11),a
@@ -281,9 +282,10 @@ sh08:
         mpy     x0,y1,a
         add     b,a
         move    a,x0
-        move    x:(r7+$10),y0
+        move    x:(r7+$10),y0           ; DRV
         mpy     y0,x0,a
-        add     x0,a
+        asl     #$3,a,a                 ; 8 * DRV * in
+        add     x0,a                    ; in * (1 + 8*DRV)
         move    a,y0
         move    x:(r7+$11),a
         tst     a
