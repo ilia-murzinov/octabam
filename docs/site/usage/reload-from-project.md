@@ -5,3 +5,5 @@ transport.
 
 - [PTN] + [TRACK n]: reload the track's sequence from the project.
 - [BANK] + [TRACK n]: re-apply the saved Part.
+
+[CUE] + [TRACK n] is stock cue behaviour, not a reload.
