@@ -103,6 +103,13 @@ check("SCRAM non-zero", max(abs(x) for x in Ls) > (1 << 14),
 Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2)
 check("DROP renders", len(Ld) == len(tone) - len(tone) % FRAMES)
 
+# Integer SIZE: small vs large slice must not be bit-identical under LOOP.
+L_sm, _ = render(tone, CHNC=127, MIX=127, SIZE=8, RATE=120, MODE=0, DECY=0)
+L_lg, _ = render(tone, CHNC=127, MIX=127, SIZE=100, RATE=120, MODE=0, DECY=0)
+check("SIZE changes loop", L_sm != L_lg,
+      f"identical={L_sm == L_lg} peak_sm={max(abs(x) for x in L_sm)} "
+      f"peak_lg={max(abs(x) for x in L_lg)}")
+
 for name in K:
     render(ramp[:FRAMES * 8], **{name: 64})
 check("every named knob renders", True)
