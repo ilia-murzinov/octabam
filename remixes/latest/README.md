@@ -1,4 +1,4 @@
-# rms
+# latest
 
 Ilia's flash remix with **every open fix** + FM SYNTH **LFO 1 / 2 → VOIC / CHRD**.
 
@@ -17,8 +17,8 @@ Ilia's flash remix with **every open fix** + FM SYNTH **LFO 1 / 2 → VOIC / CHR
 ## Build
 
 ```bash
-make image REMIX=rms BUILD=SC
+make image REMIX=latest BUILD=SC
 ```
 
 - Card flash: `out/OCTATRACK_OCTABAMSC.bin` → OS UPGRADE
-- BRAIN switch: `out/RMS SC.RMX` → `/BRAIN/REMIXES/`
+- BRAIN switch: `out/LATEST SC.RMX` → `/BRAIN/REMIXES/`

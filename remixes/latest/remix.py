@@ -1,4 +1,4 @@
-"""rms -- Ilia's flash stack with every open fix + FM SYNTH LFO → VOIC/CHRD.
+"""latest -- Ilia's flash stack with every open fix + FM SYNTH LFO → VOIC/CHRD.
 
 CORE + STEM REC (AUDIO/STEMS/<project>/time) + COPY PROJECT + RECBUF PERSIST
 + EUCLID FILL / RND NAME / reload CUE+TRACK gate + glitch inserts + synth/FX.
@@ -22,7 +22,7 @@ CORE = (
 )
 
 REMIX = Remix(
-    name="rms",
+    name="latest",
     family="mods",
     proof=Proof.RENDER,
     proof_note="all open fork fixes + FM SYNTH LFO 1/2 → VOIC/CHRD (synth fc24064).",
