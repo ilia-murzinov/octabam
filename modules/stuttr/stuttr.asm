@@ -10,7 +10,8 @@
 ;    $2d dir $2e scram $2f wetL $30 wetR $31 fdbk $32 decy
 ;    $33 slice start (absolute); read = start + offset, folded into ring
 ; Labels st00.. only. mpy x0,y1 / y0,x0 / x0,x0 only. init keeps r1. No rep.
-; SIZE is integer words (never fractional mpy): FX2 (kn+1)<<7, FX1 (kn+1)*24.
+; SIZE words (integer): FX2 (kn+1)*32, FX1 (kn+1)*8. Min 8, even.
+; RATE clock step: 0x100+(kn<<9) -> ~1.5s .. ~128 samples between re-grabs.
 ; ---------------------------------------------------------------------------
 
 init:
@@ -27,6 +28,7 @@ st00:
         move    x:(r4),a
         move    a,x:(r7+$20)
         move    a,x:(r7+$21)
+        move    a,x:(r7+$33)            ; slice start = base until first grab
         move    #>$80,a
         move    a,x:(r7+$22)
         move    #>$4000,x0
@@ -41,6 +43,7 @@ st00:
         move    x0,x:(r7+$2c)
         move    #>$1,x0
         move    x0,x:(r7+$2d)
+        move    x0,x:(r7+$2b)            ; armed: loop before first RATE grab
         rts
 
 proc:
@@ -61,8 +64,7 @@ st02:
         nop
         rts
 st01:
-; SIZE -> slice length in words (stereo pairs = size/2). Integer, not mpy:
-; FX2 maxlen 16384: (kn+1)<<7 ; FX1 maxlen 3072: (kn+1)*24. Min 8, even.
+; SIZE -> slice length in words. Short grains: FX2 (kn+1)*32, FX1 (kn+1)*8.
         move    x:(r6+$0),a
         and     #>$7f0000,a             ; LFO low byte must not leak
         asr     #$10,a,a                ; kn 0..127
@@ -72,13 +74,10 @@ st01:
         move    #>$4000,y0
         cmp     y0,b
         bne     st20                    ; FX1 path
-        asl     #$7,a,a                 ; FX2: (kn+1)*128
+        asl     #$5,a,a                 ; FX2: (kn+1)*32  (32..4096 words)
         bra     st21
 st20:
-        move    x0,b                    ; (kn+1)*24 = <<4 + <<3
-        asl     #$4,a,a
-        asl     #$3,b,b
-        add     b,a
+        asl     #$3,a,a                 ; FX1: (kn+1)*8   (8..1024 words)
 st21:
         move    #>$8,x0
         cmp     x0,a
@@ -88,11 +87,13 @@ st21:
         tgt     x0,a
         and     #>$fffffe,a
         move    a,x:(r7+$24)
-        move    x:(r6+$1),a             ; RATE
-        and     #>$7fffff,a
-        asr     #$4,a,a
-        move    #>$002000,x0
-        add     x0,a
+; RATE -> clock step. Overflow at 0x800000 ≈ re-grab period.
+; step = 0x100 + (kn<<9): kn0 ≈ 1.5s, kn127 ≈ 128 samples.
+        move    x:(r6+$1),a
+        and     #>$7f0000,a
+        asr     #$10,a,a                ; kn 0..127
+        asl     #$9,a,a                 ; kn*512
+        add     #>$100,a
         move    x:(r6+$7),b             ; SYNC 0=FREE 1=/16 2=/8 3=/4
         and     #>$7f0000,b
         asr     #$10,b,b

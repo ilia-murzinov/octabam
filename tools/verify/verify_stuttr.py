@@ -4,9 +4,10 @@
   MIX=0       -> bit-exact passthrough
   CHNC=0      -> dry glitch stage (near passthrough at MIX 127)
   LOOP        -> energy on a tone when CHNC open
-  REV         -> non-silent when engaged
-  SCRAM       -> non-zero output when engaged
-  DROP        -> renders (may be quieter)
+  REV/SCRAM   -> non-silent when engaged
+  DROP        -> renders
+  SIZE        -> spike after clear repeats at ~SIZE/2 sample gaps
+  RATE slow   -> several SIZE loops land before the next grab
   every knob  -> renders without dsp_host dying
 """
 import pathlib, struct, subprocess, sys
@@ -25,6 +26,8 @@ FXID = MOD.menu.fx2_id
 FRAMES = 15
 TMP = pathlib.Path("out/_stgate")
 TMP.mkdir(parents=True, exist_ok=True)
+# init clears 0x80 procs before audio runs
+CLEAR = 0x80 * FRAMES
 
 pathlib.Path(MEM).unlink(missing_ok=True)
 subprocess.run([sys.executable, "tools/remix/audition.py", MOD.name, "out/dry/drums_110.wav"],
@@ -61,6 +64,16 @@ def render(samples, **kw):
         sys.exit(f"dsp_host failed for {kw}:\n{r.stdout}\n{r.stderr}")
     w = struct.unpack(f"<{len(out.read_bytes()) // 4}i", out.read_bytes())
     return list(w[0::2])[:n], list(w[1::2])[:n]
+
+
+def peak_gaps(xs, thr=(1 << 17)):
+    peaks = [i for i, x in enumerate(xs) if abs(x) > thr]
+    sep = []
+    for p in peaks:
+        if not sep or p - sep[-1] >= 2:
+            sep.append(p)
+    gaps = [sep[i + 1] - sep[i] for i in range(len(sep) - 1)]
+    return sep, gaps
 
 
 FAILS = []
@@ -103,12 +116,39 @@ check("SCRAM non-zero", max(abs(x) for x in Ls) > (1 << 14),
 Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2)
 check("DROP renders", len(Ld) == len(tone) - len(tone) % FRAMES)
 
-# Integer SIZE: small vs large slice must not be bit-identical under LOOP.
-L_sm, _ = render(tone, CHNC=127, MIX=127, SIZE=8, RATE=120, MODE=0, DECY=0)
-L_lg, _ = render(tone, CHNC=127, MIX=127, SIZE=100, RATE=120, MODE=0, DECY=0)
-check("SIZE changes loop", L_sm != L_lg,
-      f"identical={L_sm == L_lg} peak_sm={max(abs(x) for x in L_sm)} "
-      f"peak_lg={max(abs(x) for x in L_lg)}")
+# Spike in the first slice (start=base until RATE grabs). SIZE = loop period.
+# FX2 words=(kn+1)*32 -> stereo frames=(kn+1)*16.
+Nspike = CLEAR + 4000
+
+
+def size_frames(kn):
+    return (kn + 1) * 16
+
+
+def spike_in():
+    s = [0] * Nspike
+    s[CLEAR + 2] = 1 << 22  # lands inside every SIZE>=0 slice at base
+    return s
+
+
+for kn in (0, 3, 7):
+    expect = size_frames(kn)
+    # RATE=0 -> ~1.5s before re-grab; many SIZE loops
+    Lw, _ = render(spike_in(), SIZE=kn, RATE=0, CHNC=127, MIX=127, MODE=0,
+                   DECY=0, FDBK=0)
+    peaks, gaps = peak_gaps(Lw)
+    good = [g for g in gaps if abs(g - expect) <= 2]
+    check(f"SIZE={kn} loop gap~{expect}",
+          len(peaks) >= 3 and len(good) >= 2,
+          f"peaks={len(peaks)} gaps={gaps[:8]} matched={len(good)}")
+
+g0 = peak_gaps(render(spike_in(), SIZE=0, RATE=0, CHNC=127, MIX=127, MODE=0,
+                      DECY=0, FDBK=0)[0])[1]
+g7 = peak_gaps(render(spike_in(), SIZE=7, RATE=0, CHNC=127, MIX=127, MODE=0,
+                      DECY=0, FDBK=0)[0])[1]
+med = lambda gs: sorted(gs)[len(gs) // 2] if gs else 0
+check("SIZE changes gap", med(g0) < med(g7) and med(g0) > 0,
+      f"med0={med(g0)} med7={med(g7)}")
 
 for name in K:
     render(ramp[:FRAMES * 8], **{name: 64})
