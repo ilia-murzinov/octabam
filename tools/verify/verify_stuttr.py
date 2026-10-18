@@ -10,6 +10,7 @@
   RATE slow   -> several SIZE loops land before the next grab
   every knob  -> renders without dsp_host dying
 """
+import math
 import pathlib, struct, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
@@ -164,6 +165,39 @@ good_r = [g for g in gaps_r if abs(g - size_frames(4)) <= 2]
 check("RATE=20 keeps SIZE loop",
       len(good_r) >= 2,
       f"gaps={gaps_r[:6]} expect~{size_frames(4)}")
+
+# DECY must fade the loop, then silence — not snap back to dry (MIX leak).
+Ndec = CLEAR + 8000
+spike = [0] * Ndec
+spike[CLEAR + size_frames(2) - 2] = 1 << 22
+Ldec = render(spike, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=24, FDBK=0)[0]
+amps = []
+seen = []
+for i, x in enumerate(Ldec):
+    if abs(x) <= (1 << 17):
+        continue
+    if seen and i - seen[-1] < 3:
+        continue
+    seen.append(i)
+    amps.append(abs(x))
+    if len(amps) >= 6:
+        break
+check("DECY fades loop",
+      len(amps) >= 2 and amps[-1] < amps[0] // 2,
+      f"amps={amps}")
+# Tail after fade: near silence, not a copy of dry (dry would be 0 here too on
+# silence input — use a continuous dry tone under MIX 127 after forced fade).
+tone_d = [int(0.25 * (1 << 23) * math.sin(2 * 3.14159265 * 220 * i / 44100))
+          for i in range(Ndec)]
+# High DECY + tiny SIZE: gain dies fast; remainder of buffer must stay quiet
+# at MIX 127 (old bug: wet fell back to dry → full tone through).
+Lquiet = render(tone_d, SIZE=0, RATE=0, CHNC=127, MIX=127, DECY=127, FDBK=0)[0]
+tail = Lquiet[CLEAR + 800:CLEAR + 2500]
+peak_tail = max(abs(x) for x in tail) if tail else 0
+peak_dry = max(abs(x) for x in tone_d[CLEAR + 800:CLEAR + 2500])
+check("MIX127 after DECY is silent not dry",
+      peak_tail < peak_dry // 8,
+      f"peak_tail={peak_tail} peak_dry={peak_dry}")
 
 for name in K:
     render(ramp[:FRAMES * 8], **{name: 64})
