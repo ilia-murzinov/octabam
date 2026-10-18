@@ -87,6 +87,16 @@ jump_s = max((abs(Ls[i] - Ls[i - 1]) for i in range(1, len(Ls))), default=0)
 check("silence stays quiet", peak_s < (1 << 12) and jump_s < (1 << 12),
       f"peak={peak_s} maxjump={jump_s}")
 
+# Hardware hush: LSB noise + FOLD+FDBK used to self-oscillate into clicks
+import random
+rnd = random.Random(1)
+hush = [rnd.randint(-64, 64) for _ in range(N)]
+Lh, _ = render(hush, DRV=127, FOLD=100, CLIP=80, CRSH=80, FDBK=80, MIX=127, MODE=0)
+clicks = sum(1 for i in range(1, len(Lh)) if abs(Lh[i] - Lh[i - 1]) > (1 << 16))
+peak_h = max(abs(x) for x in Lh)
+check("hush no FOLD+FDBK clicks", clicks == 0 and peak_h < (1 << 17),
+      f"clicks={clicks} peak={peak_h}")
+
 L0, _ = render(ramp)
 check("defaults near dry", max(abs(a - b) for a, b in zip(L0, ramp)) < (1 << 10),
       f"max|d|={max(abs(a-b) for a,b in zip(L0,ramp))}")
