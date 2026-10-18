@@ -81,6 +81,7 @@ nav:
       - Recbuf Persist: reference/modules/recbuf-persist.md
       - Store: reference/modules/store.md
   - Utilities:
+      - Copy Project: reference/modules/copy-project.md
       - Random Naming: reference/modules/rnd-name.md
       - Reload from Project: reference/modules/reload-from-project.md
       - Remix Switch: reference/modules/remix-switch.md
