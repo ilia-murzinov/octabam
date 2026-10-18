@@ -10,8 +10,8 @@
 ;    $2d dir $2e scram $2f wetL $30 wetR $31 fdbk $32 decy
 ;    $33 slice start (absolute); read = start + offset, folded into ring
 ; Labels st00.. only. mpy x0,y1 / y0,x0 / x0,x0 only. init keeps r1. No rep.
-; SIZE words (integer): FX2 (kn+1)*32, FX1 (kn+1)*8. Min 8, even.
-; RATE clock step: 0x400+(kn<<10) -> ~372ms .. ~64 samples between re-grabs.
+; SIZE words (integer): FX2 (kn+1)<<7, FX1 (kn+1)*24. Min 8, even.
+; RATE step 0x80+(kn<<5): ~1.5s .. ~44ms between re-grabs (SIZE must fit).
 ; Wet only after a grab (never loop the cleared base). CHNC is on/off.
 ; ---------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ st02:
         nop
         rts
 st01:
-; SIZE -> slice length in words. Short grains: FX2 (kn+1)*32, FX1 (kn+1)*8.
+; SIZE -> slice length in words. FX2 (kn+1)*128 (up to full 16k ring).
         move    x:(r6+$0),a
         and     #>$7f0000,a             ; LFO low byte must not leak
         asr     #$10,a,a                ; kn 0..127
@@ -75,10 +75,13 @@ st01:
         move    #>$4000,y0
         cmp     y0,b
         bne     st20                    ; FX1 path
-        asl     #$5,a,a                 ; FX2: (kn+1)*32  (32..4096 words)
+        asl     #$7,a,a                 ; FX2: (kn+1)*128  (128..16384 words)
         bra     st21
 st20:
-        asl     #$3,a,a                 ; FX1: (kn+1)*8   (8..1024 words)
+        move    x0,b                    ; FX1: (kn+1)*24 = <<4 + <<3
+        asl     #$4,a,a
+        asl     #$3,b,b
+        add     b,a
 st21:
         move    #>$8,x0
         cmp     x0,a
@@ -89,12 +92,12 @@ st21:
         and     #>$fffffe,a
         move    a,x:(r7+$24)
 ; RATE -> clock step. Overflow at 0x800000 ≈ re-grab period.
-; step = 0x400 + (kn<<10): kn0 ≈ 372ms, kn127 ≈ 64 samples.
+; step = 0x80+(kn<<5): kn0 ≈ 1.5s, kn127 ≈ 44ms — slower than SIZE so loops hear.
         move    x:(r6+$1),a
         and     #>$7f0000,a
         asr     #$10,a,a                ; kn 0..127
-        asl     #$a,a,a                 ; kn*1024
-        add     #>$400,a
+        asl     #$5,a,a                 ; kn*32
+        add     #>$80,a
         move    x:(r6+$7),b             ; SYNC 0=FREE 1=/16 2=/8 3=/4
         and     #>$7f0000,b
         asr     #$10,b,b
