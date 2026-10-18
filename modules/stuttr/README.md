@@ -1,9 +1,9 @@
 # `stuttr` — STUTTR
 
 A per-track buffer glitch insert. Input is written into the stock FX
-instance ring; an internal clock retriggers a slice that loops, reverses,
-drops to silence, or scrambles its read position. CHNC sets how often the
-wet path wins; MIX 0 is bit-exact dry.
+instance ring; after the ring fills (or RATE fires) a slice loops, reverses,
+drops, or scrambles. CHNC 0 is dry; MIX 0 is bit-exact dry. Re-select the
+effect after a flash if an old Part still has CHNC at 0.
 
 ## Knobs
 
