@@ -116,25 +116,25 @@ check("SCRAM non-zero", max(abs(x) for x in Ls) > (1 << 14),
 Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2)
 check("DROP renders", len(Ld) == len(tone) - len(tone) % FRAMES)
 
-# Spike in the first slice (start=base until RATE grabs). SIZE = loop period.
+# Spike after clear; auto-grab once the ring holds SIZE. SIZE = loop period.
 # FX2 words=(kn+1)*32 -> stereo frames=(kn+1)*16.
-Nspike = CLEAR + 4000
+Nspike = CLEAR + 6000
 
 
 def size_frames(kn):
     return (kn + 1) * 16
 
 
-def spike_in():
+def spike_in(kn):
+    # spike just before auto-grab so it sits inside the captured slice
     s = [0] * Nspike
-    s[CLEAR + 2] = 1 << 22  # lands inside every SIZE>=0 slice at base
+    s[CLEAR + size_frames(kn) - 2] = 1 << 22
     return s
 
 
 for kn in (0, 3, 7):
     expect = size_frames(kn)
-    # RATE=0 -> ~1.5s before re-grab; many SIZE loops
-    Lw, _ = render(spike_in(), SIZE=kn, RATE=0, CHNC=127, MIX=127, MODE=0,
+    Lw, _ = render(spike_in(kn), SIZE=kn, RATE=0, CHNC=127, MIX=127, MODE=0,
                    DECY=0, FDBK=0)
     peaks, gaps = peak_gaps(Lw)
     good = [g for g in gaps if abs(g - expect) <= 2]
@@ -142,13 +142,18 @@ for kn in (0, 3, 7):
           len(peaks) >= 3 and len(good) >= 2,
           f"peaks={len(peaks)} gaps={gaps[:8]} matched={len(good)}")
 
-g0 = peak_gaps(render(spike_in(), SIZE=0, RATE=0, CHNC=127, MIX=127, MODE=0,
+g0 = peak_gaps(render(spike_in(0), SIZE=0, RATE=0, CHNC=127, MIX=127, MODE=0,
                       DECY=0, FDBK=0)[0])[1]
-g7 = peak_gaps(render(spike_in(), SIZE=7, RATE=0, CHNC=127, MIX=127, MODE=0,
+g7 = peak_gaps(render(spike_in(7), SIZE=7, RATE=0, CHNC=127, MIX=127, MODE=0,
                       DECY=0, FDBK=0)[0])[1]
 med = lambda gs: sorted(gs)[len(gs) // 2] if gs else 0
 check("SIZE changes gap", med(g0) < med(g7) and med(g0) > 0,
       f"med0={med(g0)} med7={med(g7)}")
+
+# Continuous tone must stay audible with defaults (not muted by DECY/empty loop)
+Lt, _ = render(tone + tone, SIZE=16, RATE=96, CHNC=127, MIX=127, MODE=0, DECY=0)
+check("tone stays loud", max(abs(x) for x in Lt[CLEAR:]) > (1 << 20),
+      f"peak={max(abs(x) for x in Lt[CLEAR:])}")
 
 for name in K:
     render(ramp[:FRAMES * 8], **{name: 64})
