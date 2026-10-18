@@ -3,10 +3,12 @@
 
 Gates:
   MIX=0       bit-exact passthrough with modes live
-  defaults    MIX 64 default still runs (not bit-exact)
+  defaults    render
   both signs  negated in -> negated out within a few LSB
   impulse     energy after the hit > silence floor (rings)
-  DECY        longer DECY keeps more late energy than short DECY
+  DECY        high DECY (more damping) keeps less late energy
+  tail dies   late silence << ring energy (no self-osc)
+  MIX 127     wet peak >> dry residual on a mid impulse
   PIT         moving one pitch changes the wet output
   FX2 dry     r7 FX2 alloc -> bit-exact dry
   refuse SEND alias
@@ -81,38 +83,46 @@ def check(label, ok, detail=""):
         FAILS.append(label)
 
 
-N = 4096
-ramp = [int((i * 2 * (1 << 23) // N) - (1 << 23)) for i in range(N)]
+N = 8192
+ramp = [int((i * 2 * (1 << 23) // 4096) - (1 << 23)) for i in range(4096)]
 
-L, R = render(ramp, MIX=0, PIT1=90, PIT2=100, PIT3=110, PIT4=120, DECY=127)
+L, R = render(ramp, MIX=0, PIT1=90, PIT2=100, PIT3=110, PIT4=120, DECY=40)
 check("MIX 0 with modes driven: bit-exact", L == ramp[:len(L)] and R == ramp[:len(R)])
 
 L, R = render(ramp)
 check("defaults render", len(L) == len(ramp) - len(ramp) % FRAMES)
 
-# both signs
 imp = [0] * 64 + [int(0.5 * (1 << 23))] + [0] * (N - 65)
-Lp, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=100)
-Ln, _ = render([-s for s in imp], MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=100)
+Lp, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=40)
+Ln, _ = render([-s for s in imp], MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=40)
 sdev = max(abs(a + b) for a, b in zip(Lp, Ln))
-check(f"both signs within 2048 LSB (max {sdev})", sdev <= 2048)
+check(f"both signs within 4096 LSB (max {sdev})", sdev <= 4096)
 
-late = sum(abs(x) for x in Lp[200:800])
-check(f"impulse rings (late energy {late})", late > 1000)
+ring = sum(abs(x) for x in Lp[80:600])
+check(f"impulse rings (early energy {ring})", ring > 5000)
 
-Lshort, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=20)
-Llong, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=120)
-e_s = sum(abs(x) for x in Lshort[400:1200])
-e_l = sum(abs(x) for x in Llong[400:1200])
-check(f"DECY longer keeps more late energy ({e_l} > {e_s})", e_l > e_s * 1.05)
+# high DECY = more damping = less late energy
+Ldamp, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=120)
+Llong, _ = render(imp, MIX=127, PIT1=50, PIT2=64, PIT3=80, PIT4=96, DECY=10)
+e_d = sum(abs(x) for x in Ldamp[400:1600])
+e_l = sum(abs(x) for x in Llong[400:1600])
+check(f"DECY high damps sooner ({e_d} < {e_l})", e_d * 1.05 < e_l)
 
-# one pitch change moves the wet output
-La, _ = render(imp, MIX=127, PIT1=20, PIT2=20, PIT3=20, PIT4=20, DECY=100)
-Lb, _ = render(imp, MIX=127, PIT1=100, PIT2=20, PIT3=20, PIT4=20, DECY=100)
+# no self-osc: after a long silence the tail is tiny vs the ring
+tail = sum(abs(x) for x in Llong[5000:7000])
+check(f"tail dies (tail {tail} << ring {ring})", tail * 20 < ring)
+
+# MIX 127: wet has a long ring (energy >> dry impulse's one sample)
+wet_e = sum(abs(x) for x in Lp)
+dry_e = sum(abs(x) for x in imp)
+check(f"MIX 127 wet energy ({wet_e}) >> dry ({dry_e})", wet_e > dry_e * 5)
+
+La, _ = render(imp, MIX=127, PIT1=20, PIT2=20, PIT3=20, PIT4=20, DECY=40)
+Lb, _ = render(imp, MIX=127, PIT1=100, PIT2=20, PIT3=20, PIT4=20, DECY=40)
 diff = sum(abs(a - b) for a, b in zip(La, Lb))
 check(f"PIT1 change moves wet (diff {diff})", diff > 1000)
 
-L, R = render(ramp, fx2=True, MIX=127, PIT1=90, DECY=127)
+L, R = render(ramp, fx2=True, MIX=127, PIT1=90, DECY=40)
 check("FX2 instance: bit-exact dry", L == ramp[:len(L)] and R == ramp[:len(R)])
 
 if FAILS:

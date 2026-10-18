@@ -1,8 +1,8 @@
 """RESONATOR -- four independent pitched modes, FX1 station.
 
-Each of PIT1..PIT4 sets one mode's pitch (~40 Hz .. ~4 kHz). DECY sets
-shared ring time; MIX blends. No body ratios / structure morph — the
-four pitches are free.
+Each of PIT1..PIT4 sets one mode's pitch (~40 Hz .. ~4 kHz). DECY is
+Rings-style damping (high = shorter). MIX blends. R stays well below 1 so
+modes are driven audibly and die after the input stops.
 
 FX1 only (`Claims(fx1_only=True)`): buffer-free state in r7; an FX2 instance
 is a dry pass. Design credit: Mutable Instruments Rings modal resonator (MIT);
@@ -17,6 +17,7 @@ from remix.schema import (BusRole, Category, Claims, DspSection, Formatter, Gate
 _FS = 44100.0
 _NYQ = _FS * 0.5
 _FMIN, _FMAX = 40.0, 4000.0
+_BW_MIN, _BW_MAX = 30.0, 2000.0
 _PLAIN = Formatter.PLAIN
 _BLANK = Param(b"", 0)
 
@@ -28,11 +29,12 @@ def _q(v: float) -> int:
 # P table (99 words), read through $fab1e0:
 #   +0   FREQ_U  pitch as fraction of Nyquist, 40..4000 Hz, 33 knots
 #   +33  COS     cos(pi * i/32), i = 0..32 (0 .. Nyquist)
-#   +66  R       exp(-pi * bw / fs) for bw 2..400 Hz, 33 knots
+#   +66  R       exp(-pi * bw / fs) for bw 30..2000 Hz, 33 knots
+#                index 0 = long ring, index 32 = short (DECY maps directly)
 FREQ_U = tuple(_q(min(_FMIN * (_FMAX / _FMIN) ** (i / 32) / _NYQ, 0.95))
                for i in range(33))
 COS = tuple(_q(_m.cos(_m.pi * i / 32)) for i in range(33))
-R_TAB = tuple(_q(_m.exp(-_m.pi * (2.0 * (400.0 / 2.0) ** (i / 32)) / _FS))
+R_TAB = tuple(_q(_m.exp(-_m.pi * (_BW_MIN * (_BW_MAX / _BW_MIN) ** (i / 32)) / _FS))
               for i in range(33))
 
 MODULE = Module(
@@ -61,10 +63,10 @@ MODULE = Module(
               doc="mode 3 pitch, ~40 Hz .. ~4 kHz exponential"),
         Param(b"PIT4", 80, active=True, formatter=_PLAIN,
               doc="mode 4 pitch, ~40 Hz .. ~4 kHz exponential"),
-        Param(b"DECY", 100, active=True, formatter=_PLAIN,
-              doc="decay: high = longer ring (narrower mode bandwidth)"),
-        Param(b"MIX", 64, active=True, formatter=_PLAIN,
-              doc="dry/wet; 0 = exact passthrough"),
+        Param(b"DECY", 40, active=True, formatter=_PLAIN,
+              doc="damping: high = shorter ring (wider mode bandwidth)"),
+        Param(b"MIX", 90, active=True, formatter=_PLAIN,
+              doc="dry/wet; 0 = exact passthrough, 127 = wet only"),
         _BLANK, _BLANK, _BLANK, _BLANK, _BLANK, _BLANK,
     ),
     dsp=DspSection(
@@ -79,5 +81,5 @@ MODULE = Module(
     claims=Claims(fx1_only=True),
     harness=Harness(layout_char="W", is_server=False),
     gates=(Gate("tools/verify/verify_resonator.py", remix_arg=False),),
-    dear={"PIT1": 64, "PIT2": 80, "PIT3": 96, "PIT4": 112, "DECY": 127, "MIX": 127},
+    dear={"PIT1": 64, "PIT2": 80, "PIT3": 96, "PIT4": 112, "DECY": 40, "MIX": 127},
 )
