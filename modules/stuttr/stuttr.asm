@@ -125,10 +125,18 @@ st17:
         move    x:(r6+$3),a             ; FDBK
         and     #>$7fffff,a
         move    a,x:(r7+$31)
-        move    x:(r6+$4),a             ; DECY -> step (0 = hold)
+; DECY -> gain step: kn0 short (~46 ms), kn127 long (~6 s).
+; step = (128-kn)<<5 — large step = fast fade; no hold at 0.
+        move    x:(r6+$4),a
         and     #>$7f0000,a
-        asr     #$7,a,a                 ; kn<<9: kn64 fades ~6 ms, kn16 ~23 ms
-        move    a,x:(r7+$32)
+        asr     #$10,a,a                ; kn 0..127
+        move    #>$80,b                 ; 128
+        sub     a,b                     ; 128-kn (1..128)
+        asl     #$5,b,b                 ; (128-kn)*32
+        move    #>$20,x0
+        cmp     x0,b
+        tlt     x0,b
+        move    b,x:(r7+$32)
         move    x:(r6+$5),a             ; MIX
         and     #>$7f0000,a
         move    #>$7f0000,x0

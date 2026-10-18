@@ -38,7 +38,7 @@ MODULE = Module(
         Param(b"FDBK", 0, active=True, formatter=_P,
               doc="recirculate slice into the write head"),
         Param(b"DECY", 0, active=True, formatter=_P,
-              doc="fade held slice to silence; 0 = hold until next grab"),
+              doc="fade held slice to silence; 0 short (~46 ms), 127 long (~6 s)"),
         Param(b"MIX", 127, active=True, formatter=_P,
               doc="dry/wet; 127 = wet only (decay ends in silence, not dry)"),
         Param(b"MODE", 0, 4, active=True, formatter=_S,

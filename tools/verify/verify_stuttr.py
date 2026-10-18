@@ -100,21 +100,22 @@ L0, _ = render(ramp, CHNC=0, MIX=127, SIZE=80, RATE=100)
 check("CHNC=0 passthrough", max(abs(a - b) for a, b in zip(L0, ramp)) < (1 << 12),
       f"max|d|={max(abs(a - b) for a, b in zip(L0, ramp))}")
 
+# DECY=127 = long fade so loops can ring for SIZE/RATE checks (0 is now short).
 E_dry = sum(x * x for x in render(tone, CHNC=0, MIX=127)[0])
 E_loop = sum(x * x for x in render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110,
-                                   MODE=0, DECY=0)[0])
+                                   MODE=0, DECY=127)[0])
 check("LOOP energy", E_loop > E_dry * 0.2,
       f"Edry={E_dry} Eloop={E_loop}")
 
-Lr, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=1, DECY=0)
+Lr, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=1, DECY=127)
 check("REV non-silent", max(abs(x) for x in Lr) > (1 << 16),
       f"peak={max(abs(x) for x in Lr)}")
 
-Ls, _ = render(tone, CHNC=127, MIX=127, SIZE=60, RATE=100, MODE=3, DECY=0)
+Ls, _ = render(tone, CHNC=127, MIX=127, SIZE=60, RATE=100, MODE=3, DECY=127)
 check("SCRAM non-zero", max(abs(x) for x in Ls) > (1 << 14),
       f"peak={max(abs(x) for x in Ls)}")
 
-Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2)
+Ld, _ = render(tone, CHNC=127, MIX=127, SIZE=40, RATE=110, MODE=2, DECY=127)
 check("DROP renders", len(Ld) == len(tone) - len(tone) % FRAMES)
 
 # Spike after clear; auto-grab once the ring holds SIZE. SIZE = loop period.
@@ -136,7 +137,7 @@ def spike_in(kn):
 for kn in (0, 2, 4):
     expect = size_frames(kn)
     Lw, _ = render(spike_in(kn), SIZE=kn, RATE=0, CHNC=127, MIX=127, MODE=0,
-                   DECY=0, FDBK=0)
+                   DECY=127, FDBK=0)
     peaks, gaps = peak_gaps(Lw)
     good = [g for g in gaps if abs(g - expect) <= 2]
     check(f"SIZE={kn} loop gap~{expect}",
@@ -144,33 +145,34 @@ for kn in (0, 2, 4):
           f"peaks={len(peaks)} gaps={gaps[:6]} matched={len(good)}")
 
 g0 = peak_gaps(render(spike_in(0), SIZE=0, RATE=0, CHNC=127, MIX=127, MODE=0,
-                      DECY=0, FDBK=0)[0])[1]
+                      DECY=127, FDBK=0)[0])[1]
 g4 = peak_gaps(render(spike_in(4), SIZE=4, RATE=0, CHNC=127, MIX=127, MODE=0,
-                      DECY=0, FDBK=0)[0])[1]
+                      DECY=127, FDBK=0)[0])[1]
 med = lambda gs: sorted(gs)[len(gs) // 2] if gs else 0
 check("SIZE changes gap", med(g0) < med(g4) and med(g0) > 0,
       f"med0={med(g0)} med4={med(g4)}")
 
 # RATE must not be faster than SIZE or the loop never completes (the unit bug).
 # SIZE=4 -> 320 frames; RATE=40 step=0x80+(40<<5)=0x580 -> period ~5958 samples.
-Lt, _ = render(tone + tone, SIZE=40, RATE=40, CHNC=127, MIX=127, MODE=0, DECY=0)
+Lt, _ = render(tone + tone, SIZE=40, RATE=40, CHNC=127, MIX=127, MODE=0, DECY=127)
 check("tone stays loud", max(abs(x) for x in Lt[CLEAR:]) > (1 << 20),
       f"peak={max(abs(x) for x in Lt[CLEAR:])}")
 
 # At SIZE max-ish with slow RATE, gap stays near SIZE (not collapsed to ~2ms).
 Lbig, _ = render(spike_in(4), SIZE=4, RATE=20, CHNC=127, MIX=127, MODE=0,
-                 DECY=0, FDBK=0)
+                 DECY=127, FDBK=0)
 gaps_r = peak_gaps(Lbig)[1]
 good_r = [g for g in gaps_r if abs(g - size_frames(4)) <= 2]
 check("RATE=20 keeps SIZE loop",
       len(good_r) >= 2,
       f"gaps={gaps_r[:6]} expect~{size_frames(4)}")
 
-# DECY must fade the loop, then silence — not snap back to dry (MIX leak).
-Ndec = CLEAR + 8000
+# DECY: 0 short, 127 long; fade ends in silence (not dry) at MIX 127.
+Ndec = CLEAR + 20000
 spike = [0] * Ndec
 spike[CLEAR + size_frames(2) - 2] = 1 << 22
-Ldec = render(spike, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=24, FDBK=0)[0]
+# mid-low DECY: several SIZE=4 loops should lose half the amp
+Ldec = render(spike, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=32, FDBK=0)[0]
 amps = []
 seen = []
 for i, x in enumerate(Ldec):
@@ -180,21 +182,33 @@ for i, x in enumerate(Ldec):
         continue
     seen.append(i)
     amps.append(abs(x))
-    if len(amps) >= 6:
+    if len(amps) >= 8:
         break
 check("DECY fades loop",
-      len(amps) >= 2 and amps[-1] < amps[0] // 2,
+      len(amps) >= 3 and amps[-1] < amps[0] // 2,
       f"amps={amps}")
-# Tail after fade: near silence, not a copy of dry (dry would be 0 here too on
-# silence input — use a continuous dry tone under MIX 127 after forced fade).
+
 tone_d = [int(0.25 * (1 << 23) * math.sin(2 * 3.14159265 * 220 * i / 44100))
           for i in range(Ndec)]
-# High DECY + tiny SIZE: gain dies fast; remainder of buffer must stay quiet
-# at MIX 127 (old bug: wet fell back to dry → full tone through).
-Lquiet = render(tone_d, SIZE=0, RATE=0, CHNC=127, MIX=127, DECY=127, FDBK=0)[0]
-tail = Lquiet[CLEAR + 800:CLEAR + 2500]
+
+
+def _energy(xs):
+    return sum(x * x for x in xs)
+
+
+# After ~12 ms kn0 is dead; kn100 (bucket 6) still rings.
+L0 = render(tone_d, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=0, FDBK=0)[0]
+L100 = render(tone_d, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=100, FDBK=0)[0]
+early0 = _energy(L0[CLEAR + 800:CLEAR + 1600])
+early100 = _energy(L100[CLEAR + 800:CLEAR + 1600])
+check("DECY 0 shorter than 100",
+      early0 < early100 // 2,
+      f"E0={early0} E100={early100}")
+# Short DECY must finish silent at MIX 127 (not snap back to dry tone).
+Lshort = render(tone_d, SIZE=4, RATE=0, CHNC=127, MIX=127, DECY=0, FDBK=0)[0]
+tail = Lshort[CLEAR + 3000:CLEAR + 6000]
 peak_tail = max(abs(x) for x in tail) if tail else 0
-peak_dry = max(abs(x) for x in tone_d[CLEAR + 800:CLEAR + 2500])
+peak_dry = max(abs(x) for x in tone_d[CLEAR + 3000:CLEAR + 6000])
 check("MIX127 after DECY is silent not dry",
       peak_tail < peak_dry // 8,
       f"peak_tail={peak_tail} peak_dry={peak_dry}")
