@@ -79,6 +79,14 @@ print("SHATTER gates")
 L, R = render(ramp, MIX=0, DRV=100, FOLD=100, CLIP=80, CRSH=80, FDBK=60)
 check("MIX=0 bit-exact", L == ramp and R == ramp, f"max|d|={max(abs(a-b) for a,b in zip(L,ramp))}")
 
+# Hot DRV + FDBK on silence must stay quiet (old: drive×fb self-oscillated)
+sil = [0] * N
+Ls, _ = render(sil, DRV=127, FOLD=80, CLIP=60, CRSH=40, FDBK=100, MIX=127, MODE=0)
+peak_s = max(abs(x) for x in Ls)
+jump_s = max((abs(Ls[i] - Ls[i - 1]) for i in range(1, len(Ls))), default=0)
+check("silence stays quiet", peak_s < (1 << 12) and jump_s < (1 << 12),
+      f"peak={peak_s} maxjump={jump_s}")
+
 L0, _ = render(ramp)
 check("defaults near dry", max(abs(a - b) for a, b in zip(L0, ramp)) < (1 << 10),
       f"max|d|={max(abs(a-b) for a,b in zip(L0,ramp))}")
