@@ -38,6 +38,7 @@ nav:
       - Character TXTR: reference/modules/character-txtr.md
       - Modulation: reference/modules/modulation.md
       - Transient: reference/modules/transient.md
+      - Resonator: reference/modules/resonator.md
       - Euclid: reference/modules/euclid.md
       - Gate Verb: reference/modules/gateverb.md
       - LOFI2: reference/modules/lofi2.md
