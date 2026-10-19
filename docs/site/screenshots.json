@@ -809,5 +809,37 @@
       "source": "emulator panel UART",
       "firmware_sha256": "eb922e1e66645072dea4b3f7c46b03e39f1d27933618e1d9b24aab724bac3bdb"
     }
+  },
+  "shatter": {
+    "setup": {
+      "image": "shatter/setup.png",
+      "caption": "SHATTER: effect selection and setup parameters.",
+      "remix": "glitch",
+      "source": "emulator panel UART",
+      "firmware_sha256": "d656861d68141f0b039034c1dda14a915bec6e527150c6a0cb24b6cb593a3201"
+    },
+    "main": {
+      "image": "shatter/main.png",
+      "caption": "SHATTER: main parameter page.",
+      "remix": "glitch",
+      "source": "emulator panel UART",
+      "firmware_sha256": "d656861d68141f0b039034c1dda14a915bec6e527150c6a0cb24b6cb593a3201"
+    }
+  },
+  "stuttr": {
+    "setup": {
+      "image": "stuttr/setup.png",
+      "caption": "STUTTR: effect selection and setup parameters.",
+      "remix": "glitch",
+      "source": "emulator panel UART",
+      "firmware_sha256": "d656861d68141f0b039034c1dda14a915bec6e527150c6a0cb24b6cb593a3201"
+    },
+    "main": {
+      "image": "stuttr/main.png",
+      "caption": "STUTTR: main parameter page.",
+      "remix": "glitch",
+      "source": "emulator panel UART",
+      "firmware_sha256": "d656861d68141f0b039034c1dda14a915bec6e527150c6a0cb24b6cb593a3201"
+    }
   }
 }

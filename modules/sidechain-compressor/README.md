@@ -6,6 +6,15 @@ Built from [Zac-Kyoti/octatrack-kyoti-fw](https://github.com/Zac-Kyoti/octatrack
 (submodule `upstream/`, pinned to `8e00275`). `Kind.DSP_EFFECT` with `MenuEntry(replaces="COMPRESSOR", stock_dsp=True)`: the row is COMPRESSOR's and its dispatch entry stays stock's. One linked unit (`patch_sidechain.s`, 338 B; ROM cave or DRAM by the `PLACE` setting, default CAVE: KEY's and KFLT's formatters, KEY's list widget, and `sc_norm`, reached by two `jsr` detours at the first instruction of both page-2 copiers, `0x4000cae8` and its twin `0x40003d1c`: a COMPRESSOR saved on stock firmware, whose hidden slots 8-11 hold stock's defaults `0x7f/0/0/0`, comes up with KEY OFF, KFLT and KGN centred and MON OFF); page-2 slots 8-11 as raw descriptor words; three per-payload `DspHook`s (`sctap`, `scdet`, `moncommit`); the per-core values as `DspSection.subst`; the 48 table words as one `ptable`.
 `upstream/octabam-modules/sidechain-compressor/README.md` is the full description, with what was measured and what was inferred.
 
+## Conflicts
+
+Do **not** put SIDECHAIN_COMPRESSOR in the same image as **TAPE ECHO + SHATTER + STUTTR**.
+That quartet stalls the sequencer (empty project too). SC + both glitch FX
+without TAPE plays. Measured under the port and on HW, 19 Oct 2026
+(`docs/contributing/FAILURE_MODES.md`). Separate from the keybus / BusDelay
+ledger refusals below. Not expressible as pairwise `Module.conflicts`
+without blocking working triples.
+
 ## Measured
 
 - Every build re-links `sc_cf` and compares it with the author's own bytes (`reference`); a difference refuses the build.

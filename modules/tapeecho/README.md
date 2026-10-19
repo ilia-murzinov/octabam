@@ -30,6 +30,15 @@ not as multiple audible echo heads. Wow-offset acceleration is limited
 after a snapped delay change to avoid briefly sweeping the old offset in
 a single 16-sample block.
 
+## Conflicts
+
+Do **not** put TAPE ECHO in the same image as **SIDECHAIN_COMPRESSOR + SHATTER + STUTTR**.
+That quartet stalls the sequencer (empty project too). TAPE + SC alone,
+TAPE + either glitch FX, and TAPE + both glitch FX without SC all play.
+Measured under the port and on HW, 19 Oct 2026
+(`docs/contributing/FAILURE_MODES.md`). Not expressible as pairwise
+`Module.conflicts` without blocking working triples.
+
 ## Knobs
 
 The first page follows the stock Delay pattern: performance controls stay on

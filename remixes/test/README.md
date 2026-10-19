@@ -24,6 +24,9 @@ Each carries one module, or one combination, for that module's gates: `make chec
 | [`euclid`](euclid/README.md) | Euclid rhythmic modulation: 12 dB LP/BP/HP or AMP, both FX slots. | local render: the module's render gates |
 | [`euclid-fill`](euclid-fill/README.md) | stock effects with EUCLID FILL: TRACK+PAGE Euclidean trig-fill page. | `make check` |
 | [`gateverb`](gateverb/README.md) | GATE VERB alone: the fixture of its render gate. | local render: `verify_gateverb`; not flashed |
+| [`glitch`](glitch/README.md) | Glitch inserts: SHATTER (crush/fold/feedback) and STUTTR (buffer slice). | on hardware: Ilia's MKII, BUILD G4, 19 Oct 2026: all SHATTER/STUTTR knobs; `make check REMIX=glitch` |
+| [`glitch-sc`](glitch-sc/README.md) | SHATTER + STUTTR + SIDECHAIN_COMPRESSOR (no TAPE ECHO). | local render: working triple: omit TAPE from the quartet |
+| [`glitch-tape`](glitch-tape/README.md) | SHATTER + STUTTR + TAPE ECHO (no SIDECHAIN_COMPRESSOR). | local render: working triple: omit SC from the quartet |
 | [`kits`](kits/README.md) | KITS (255 Kits per project) on the stock effects. | port-gated: verify_kits under the port |
 | [`kyoti-fixes`](kyoti-fixes/README.md) | stock effects with QUANTIZE_LIVE_REC_TOGGLE, ERASE_EMPTY_TRIGLESS_LOCKS and BATCH_BUGFIXES together. | `make check` |
 | [`kyoti-mute-jump`](kyoti-mute-jump/README.md) | stock effects with MUTE_MODES and DIRECT_JUMP_KYOTI together. | `make check` |
