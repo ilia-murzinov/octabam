@@ -1,7 +1,6 @@
 """glitch-tape -- SHATTER + STUTTR + TAPE ECHO (no SIDECHAIN_COMPRESSOR).
 
-Working triple for the TAPE+SC+SHATTER+STUTTR quartet stall
-(docs/contributing/FAILURE_MODES.md). TAPE replaces SPRING REV.
+TAPE replaces SPRING REV; DARK REV kept.
 """
 
 from remix.schema import Proof, Remix
@@ -10,7 +9,7 @@ REMIX = Remix(
     name="glitch-tape",
     family="effects",
     proof=Proof.RENDER,
-    proof_note="working triple: omit SC from the quartet",
+    proof_note="builds; DARK kept",
     doc="SHATTER + STUTTR + TAPE ECHO (no SIDECHAIN_COMPRESSOR).",
     modules=(
         "SHATTER", "STUTTR", "TAPE ECHO",

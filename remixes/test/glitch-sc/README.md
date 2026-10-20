@@ -1,7 +1,6 @@
 # `glitch-sc` — SHATTER + STUTTR + SIDECHAIN
 
-Working triple that omits TAPE ECHO from the
-TAPE+SC+SHATTER+STUTTR quartet stall
-(`docs/contributing/FAILURE_MODES.md`).
+SHATTER + STUTTR + SIDECHAIN_COMPRESSOR (no TAPE ECHO). PLATE+SPRING
+harvested so the three fit; DARK REV kept.
 
 `make check REMIX=glitch-sc`.

@@ -928,8 +928,9 @@ def main():
              "lofi2": ("PLATE REV", "SPRING REV"),   # LOFI2's 1,372 words with its table; PLATE alone is 594
              "bbd": ("PLATE REV", "SPRING REV"),   # BBD's 1,112 words from PLATE's start, clear of the SPRING words DARK calls
              "glitch": ("PLATE REV", "SPRING REV"),  # SHATTER+STUTTR in their words; DARK kept in chooser
-             "glitch-sc": ("SPRING REV",),  # SC + SHATTER+STUTTR; PLATE+DARK kept; SPRING for SC DSP
+             "glitch-sc": ("PLATE REV", "SPRING REV"),  # SC+SHATTER+STUTTR; DARK kept
              "glitch-tape": ("PLATE REV", "SPRING REV"),  # TAPE+SHATTER+STUTTR; DARK kept (TAPE owns SPRING's row)
+             "glitch-quartet": ("PLATE REV", "SPRING REV"),  # TAPE+SC+SHATTER+STUTTR probe; DARK kept
              "testgen": ("PLATE REV",),     # TESTGEN runs in its words; the other 13 stay
              "vocoder": ("PLATE REV", "DJ EQ"),   # VOCODER runs in PLATE's words; DJ EQ out so the tables sit in X
              "vocoder-usb": ("PLATE REV", "DJ EQ"),   # the vocoder remix + USB MIDI and USB AUDIO (ColdFire, no DSP words)

@@ -46,15 +46,6 @@ kept in 16 bits and stored from a clean accumulator (no A2-stale / saturating
 store). `max_off` is computed at block rate so the sample loop stays
 cycle-countable.
 
-## Conflicts
-
-Do **not** put STUTTR in the same image as **TAPE ECHO + SIDECHAIN_COMPRESSOR + SHATTER**.
-That quartet stalls the sequencer (empty project too). Any proper subset
-plays. Measured under the port and on HW, 19 Oct 2026
-(`docs/contributing/FAILURE_MODES.md`). FX2 id is not the stall (tried
-`0x19` and `0x1b`). Not expressible as pairwise `Module.conflicts` without
-blocking working triples.
-
 ## Storage and stock firmware
 
 The page descriptor is cloned from **DARK REV**; the FX id is **`0x1e`**
@@ -74,8 +65,7 @@ back to stock.
 ## Measured
 
 Local render gates (`verify_stuttr`), including a JITR=127 grab-start
-distribution check (not constant). Port: plays alone and with SHATTER when
-TAPE or SC is omitted.
+distribution check (not constant).
 
 ## On the unit
 
@@ -87,7 +77,6 @@ SYNC). Id `0x1e`, 15,862-word ring, no build tag.
 ## Open
 
 - Project-BPM tempo sync
-- Root cause of the TAPE+SC+SHATTER+STUTTR quartet stall
 
 ## Gates
 

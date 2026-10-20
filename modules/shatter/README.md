@@ -22,14 +22,6 @@ this one is self-modulating destruction.
 | 2 | 7 | TONE | 0–127 | feedback shelf |
 | 2 | 8 | RATE | 0–127 | CHAOS flip rate |
 
-## Conflicts
-
-Do **not** put SHATTER in the same image as **TAPE ECHO + SIDECHAIN_COMPRESSOR + STUTTR**.
-That quartet stalls the sequencer (empty project too). Any proper subset
-plays. Measured under the port and on HW, 19 Oct 2026
-(`docs/contributing/FAILURE_MODES.md`). Not expressible as pairwise
-`Module.conflicts` without blocking working triples.
-
 ## Storage and stock firmware
 
 The page descriptor is cloned from **DARK REV**. A Part saved with SHATTER
@@ -50,8 +42,7 @@ back to stock.
 ## Measured
 
 Local render gates (`verify_shatter`). DRV is dry-only (~×9 at 127);
-feedback is not driven. LFO-dirty page words are masked before use. Port:
-plays alone and with STUTTR when TAPE or SC is omitted.
+feedback is not driven. LFO-dirty page words are masked before use.
 
 ## On the unit
 
@@ -65,7 +56,6 @@ TONE, RATE). No build tag on the panel.
 - CHAOS voicing: RATE curve and polarity-flip energy
 - How many instances fit on one core at dear settings
 - Whether CRSH should split into separate BRR / SRR knobs
-- Root cause of the TAPE+SC+SHATTER+STUTTR quartet stall
 
 ## Gates
 

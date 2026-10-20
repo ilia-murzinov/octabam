@@ -1,7 +1,6 @@
 # `glitch-tape` — SHATTER + STUTTR + TAPE ECHO
 
-Working triple that omits SIDECHAIN_COMPRESSOR from the
-TAPE+SC+SHATTER+STUTTR quartet stall
-(`docs/contributing/FAILURE_MODES.md`).
+SHATTER + STUTTR + TAPE ECHO (no SIDECHAIN_COMPRESSOR). TAPE replaces
+SPRING REV; DARK REV kept.
 
 `make check REMIX=glitch-tape`.

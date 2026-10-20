@@ -570,27 +570,19 @@ Entries from here to the end of the file (5 Oct 2026) were recorded in other doc
 - **Cause:** open. Not reproduced under the port (`usb_host` bench, `--frame`): 24 rounds of alt 1, then 0–160 polls on EP3, alt 0 and GET_INTERFACE; the same 18 rounds with GET CUR + SET CUR 44100 before alt 1, and with SET CUR 48000 (STALL) mid-stream. All clean, alt reads 0. 🟡 erreye's candidate: alt 0 in `audio_setiface_shim` runs `audio_ep3_flush` inside the USB interrupt, and the port's flush completes at once (`modules/usb/README.md`, "Bus reset and session end"), so that path is unmeasured on a unit.
 - **Fix:** none. Workaround: don't change the DAW's buffer size or sample rate while the unit is its open input. To find out: the same on stock upstream test images (`AUD_TARGET` 64, without POST); a diagnostic build on erreye's unit (offered) around the alt 0 flush; whether the port's bench can hold the flush pending.
 
-## TAPE + SIDECHAIN + SHATTER + STUTTR: sequencer never advances ✅ measured under the port + HW
+## TAPE + SIDECHAIN + SHATTER + STUTTR: sequencer never advances ❌ retracted (20 Oct 2026)
 
-- **Seen:** Ilia's MKII, 19 Oct 2026, remixes with all four. Play does nothing —
-  empty project too. TAPE+SC alone, TAPE+SC+SHATTER, TAPE+SC+STUTTR, and both
-  glitch FX without TAPE or without SC all play.
-- **Cause:** open. Not a pairwise FX2-id clash (STUTTR on `0x19` / `0x1b` / `0x1e` all
-  fail the same way; BBD stays on `0x1b`).
-  Under the port: transport posts, then `frames run : 0 … TIME`; triples that
-  omit TAPE or omit SC reach 200 frames. Likely a ColdFire packing / always-on
-  hook interaction when TAPE's CPU path, SC's dispatcher hooks, and both
-  inserts' clones share one image — not DSP audio from the inserts (they are
-  unselected on an empty project).
-- **Fix (avoidance):** do not select all four in one remix. Any proper subset
-  plays. Probes: `remixes/test/glitch` (both FX), `glitch-sc` (omit TAPE),
-  `glitch-tape` (omit SC). Pairwise `Module.conflicts` would over-refuse
-  working triples, so the rule is documented here and in the four modules'
-  READMEs rather than declared on the manifests.
-- **Check:** `ot_emu --sequencer --frames 200` on the composed mainos; on the
-  unit, a remix with the quartet vs one with any one dropped. A green quartet
-  after a packing change falsifies the open cause only if empty-project play
-  still stalls before that change and runs after.
+- **Claimed (19 Oct 2026):** Ilia's MKII + port: quartet stalls (`frames run : 0`);
+  proper subsets play. Documented without a checked-in quartet remix; `glitch-sc`
+  did not build at the tip Sam pulled (`902c0cfb`).
+- **Falsified:** Sam could not reproduce (`902c0cfb`). Re-check on this tree
+  (`remixes/test/glitch-quartet/`, tip after the retract): `ot_emu --sequencer
+  --internal-clock --frames 200 --dsp` on project RIG →
+  `frames run : 200 since transport start (target 200), run ended REACHED`.
+  `glitch-sc` builds again (harvests PLATE+SPRING; DARK kept).
+- **Cause of the bad claim:** unreproducible write-up — not a packing stall.
+  The HW report may have been a wrong image / card mix; it is not treated as
+  evidence here until it reproduces with a named BUILD and this remix.
 
 ## A marginal USB cable freezes the unit in DISK MODE ✅ measured (the cable)
 
