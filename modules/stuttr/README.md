@@ -48,10 +48,11 @@ cycle-countable.
 
 ## Storage and stock firmware
 
-The page descriptor is cloned from **DARK REV**; the FX id is **`0x1e`**
-(free custom pool; BBD stays on `0x1b`). A Part saved with STUTTR keeps that
-id and the eight page bytes. Stock 1.40C has no effect on that id. If the
-same page bytes are loaded under DARK REV, they read as DARK's knobs:
+The page descriptor is cloned from **DARK REV**; the FX id is **MULTIBCOMP**
+(`0x19`, `replaces=`). RESONATOR keeps free id `0x1e` (#806). A Part saved
+with STUTTR keeps that id and the eight page bytes. Stock 1.40C runs
+MULTIBCOMP (null stub) on that id. If the same page bytes are loaded under
+DARK REV, they read as DARK's knobs:
 
 | our slot | our name | stock DARK |
 |---|---|---|
@@ -72,7 +73,7 @@ distribution check (not constant).
 Ilia's MKII, 19 Oct 2026, remix `glitch` **BUILD G4** (`OCTABAMG4` /
 `GLITCH G4.RMX`): SHATTER + STUTTR beside the stock FX chooser. Every
 page-1 and page-2 knob exercised (SIZE, RATE, JITR, FDBK, DECY, MIX, MODE,
-SYNC). Id `0x1e`, 15,862-word ring, no build tag.
+SYNC). MULTIBCOMP `0x19`, 15,862-word ring, no build tag.
 
 ## Open
 

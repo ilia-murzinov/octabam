@@ -21,12 +21,15 @@ MODULE = Module(
     author_url="https://github.com/ilia-murzinov",
     proof=Proof.HARDWARE,
     proof_note="Ilia's MKII, remix glitch BUILD G4 (OCTABAMG4 / GLITCH G4.RMX), "
-               "19 Oct 2026: every page-1/page-2 knob exercised; verify_stuttr",
+               "19 Oct 2026: every page-1/page-2 knob exercised (DSP of this "
+               "tip; id since moved to MULTIBCOMP 0x19 for RESONATOR 0x1e); "
+               "verify_stuttr",
     doc="Buffer glitch: freeze, slice-repeat, reverse, dropout, scramble.",
     menu=MenuEntry(
-        # Free custom id 0x1e (BBD 0x1b, SHATTER 0x0a). Selftest fixtures
-        # use DELAY's id via replaces, not 0x1e (docs/contributing/MODULES.md).
-        fx2_id=0x1e,
+        # RESONATOR (#806) keeps free id 0x1e. MULTIBCOMP 0x19 — stock null
+        # stub, FX2-only; page clone still from DARK REV.
+        fx2_id=0x19,
+        replaces="MULTIBCOMP",
         donor_desc=0x400d58b8,
         abbr=b"STUT",
         fullname=b"Stuttr",

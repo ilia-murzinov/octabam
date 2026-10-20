@@ -262,6 +262,13 @@ MODULES = (
            "Stock Echo Freeze delay -- runs on the ColdFire, so it costs the "
            "DSP nothing; the row works as on a stock unit. No local render.",
            "Y"),
+    # Null DSP stub (docs/firmware/DSP.md); FX2-only. Listed so a buffer
+    # insert can declare replaces="MULTIBCOMP" without taking DELAY/PHASER.
+    _stock("MULTIBCOMP", "multibcomp", 0x19, 0x400d5bdc, b"MBC",
+           b"MULTIBCOMP", 0,
+           "Stock multiband compressor stub -- null DSP, not in the stock "
+           "chooser. Kept here so a module may replace its id.",
+           "W"),  # not H: GATE VERB already uses H
     # ---- THE THREE REVERBS, listable -------------------
     _stock("PLATE REV", "plate", 0x14, 0x400d5594, b"PLTE", b"PLATE REV", 594,
            "Stock plate reverb. Its 594 words are the FIRST of the donor "
