@@ -117,21 +117,40 @@ def shard_ok(path):
     return f"worktree {path.resolve()}" in r.stdout.splitlines()
 
 
+def _worktree_lock():
+    """Serialize git worktree add/remove across refhash + check_shards (CI race)."""
+    import fcntl
+    from contextlib import contextmanager
+    lock_path = ROOT / "out" / ".worktree-shard.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+
+    @contextmanager
+    def held():
+        with open(lock_path, "a+") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            yield
+
+    return held()
+
+
 def make_shard(path, log, fresh=False, port=True):
     """A detached worktree of HEAD with this tree's uncommitted changes, the
     shared toolchain links, the stock slice, its submodules and the port
     from the store (`port=False`: none) -- created, or refreshed when one is
     already there."""
-    keep = shard_ok(path) and not fresh
-    if not keep:
-        remove_shard(path)
-        git("worktree", "add", "--detach", str(path), "HEAD")
-    else:
-        # Drop the previous run's applied diff and untracked copies, then
-        # move to this tree's HEAD.
-        for args in (("reset", "--hard", "--quiet"), ("clean", "-fdq"),
-                     ("checkout", "--detach", "--quiet", git("rev-parse", "HEAD").stdout.strip())):
-            git(*args, cwd=path)
+    with _worktree_lock():
+        keep = shard_ok(path) and not fresh
+        if not keep:
+            remove_shard(path)
+            git("worktree", "add", "--detach", str(path), "HEAD")
+        else:
+            # Drop the previous run's applied diff and untracked copies, then
+            # move to this tree's HEAD.
+            for args in (("reset", "--hard", "--quiet"), ("clean", "-fdq"),
+                         ("checkout", "--detach", "--quiet",
+                          git("rev-parse", "HEAD").stdout.strip())):
+                git(*args, cwd=path)
+    # Filesystem sync outside the lock — parallel shards OK from here.
     diff = subprocess.run(["git", "diff", "HEAD", "--binary", "--ignore-submodules=all"],
                           cwd=ROOT, capture_output=True, check=True).stdout
     if diff.strip():
