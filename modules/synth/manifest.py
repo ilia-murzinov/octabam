@@ -13,9 +13,9 @@ sounding note is delivered in the panel key's form, and a warm START ramps
 the index envelope.
 
 Source: `upstream/` is Tim Hastie's repository (timhastie/octatrick-modules,
-submodule, pinned to v2.9 (525f4b1) = Octatrick 2.9, 29 Sep 2026; the test builds 2.3 .. 2.8 and the 2.9
-line up to its previous build flashed on his MKI, the last two 2.9 fixes
-emulator-verified). The declaration is
+submodule, pinned to aff1417 = Tim main through 2.14 plus LFO 1/2
+assignable to VOIC/CHRD with VOIC on the same 0..127 domain as CHRD; test
+builds 2.3..2.12 on his MKI, later fixes emulator-verified). The declaration is
 `upstream/synth/manifest.py`: the voice engine as a DRAM unit (`poly.s`,
 `Linked(dram=True)`, in the platform reserve with the other DRAM modules),
 the page as a pinned ROM cave (`page.s` at 0x400d24d0, the start of the
@@ -53,56 +53,24 @@ index ramp) are emulator-verified only.
 """
 
 import dataclasses
-import os
 import pathlib
 import runpy
 
-from remix.schema import Apply, Category, Detour, Linked, Option, Proof, Setting, Store
+from remix.schema import Category, Proof
 
 _UPSTREAM = pathlib.Path(__file__).resolve().parent / "upstream" / "synth" / "manifest.py"
 
 MODULE = runpy.run_path(str(_UPSTREAM), run_name="remix_manifest_synth")["MODULE"]
+# Build passes (modules, remix); Tim's include is (modules) only. Adapt here.
+def _adapt_unit(_unit):
+    if callable(getattr(_unit, "include", None)):
+        return dataclasses.replace(
+            _unit, include=(lambda modules, remix, _inc=_unit.include: _inc(modules)))
+    return _unit
+
 # The module table's fields are octabam's (README.md, `make docs`), so they
 # are added here rather than in his manifest.
 MODULE = dataclasses.replace(
-    MODULE, category=Category.MACHINES, author="timhastie/octatrick-modules", author_url="https://github.com/timhastie/octatrick-modules",
+    MODULE, linked=tuple(_adapt_unit(_u) for _u in MODULE.linked),
+    category=Category.MACHINES, author="timhastie/octatrick-modules", author_url="https://github.com/timhastie/octatrick-modules",
     proof=Proof.HARDWARE, proof_note="`octatrick-usb` on his MKI, 26 Sep 2026 (OCTATRICK9) through 2.9; the last two 2.9 fixes under the port")
-
-
-# PLACE: where the PLAYBACK page lives. DRAM (the default) links page.s into the platform
-# runtime. CAVE is the author's pinned ROM cave at 0x400d24d0, the bytes his build ratified
-# (`PINNED_PAGE`); the ledger refuses it in a remix that lists the stock DELAY (stock.py).
-# The stock DELAY reads `0x400d1ce0 + 4 * (x >> 6)` for an index up to 511 and
-# its table ends at 0x400d24d0, so the first words of that run are read as
-# data when the delay time is long and the tempo slow: the page's first bytes
-# change the DELAY's output (issue #771, measured under the port). DRAM links
-# page.s into the platform runtime with poly.s and leaves the zero run alone;
-# its resolver is a detour at the same site. page.s is written with labels, so
-# no pointer is pinned; the DRAM form has no author reference bytes.
-_UPSTREAM_DIR = _UPSTREAM.parent
-_PAGE_HOOK = 0x40031ece
-_PAGE_STOCK = bytes.fromhex("20300c00" "6002")
-PLACES = ("CAVE", "DRAM")
-
-
-def _variant(values):
-    """PLACE -> the page's placement."""
-    if values["PLACE"] != "DRAM":
-        return {}
-    return {
-        "linked": MODULE.linked + (Linked("page", os.path.join(str(_UPSTREAM_DIR), "page.s"),
-                                          cpu="5475", dram=True),),
-        "cf_patches": (),
-        "detours": MODULE.detours + (Detour(
-            _PAGE_HOOK, _PAGE_STOCK, "page", "pg_resolve",
-            "PLAYBACK page resolver: a synth track's page reads RATIO/INDEX/FDBK/DECAY "
-            "(the DRAM form of the cave's one poke)", kind="jmp"),),
-    }
-
-
-MODULE = dataclasses.replace(
-    MODULE, store=Store("timhastie.synth"), variant=_variant,
-    settings=(Setting(1, "PLACE", Option(*PLACES), default="DRAM", apply=Apply.BUILD,
-                      doc="DRAM: the page in octabam's platform runtime, leaving the stock DELAY's table "
-                          "read untouched; CAVE: the pinned ROM cave at 0x400d24d0 (the author's bytes), "
-                          "refused where the stock DELAY is listed"),))

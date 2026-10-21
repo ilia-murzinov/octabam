@@ -2,7 +2,7 @@
 
 A two-operator FM synth machine for FLEX tracks, built from
 [timhastie/octatrick-modules](https://github.com/timhastie/octatrick-modules)
-(submodule `upstream/`, pinned to `v2.9` (`525f4b1`)). `Kind.CF_PATCH`: the voice engine as
+(submodule `upstream/`, pinned to Tim `main` + LFO→VOIC/CHRD (`aff1417`)). `Kind.CF_PATCH`: the voice engine as
 a DRAM unit (`poly.s`), the page code as a pinned ROM cave (`page.s`; the
 page descriptor itself is cloned from the unit's own ROM at first use, so no
 stock bytes ship in the repo), a `SymbolRef` on the kind table's FLEX
@@ -17,7 +17,10 @@ as a sample. Its PLAYBACK page reads PTCH RATO INDX FINE FDBK DEC (title FM
 SYNTH; PTCH in semitones, FINE in cents); on the LFO page VOIC (1 = mono,
 2..4 = paraphonic) and CHRD (32 chord shapes in Syntakt order, each with
 three inversions on the knob, lockable per step, snapped onto SCALE
-QUANTIZER's scale); GLIDE from the quantizer's row. Since 2.8: MIDI IN
+QUANTIZER's scale); LFO SETUP's PMTR offers VOIC and CHRD as destinations
+of LFO 1 and LFO 2 (VOIC stores 0..127 like CHRD and maps to 1..4 so a
+deep LFO sweeps the full range; next note start latches them; LFO 3 stays
+muted); GLIDE from the quantizer's row. Since 2.8: MIDI IN
 plays a synth track like the CHROMATIC keys (one voice a note up to VOIC, a
 note-off releases it); a chord fingered on the keys or over MIDI during live
 recording is recorded as PTCH / CHRD / VOIC locks (the bass, the shape and
@@ -80,7 +83,8 @@ inferred).
 
 ## How it is built
 
-Source: `upstream/` is Tim's repository (submodule, pinned to `v2.9` (`525f4b1`)).
+Source: `upstream/` is Tim's repository (submodule, pinned to `aff1417` =
+current `timhastie/octatrick-modules` main plus LFO 1/2 → VOIC/CHRD).
 Nothing inside `upstream/` is edited here. The manifest here
 (`manifest.py`) executes `upstream/synth/manifest.py` from the source on
 disk and re-exports its `MODULE`; that manifest derives its source paths
@@ -90,18 +94,6 @@ Tim's tree and at `modules/synth/upstream/synth/` here. The engine is
 units and depacked at boot into the arena reserve
 (`docs/contributing/PLACEMENT.md`). The page is pinned at `0x400d24d0`, the
 start of the second free gap.
-
-`PLACE` (setting `timhastie.synth`, Apply.BUILD, default `DRAM`) chooses where the
-page lives. `DRAM`: `page.s` is linked into the platform runtime with `poly.s`, the resolver at `0x40031ece`
-is a detour to `pg_resolve`, and the zero run is left alone. `CAVE`: the author's
-pinned ROM cave at `0x400d24d0`, which the ledger refuses in a remix that lists the
-stock DELAY (`Keep` on `0x400d24d0..0x400d24df`, `tools/remix/stock.py`). The stock DELAY
-reads the first words of that run as table data when its delay is long and the
-tempo slow, so with `CAVE` the DELAY computes a different output (issue #771,
-`docs/contributing/FAILURE_MODES.md`). Measured under the port: the DRAM form
-renders the PLAYBACK and LFO pages pixel for pixel as the cave form, and TAPE ECHO
-+ SYNTH MACHINE passes `verify_tapeecho_cpu` with it. Not on a unit; the DRAM
-form has no author reference bytes (the cave form's are `PINNED_PAGE`).
 
 ## Collisions
 
