@@ -13,9 +13,8 @@ sounding note is delivered in the panel key's form, and a warm START ramps
 the index envelope.
 
 Source: `upstream/` is Tim Hastie's repository (timhastie/octatrick-modules,
-submodule, pinned to aff1417 = Tim main through 2.14 plus LFO 1/2
-assignable to VOIC/CHRD with VOIC on the same 0..127 domain as CHRD; test
-builds 2.3..2.12 on his MKI, later fixes emulator-verified). The declaration is
+submodule, pinned to v2.15 (17ba281): selection guard, MIDI-track scale, LFO 1/2 →
+VOIC/CHRD; octabam machine_limits.inc sets ML_FM_MAX=3). The declaration is
 `upstream/synth/manifest.py`: the voice engine as a DRAM unit (`poly.s`,
 `Linked(dram=True)`, in the platform reserve with the other DRAM modules),
 the page as a pinned ROM cave (`page.s` at 0x400d24d0, the start of the
@@ -53,24 +52,88 @@ index ramp) are emulator-verified only.
 """
 
 import dataclasses
+import os
 import pathlib
 import runpy
 
-from remix.schema import Category, Proof
+from remix.schema import Apply, Category, Detour, Linked, Option, Proof, Setting, Store
 
 _UPSTREAM = pathlib.Path(__file__).resolve().parent / "upstream" / "synth" / "manifest.py"
+_HERE = pathlib.Path(__file__).resolve().parent
+_PAGE_DRAM = _HERE / "page_dram.s"
+_PAGE_HOOK = 0x40031ece
+_PAGE_STOCK = bytes.fromhex("20300c00" "6002")
+PLACES = ("CAVE", "DRAM")
 
 MODULE = runpy.run_path(str(_UPSTREAM), run_name="remix_manifest_synth")["MODULE"]
+
+
+def _synth_place(modules) -> str:
+    """PLACE from the bound SYNTH MACHINE module (build_values), else DRAM."""
+    seq = modules.values() if isinstance(modules, dict) else modules
+    for m in seq:
+        if getattr(m, "key", None) == "SYNTH MACHINE" or getattr(m, "name", None) == "synth":
+            return dict(getattr(m, "build_values", {}) or {}).get("PLACE", "DRAM")
+    return "DRAM"
+
+
 # Build passes (modules, remix); Tim's include is (modules) only. Adapt here.
+# PLACE=DRAM also remaps FM_DESC: engine_abi pins it at the cave, but the cave
+# is empty in this form — machine.s's .long FM_DESC must bind to page_dram.s's
+# exported fm_descriptor (VEC 04 at 0x400d24d0 otherwise, HW 22 Oct 2026).
+def _adapt_include(_inc):
+    def _wrapped(modules, remix=None, _inc=_inc):
+        text = _inc(modules)
+        # Override Tim's ML_FM_MAX (v2.15 defaults to 1) — same cap as CX OSC.
+        text += "\n" + (_HERE / "machine_limits.inc").read_text()
+        if _synth_place(modules) == "DRAM":
+            text += "\n        .set    FM_DESC, fm_descriptor\n"
+        return text
+    return _wrapped
+
+
 def _adapt_unit(_unit):
     if callable(getattr(_unit, "include", None)):
-        return dataclasses.replace(
-            _unit, include=(lambda modules, remix, _inc=_unit.include: _inc(modules)))
+        return dataclasses.replace(_unit, include=_adapt_include(_unit.include))
     return _unit
 
-# The module table's fields are octabam's (README.md, `make docs`), so they
-# are added here rather than in his manifest.
+
 MODULE = dataclasses.replace(
     MODULE, linked=tuple(_adapt_unit(_u) for _u in MODULE.linked),
     category=Category.MACHINES, author="timhastie/octatrick-modules", author_url="https://github.com/timhastie/octatrick-modules",
-    proof=Proof.HARDWARE, proof_note="`octatrick-usb` on his MKI, 26 Sep 2026 (OCTATRICK9) through 2.9; the last two 2.9 fixes under the port")
+    proof=Proof.HARDWARE, proof_note="v2.15 on Tim's MKI, 18 Oct 2026; octabam ML_FM_MAX=3")
+
+
+# PLACE: where the PLAYBACK page lives. DRAM (the default) links page.s into the platform
+# runtime. CAVE is the author's pinned ROM cave at 0x400d24d0, the bytes his build ratified
+# (`PINNED_PAGE`); the ledger refuses it in a remix that lists the stock DELAY (stock.py).
+# The stock DELAY reads `0x400d1ce0 + 4 * (x >> 6)` for an index up to 511 and
+# its table ends at 0x400d24d0, so the first words of that run are read as
+# data when the delay time is long and the tempo slow: the page's first bytes
+# change the DELAY's output (issue #771, measured under the port). DRAM links
+# page.s into the platform runtime with poly.s and leaves the zero run alone;
+# its resolver is a detour at the same site. page_dram.s exports fm_descriptor /
+# pg_resolve (Tim's page.s keeps them local for the CAVE absolute FM_DESC).
+
+
+def _variant(values):
+    """PLACE -> the page's placement."""
+    if values["PLACE"] != "DRAM":
+        return {}
+    return {
+        "linked": MODULE.linked + (Linked("page", os.path.join(str(_PAGE_DRAM)),
+                                          cpu="5475", dram=True),),
+        "cf_patches": (),
+        "detours": MODULE.detours + (Detour(
+            _PAGE_HOOK, _PAGE_STOCK, "page", "pg_resolve",
+            "PLAYBACK page resolver: a synth track's page reads RATIO/INDEX/FDBK/DECAY "
+            "(the DRAM form of the cave's one poke)", kind="jmp"),),
+    }
+
+
+MODULE = dataclasses.replace(
+    MODULE, store=Store("timhastie.synth"), variant=_variant,
+    settings=(Setting(1, "PLACE", Option(*PLACES), default="DRAM", apply=Apply.BUILD,
+                      doc="DRAM: the page in octabam's platform runtime, leaving the stock DELAY's table "
+                          "read untouched; CAVE: the pinned ROM cave at 0x400d24d0 (the author's bytes), "
+                          "refused where the stock DELAY is listed"),))

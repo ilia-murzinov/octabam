@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""CX OSC gates under Unicorn: voice knobs + the one-track-per-Part guard.
+"""CX OSC gates under Unicorn: voice knobs + the Part selection guard.
 
 1. Voice: FOLD / SYMM / RATO / FDBK move the output; FOLD=SYMM=FDBK=127 stays
    bounded (rail sample counts). Calls `sy_render` with a planted Part.
-2. Guard: `ml_guard_p` refuses a second CX OSC track in a Part ("CX OSC: 1 MAX")
-   and allows the track's own machine again / a first choice / a stock row.
+2. Guard: `ml_guard_p` allows up to ML_FM_MAX (3) CX OSC tracks; refuses a
+   fourth ("CX OSC: 3 MAX"); allows re-pick / stock beside them.
 
 ColdFire, not dsp_host. Instruction counts are diagnostics, not hardware cycles.
 
@@ -55,7 +55,8 @@ STOP, STACK = 0x10000, 0x20000
 Q14_PEAK = 0x4000
 RAIL = 0x7FFFF0  # top-24 sample near full scale
 FM_ROW = 5  # machine.s: sixth list row = CX OSC
-MSG_FM_MAX = b"CX OSC: 1 MAX"
+MSG_FM_MAX = b"CX OSC: 3 MAX"
+FM_MAX = 3
 
 
 def die(msg):
@@ -109,7 +110,7 @@ def read_cstr(uc, addr, n=32):
 
 
 def check_guard(uc, symbols):
-    """One CX OSC per Part: refuse a second choice; allow first / own / stock."""
+    """Up to FM_MAX CX OSC per Part; refuse FM_MAX+1; allow re-pick / stock."""
     clear_part(uc)
     d0 = call_ml_guard_p(uc, symbols, FM_ROW, 0)
     check("guard: first CX OSC on T1 allowed", d0 == 0, f"d0={d0:#x}")
@@ -118,22 +119,26 @@ def check_guard(uc, symbols):
     d0 = call_ml_guard_p(uc, symbols, FM_ROW, 0)
     check("guard: choosing CX OSC again on the same track allowed", d0 == 0)
 
-    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 1)
+    for t in range(1, FM_MAX):
+        d0 = call_ml_guard_p(uc, symbols, FM_ROW, t)
+        check(f"guard: CX OSC on T{t + 1} allowed ({t + 1}/{FM_MAX})", d0 == 0, f"d0={d0:#x}")
+        sign_cx(uc, t)
+
+    d0 = call_ml_guard_p(uc, symbols, FM_ROW, FM_MAX)
     msg = read_cstr(uc, d0)
     check(
-        "guard: second track refused with CX OSC: 1 MAX",
+        f"guard: {FM_MAX + 1}th track refused with {MSG_FM_MAX.decode()}",
         d0 != 0 and msg == MSG_FM_MAX,
         f"d0={d0:#x} msg={msg!r}",
     )
 
-    # Stock row (FLEX = 1): always allowed even with one CX OSC present
-    d0 = call_ml_guard_p(uc, symbols, 1, 1)
-    check("guard: stock row on a free track allowed beside one CX OSC", d0 == 0)
+    d0 = call_ml_guard_p(uc, symbols, 1, FM_MAX)
+    check("guard: stock row on a free track allowed beside max CX OSC", d0 == 0)
 
-    # Paste-style: destination Part already has CX on T1; choosing CX on T3
     clear_part(uc)
-    sign_cx(uc, 0)
-    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 2)
+    for t in range(FM_MAX):
+        sign_cx(uc, t)
+    d0 = call_ml_guard_p(uc, symbols, FM_ROW, FM_MAX)
     msg = read_cstr(uc, d0)
     check(
         "guard: paste onto another track refused (same ml_guard_p)",

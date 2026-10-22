@@ -7,9 +7,9 @@ SYNTH MACHINE submodule.
 
 **FUNC + SRC** or **SELECT MACHINE TYPE** → **CX OSC** (after the stock
 five). No marker sample. The Part stores FLEX with signature `"CX", 1`.
-At most one CX OSC track per Part (one sounding CX OSC track on the active
-Part). Conflicts with **SYNTH MACHINE**, **ANALOG BD**, and
-**BLACKPYRAMIDS_303** (shared kind table / page cave / ROM hooks). Gate
+At most three CX OSC tracks per Part (`ML_FM_MAX 3`, same as FM SYNTH); a
+fourth shows **CX OSC: 3 MAX**. Conflicts with **SYNTH MACHINE**, **ANALOG BD**,
+and **BLACKPYRAMIDS_303** (shared kind table / page cave / ROM hooks). Gate
 remix: `cxosc`.
 
 ![SRC SETUP: CX OSC selected in the machine list.](../../img/cxosc/setup.png)

@@ -8,11 +8,10 @@ and the `THIRD_PARTY.md` row.
 ## Select
 
 **FUNC + SRC** or **SELECT MACHINE TYPE** → **CX OSC** (sixth row). No marker
-file. Stored as FLEX with Part signature `"CX", 1`. At most **one CX OSC track
-per Part** (`ml_guard` / `ML_FM_MAX 1`) — so **one track can sound** as CX OSC
-at a time on the active Part. A second choice (machine window, SRC SETUP,
-track/Part paste) shows **CX OSC: 1 MAX**. `verify_cxosc` exercises the
-refusal under Unicorn.
+file. Stored as FLEX with Part signature `"CX", 1`. At most **three CX OSC
+tracks per Part** (`ml_guard` / `ML_FM_MAX 3`, same as FM SYNTH). A fourth
+choice (machine window, SRC SETUP, track/Part paste) shows **CX OSC: 3 MAX**.
+`verify_cxosc` exercises the refusal under Unicorn.
 
 ## Provenance
 
