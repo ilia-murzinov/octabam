@@ -68,22 +68,22 @@ MODULE = Module(
               doc="dry↔noise (0=exact dry, 127=pure noise); AM/DRV/FDBK on noise only"),
         Param(b"RATE", 72, 128, active=True, formatter=_P,
               doc="LFO rate; idle when SRC=NBR"),
-        Param(b"SHPE", 0, 3, active=True, formatter=_S,
-              labels=("SIN", "SQR", "SAW"),
-              doc="LFO shape; idle when SRC=NBR"),
-        Param(b"DPTH", 100, 128, active=True, formatter=_P,
-              doc="AM depth on noise (LFO or neighbour envelope)"),
+        Param(b"COLR", 64, 128, active=True, formatter=_P,
+              doc="noise low-pass after HPF; 127 = open; dry untouched"),
+        Param(b"HPF", 0, 128, active=True, formatter=_P,
+              doc="noise high-pass before COLR; 0 = bypass; dry untouched"),
         Param(b"DRV", 0, 128, active=True, formatter=_P,
               doc="soft-clip on noise only (before BAL); 0 = bypass"),
         Param(b"FDBK", 0, 128, active=True, formatter=_P,
               doc="one-sample AC feedback on noise only; 0 = off"),
         # ---- page 2 --------------------------------------------------------
-        # Top: COLR HPF WID ; bottom: SRC · · .
-        # HPF=$c companion; WID=$d knob; SRC=$d companion (slot 9).
-        Param(b"COLR", 64, 128, active=True, formatter=_P,
-              doc="noise low-pass after HPF; 127 = open; dry untouched"),
-        Param(b"HPF", 0, 128, active=True, formatter=_P,
-              doc="noise high-pass before COLR; 0 = bypass; dry untouched"),
+        # Top: SHPE DPTH WID ; bottom: SRC · · .
+        # SHPE=$c knob; DPTH=$c companion; WID=$d knob; SRC=$d companion.
+        Param(b"SHPE", 0, 3, active=True, formatter=_S,
+              labels=("SIN", "SQR", "SAW"),
+              doc="LFO shape; idle when SRC=NBR"),
+        Param(b"DPTH", 100, 128, active=True, formatter=_P,
+              doc="AM depth on noise (LFO or neighbour envelope)"),
         Param(b"WID", 0, 128, active=True, formatter=_P,
               doc="noise stereo width; 0=mono; side shares HPF/COLR/DRV"),
         Param(b"SRC", 0, 2, active=True, formatter=_S,

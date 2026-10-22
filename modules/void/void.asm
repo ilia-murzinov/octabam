@@ -69,32 +69,10 @@ proc:
         move    (r5)+n5
         move    p:(r5),x0
         move    x0,x:(r7+$10)            ; RATE step
+; COLR page1 $2: kn; 127 → open flag; table +258
         move    x:(r6+$2),a
         and     #>$7f0000,a
         asr     #$10,a,a
-        move    #>$000002,x0
-        cmp     x0,a
-        move    #0,y0
-        tgt     y0,a
-        move    a,x:(r7+$17)
-; DPTH: kn<<16; kn=127 → exact 1.0 so uni=0 fully mutes noise
-        move    x:(r6+$3),a
-        and     #>$7f0000,a
-        move    #>$7f0000,x0
-        cmp     x0,a
-        move    #>$7fffff,x0
-        teq     x0,a
-        move    a,x:(r7+$11)
-        move    x:(r6+$4),a
-        and     #>$7f0000,a
-        move    a,x:(r7+$13)
-        move    x:(r6+$5),a
-        and     #>$7f0000,a
-        move    a,x:(r7+$12)
-        move    x:(r6+$c),a
-        and     #>$7f0000,a
-        asr     #$10,a,a
-; clr after cmp would set Z and make teq always fire (COLR always "open")
         move    #0,b
         move    #>$00007f,x0
         cmp     x0,a
@@ -108,10 +86,10 @@ proc:
         move    (r5)+n5
         move    p:(r5),x0
         move    x0,x:(r7+$15)
-; HPF = companion of $c (slot 7, top row)
-        move    x:(r6+$c),a
-        and     #>$007f00,a
-        asr     #$8,a,a
+; HPF page1 $3: 0 = bypass; table +129
+        move    x:(r6+$3),a
+        and     #>$7f0000,a
+        asr     #$10,a,a
         move    #0,b
         tst     a
         move    #>$000001,y0
@@ -124,7 +102,31 @@ proc:
         move    (r5)+n5
         move    p:(r5),x0
         move    x0,x:(r7+$14)
-; WID = $d knob (slot 8); SRC = $d companion (slot 9, bottom left)
+        move    x:(r6+$4),a
+        and     #>$7f0000,a
+        move    a,x:(r7+$13)            ; DRV
+        move    x:(r6+$5),a
+        and     #>$7f0000,a
+        move    a,x:(r7+$12)            ; FDBK
+; SHPE = $c knob (SETUP); DPTH = $c companion
+        move    x:(r6+$c),a
+        and     #>$7f0000,a
+        asr     #$10,a,a
+        move    #>$000002,x0
+        cmp     x0,a
+        move    #0,y0
+        tgt     y0,a
+        move    a,x:(r7+$17)            ; SHPE
+        move    x:(r6+$c),a
+        and     #>$007f00,a
+        asr     #$8,a,a
+        asl     #$10,a,a                ; kn<<16
+        move    #>$7f0000,x0
+        cmp     x0,a
+        move    #>$7fffff,x0
+        teq     x0,a
+        move    a,x:(r7+$11)            ; DPTH (127 → exact 1.0)
+; WID = $d knob; SRC = $d companion
         move    x:(r6+$d),a
         and     #>$7f0000,a
         move    #>$7f0000,x0

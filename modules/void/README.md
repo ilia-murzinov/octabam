@@ -18,12 +18,12 @@ r7 `$40..$4f` stays reserved for a longer FEED delay later.
 |---|---|---|---|---|
 | 1 | 0 | BAL | 0–127 | dry↔noise (**0 = exact dry**, 127 = pure noise) |
 | 1 | 1 | RATE | 0–127 | LFO rate; idle when SRC=NBR |
-| 1 | 2 | SHPE | SIN / SQR / SAW | LFO shape; idle when SRC=NBR |
-| 1 | 3 | DPTH | 0–127 | AM depth on **noise** only (LFO or nbr uni) |
+| 1 | 2 | COLR | 0–127 | noise low-pass ~30 Hz..16 kHz; 127 = open |
+| 1 | 3 | HPF | 0–127 | noise high-pass before COLR; **0 = bypass** |
 | 1 | 4 | DRV | 0–127 | soft-clip on **noise** only; 0 = bypass |
 | 1 | 5 | FDBK | 0–127 | one-sample AC feedback on **noise** only |
-| 2 | 6 | COLR | 0–127 | noise low-pass ~30 Hz..16 kHz; 127 = open |
-| 2 | 7 | HPF | 0–127 | noise high-pass before COLR; **0 = bypass** |
+| 2 | 6 | SHPE | SIN / SQR / SAW | LFO shape; idle when SRC=NBR |
+| 2 | 7 | DPTH | 0–127 | AM depth on **noise** only (LFO or nbr uni) |
 | 2 | 8 | WID | 0–127 | mono → stereo grit (2nd noise, same HPF/COLR/DRV) |
 | 2 | 9 | SRC | LFO / NBR | AM source (NBR = previous track keybus) |
 
@@ -37,7 +37,7 @@ AM’d noise. SETUP **WID**: 0 = mono; >0 = second white → same HPF/COLR/DRV
 Noise peaks around −6 dB at BAL=127. High FDBK + DRV screams (AC feedback —
 a raw one-sample loop was railing to DC / silence past ~FDBK 50 with drive).
 
-SETUP: COLR · HPF · WID / SRC · · .
+SETUP: SHPE · DPTH · WID / SRC · · .
 
 ## Storage and stock firmware
 
