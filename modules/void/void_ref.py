@@ -117,6 +117,7 @@ def process_block(
     color: int = 64,
     hpf: int = 0,
     wid: int = 0,
+    src: int = 0,
     nbr_l: list[float] | None = None,
     nbr_r: list[float] | None = None,
     state: VoidState | None = None,
@@ -129,7 +130,7 @@ def process_block(
     w_wid = _kn_q23(wid)
     hc = hpf_coef(hpf)
     cc = color_coef(color)
-    use_nbr = nbr_l is not None
+    use_nbr = int(src) != 0 and nbr_l is not None
     out_l, out_r = [], []
     for i, (x_l, x_r) in enumerate(zip(left, right)):
         st.noise, n = _white_step(st.noise)

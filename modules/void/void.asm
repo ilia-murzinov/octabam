@@ -6,11 +6,9 @@
 ; Law: modules/void/void_ref.py
 ;
 ; BAL = this track ↔ noise always (neighbour never replaces the dry source).
-; Auto neighbour AM only when the previous same-core FX2 slot is also VOID
-; (r7−$300+$2f holds VOID_LIVE). Lone VOID on T2/T6/… keeps the LFO — slot
-; position alone is not enough. Trigger audio is still SC keybus
-; Y:($800+(track−1)·$40); quiet previous → AM≈0 → noise stops (no free-run).
-; X:$420 = absolute track (0..7); harness $420=0 invents abs from pos.
+; SETUP SRC ($d companion, bottom left): LFO (default) or NBR. NBR AM’s noise
+; from previous track’s SC keybus Y:($800+(track−1)·$40); quiet → noise stops.
+; X:$420 = absolute track (0..7); harness $420=0 invents abs from FX2 pos.
 ; Sample loop reads Y:(r5)+ directly — never flatten into X (X:$500 stomped
 ; shared scratch and broke FM chromatic / MIDI IN; HW A/B 22 Oct 2026).
 ; Law: noise' = FDBK+DRV(noise);  noise'' = noise'·((1−DPTH)+DPTH·uni);
@@ -28,13 +26,13 @@
 ;     $06 fbL   $07 fbR   (FDBK on mid only; both kept in step when mono)
 ;     $0c dcL   $0d dcR   (feedback DC tracker — high FDBK+DRV otherwise rails)
 ;     $10..$19 block knobs/flags ($16 = BAL)
-;     $1b use_nbr (auto)  $1c pos  $1d nbr Y: read ptr (keybus lane)
+;     $1b use_nbr (SRC=NBR)  $1c pos  $1d nbr Y: read ptr (keybus lane)
 ;     $1e nbr uni (smoothed |mono|)  $1f env one-pole state
 ;     $20 nL after AM/width  $21 nR after AM/width  $22 dryL  $23 dryR
 ;     $24 scratch (u / pre-HP / m)
 ;     $25 noise sample / sqr osc (reused after src)
 ;     $26 uni / sin  $27 saw / u park  $28 driven mid
-;     $2e LCG2 (side)  $2f VOID_LIVE magic ($130013)  $37 WID (Q23)
+;     $2e LCG2 (side)  $37 WID (Q23)
 ;     $40..$4f RESERVED for FEED delay (kept zero)
 ;
 ; CYCLES_FORWARD_BRANCHES
@@ -126,15 +124,28 @@ proc:
         move    (r5)+n5
         move    p:(r5),x0
         move    x0,x:(r7+$14)
-; WID = $d knob (slot 8, top right): kn<<16; 127 → exact 1.0
+; WID = $d knob (slot 8); SRC = $d companion (slot 9, bottom left)
         move    x:(r6+$d),a
         and     #>$7f0000,a
         move    #>$7f0000,x0
         cmp     x0,a
         move    #>$7fffff,x0
         teq     x0,a
-        move    a,x:(r7+$37)
-; FX2 pos from r7 ($6200/$6500/$6800/$6b00 → 0..3)
+        move    a,x:(r7+$37)            ; WID
+        move    x:(r6+$d),a
+        and     #>$007f00,a             ; SRC companion
+        asr     #$8,a,a
+        tst     a
+        move    #0,a
+        move    #>$000001,x0
+        tne     x0,a
+        move    a,x:(r7+$1b)            ; use_nbr (0=LFO, 1=NBR)
+        clr     a
+        move    a,x:(r7+$1d)
+        move    x:(r7+$1b),a
+        tst     a
+        beq     vd_nbr_go               ; LFO — no keybus
+; FX2 pos from r7 (harness invents abs track when X:$420 is 0)
         move    #0,a
         move    r7,b
         move    #>$6500,x0
@@ -150,25 +161,13 @@ proc:
         move    #>$000003,y0
         teq     y0,a
         move    a,x:(r7+$1c)
-; nbr AM only if previous same-core FX2 is VOID (its $2f == VOID_LIVE).
-; Keep r4 = P-table base; do not write absolute X.
-        clr     a
-        move    a,x:(r7+$1b)
-        move    a,x:(r7+$1d)
-        move    x:(r7+$1c),a            ; pos 0..3
-        tst     a
-        beq     vd_stamp                ; first on core → LFO
-        move    r7,r5
-        move    #>$300,n5
-        move    (r5)-n5                 ; r5 → previous FX2 r7
-        move    x:(r5+$2f),a
-        move    #>$130013,x0            ; VOID_LIVE
-        cmp     x0,a
-        bne     vd_stamp                ; lone T2/T6/… → LFO
-        move    x:>$420,b               ; absolute track when the dispatcher set it
+        move    x:>$420,b
         tst     b
         bne     vd_abs
-        move    x:(r7+$1c),b            ; harness: invent abs track = pos
+        move    a,b                     ; harness: abs = pos
+        tst     b
+        bne     vd_abs
+        move    #>$000001,b             ; pos0 harness → read Y:$800 as nbr
 vd_abs:
         move    b,a
         move    #>$000001,x0
@@ -176,12 +175,8 @@ vd_abs:
         asl     #$6,a,a                 ; · $40
         move    #>$800,x0
         add     x0,a                    ; Y:keybus gen 0
-        move    a,x:(r7+$1d)            ; sample loop: y:(r5)+ from here
-        move    #>$000001,a
-        move    a,x:(r7+$1b)
-vd_stamp:
-        move    #>$130013,x0            ; announce VOID for the next slot
-        move    x0,x:(r7+$2f)
+        move    a,x:(r7+$1d)
+vd_nbr_go:
         move    #$1,n0
 
         do      n7,>vd_end

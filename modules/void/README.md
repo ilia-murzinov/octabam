@@ -6,9 +6,9 @@ opens without that effect (re-pick VOID or stamp defaults). Code sits in
 harvested **PLATE REV** words.
 
 Grit: this track’s input blended with white noise (shape with COLR/HPF; WID
-for stereo), amplitude-modulated by an audio-rate LFO (or the previous
-same-core track’s envelope when that neighbour is live). HPF/COLR/DRV/FDBK/AM
-hit the **noise** only; dry is unfiltered. Always wet — no dry/wet MIX.
+for stereo), amplitude-modulated by an audio-rate LFO or (SETUP **SRC=NBR**)
+the previous track’s keybus envelope. HPF/COLR/DRV/FDBK/AM hit the **noise**
+only; dry is unfiltered. Always wet — no dry/wet MIX.
 
 r7 `$40..$4f` stays reserved for a longer FEED delay later.
 
@@ -17,19 +17,19 @@ r7 `$40..$4f` stays reserved for a longer FEED delay later.
 | page | slot | name | range | what it does |
 |---|---|---|---|---|
 | 1 | 0 | BAL | 0–127 | dry↔noise (**0 = exact dry**, 127 = pure noise) |
-| 1 | 1 | RATE | 0–127 | LFO rate; idle only in a VOID←VOID chain |
-| 1 | 2 | SHPE | SIN / SQR / SAW | LFO shape; idle only in a VOID←VOID chain |
+| 1 | 1 | RATE | 0–127 | LFO rate; idle when SRC=NBR |
+| 1 | 2 | SHPE | SIN / SQR / SAW | LFO shape; idle when SRC=NBR |
 | 1 | 3 | DPTH | 0–127 | AM depth on **noise** only (LFO or nbr uni) |
 | 1 | 4 | DRV | 0–127 | soft-clip on **noise** only; 0 = bypass |
 | 1 | 5 | FDBK | 0–127 | one-sample AC feedback on **noise** only |
 | 2 | 6 | COLR | 0–127 | noise low-pass ~30 Hz..16 kHz; 127 = open |
 | 2 | 7 | HPF | 0–127 | noise high-pass before COLR; **0 = bypass** |
 | 2 | 8 | WID | 0–127 | mono → stereo grit (2nd noise, same HPF/COLR/DRV) |
+| 2 | 9 | SRC | LFO / NBR | AM source (NBR = previous track keybus) |
 
-**Auto neighbour AM:** only when the **previous same-core track also has
-VOID**. Lone VOID on T2/T6/… keeps RATE/SHPE. In a VOID←VOID chain the
-follower’s noise opens from the previous track’s keybus level and stops
-when that goes quiet (no LFO free-run). AM and DRV/FDBK hit **noise only**:
+**SRC=NBR:** noise opens from the previous track’s SC keybus level and stops
+when that goes quiet (no LFO free-run). Default **SRC=LFO** keeps RATE/SHPE
+on any track. AM and DRV/FDBK hit **noise only**:
 `wet = (1−BAL)·dry + BAL·noise''`. BAL=0 is always exact dry; BAL=127 =
 AM’d noise. SETUP **WID**: 0 = mono; >0 = second white → same HPF/COLR/DRV
 (no FDBK) → same AM; `L/R = mid ± (w/2)·side` (mono sum keeps mid/LFO).
@@ -37,7 +37,7 @@ AM’d noise. SETUP **WID**: 0 = mono; >0 = second white → same HPF/COLR/DRV
 Noise peaks around −6 dB at BAL=127. High FDBK + DRV screams (AC feedback —
 a raw one-sample loop was railing to DC / silence past ~FDBK 50 with drive).
 
-SETUP: COLR · HPF · WID / · · · .
+SETUP: COLR · HPF · WID / SRC · · .
 
 ## Storage and stock firmware
 

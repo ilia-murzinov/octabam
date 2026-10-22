@@ -206,6 +206,7 @@ for p in MOD.params:
     if not p.name:
         continue
     max_kw[p.name.decode("latin1")] = (p.count - 1) if p.count else 0
+max_kw["SRC"] = 0  # NBR needs keybus; rail budget is the LFO scrape
 L, R = render(long_in, **max_kw)
 hits = rail_hits(L + R)
 n_samp = len(L) + len(R)
@@ -243,49 +244,24 @@ if r.returncode == 0 and out.exists():
               pk < RAIL and rail_hits(Li + Ri) == 0,
               f"peak={pk} rail_hits={rail_hits(Li + Ri)}")
 
-# Auto neighbour AM: only when previous same-core FX2 is also VOID.
-# Leader at -r7 2 stamps VOID_LIVE; follower at -r7 5 is measured (.i1).
-# Keybus poke seeds every gen-0 lane (harness $420 may not be 0).
+# SRC=NBR: previous-track keybus AM. Seed every gen-0 lane (harness $420
+# may not be 0). SRC=LFO on the same slot still responds to RATE.
 carrier = [0.5 * math.sin(2 * math.pi * 220 * i / FS) for i in range(n)]
 src1 = TMP / "nbr1.raw"
 out_nbr = TMP / "out_nbr.raw"
-out_nbr_i1 = pathlib.Path(f"{out_nbr}.i1")
 src1.write_bytes(b"".join(struct.pack("<i", m) for m in q23(carrier)))
 _qw = q23([0.6])[0] & 0xFFFFFF
 _pokey = ",".join(
     f"{0x800 + t * 0x40 + i:x}={_qw:x}"
     for t in range(8) for i in range(32))
-_lead = params(BAL=0, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0, RATE=10, SHPE=0)
 
 
-def _auto_nbr(**kw):
-    out_nbr_i1.unlink(missing_ok=True)
-    cmd = [HOST, "-mem", MEM,
-           "-init", f"{init:x},{init:x}", "-proc", f"{proc:x},{proc:x}",
-           "-inst", "2", "-r7", "2,5", "-alloc", "1,3", "-inmask", "2",
-           "-audio", "0", "-frames", str(FRAMES), "-blocks", str(n // FRAMES),
-           "-in", str(src1), "-out", str(out_nbr),
-           "-pokey", _pokey,
-           "-params", ",".join(str(x) for x in _lead),
-           "-params", ",".join(str(x) for x in params(**kw))]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    out_nbr.unlink(missing_ok=True)
-    if r.returncode != 0 or not out_nbr_i1.exists():
-        return None, r.returncode
-    w = struct.unpack(f"<{len(out_nbr_i1.read_bytes()) // 4}i",
-                      out_nbr_i1.read_bytes())
-    L1 = list(w[0::2])[:n]
-    out_nbr_i1.unlink(missing_ok=True)
-    return L1, 0
-
-
-# Lone VOID on slot 1 (T2/T6): no previous VOID → LFO still works.
-def _lonely(**kw):
+def _src_render(pokey, **kw):
     cmd = [HOST, "-mem", MEM, "-init", f"{init:x}", "-proc", f"{proc:x}",
            "-inst", "1", "-r7", "5", "-alloc", "3", "-inmask", "1",
            "-audio", "0", "-frames", str(FRAMES), "-blocks", str(n // FRAMES),
            "-in", str(src1), "-out", str(out_nbr),
-           "-pokey", _pokey,
+           "-pokey", pokey,
            "-params", ",".join(str(x) for x in params(**kw))]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0 or not out_nbr.exists():
@@ -296,64 +272,51 @@ def _lonely(**kw):
     return L1, 0
 
 
-L_lon10, rcl = _lonely(BAL=127, DPTH=127, DRV=0, FDBK=0, COLR=127, HPF=0,
-                       RATE=10, SHPE=0)
-L_lon100, rcl2 = _lonely(BAL=127, DPTH=127, DRV=0, FDBK=0, COLR=127, HPF=0,
-                         RATE=100, SHPE=0)
-check("lonely T6 keeps LFO",
-      rcl == 0 and rcl2 == 0 and L_lon10 is not None and L_lon100 is not None
-      and max(abs(a - b) for a, b in zip(L_lon10, L_lon100)) > (1 << 16),
-      f"rc={rcl}/{rcl2} maxd="
-      f"{None if not (L_lon10 and L_lon100) else max(abs(a-b) for a,b in zip(L_lon10, L_lon100))}")
+def _auto_nbr(**kw):
+    return _src_render(_pokey, SRC=1, **kw)
 
-# BAL0 DPTH0: exact dry (AM bypass). RATE still idle under nbr.
+
+L_lfo10, rcl = _src_render(_pokey, SRC=0, BAL=127, DPTH=127, DRV=0, FDBK=0,
+                           COLR=127, HPF=0, RATE=10, SHPE=0)
+L_lfo100, rcl2 = _src_render(_pokey, SRC=0, BAL=127, DPTH=127, DRV=0, FDBK=0,
+                             COLR=127, HPF=0, RATE=100, SHPE=0)
+check("SRC=LFO RATE still works",
+      rcl == 0 and rcl2 == 0 and L_lfo10 is not None and L_lfo100 is not None
+      and max(abs(a - b) for a, b in zip(L_lfo10, L_lfo100)) > (1 << 16),
+      f"rc={rcl}/{rcl2} maxd="
+      f"{None if not (L_lfo10 and L_lfo100) else max(abs(a-b) for a,b in zip(L_lfo10, L_lfo100))}")
+
+# BAL0 DPTH0: exact dry. RATE idle under SRC=NBR (check with BAL=127 too).
 L_slow, rc = _auto_nbr(BAL=0, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0, RATE=10, SHPE=0)
-check("auto-nbr host ok", rc == 0 and L_slow is not None, f"rc={rc}")
+check("SRC=NBR host ok", rc == 0 and L_slow is not None, f"rc={rc}")
 if L_slow is not None:
-    L_fast, rc2 = _auto_nbr(BAL=0, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0,
-                            RATE=120, SHPE=0)
-    check("auto-nbr RATE ignored", rc2 == 0 and L_fast is not None
-          and max(abs(a - b) for a, b in zip(L_slow, L_fast)) <= 2,
-          f"rc={rc2}")
+    L_r10, _ = _auto_nbr(BAL=127, DPTH=127, DRV=0, FDBK=0, COLR=127, HPF=0,
+                         RATE=10, SHPE=0)
+    L_r100, rc2 = _auto_nbr(BAL=127, DPTH=127, DRV=0, FDBK=0, COLR=127, HPF=0,
+                            RATE=100, SHPE=0)
+    check("SRC=NBR RATE ignored",
+          rc2 == 0 and L_r10 is not None and L_r100 is not None
+          and max(abs(a - b) for a, b in zip(L_r10, L_r100)) <= 2,
+          f"rc={rc2} maxd="
+          f"{None if not (L_r10 and L_r100) else max(abs(a-b) for a,b in zip(L_r10, L_r100))}")
     energy = sum(abs(x) for x in L_slow)
-    check("auto-nbr keeps this track", energy > (1 << 20), f"energy={energy}")
+    check("SRC=NBR keeps this track", energy > (1 << 20), f"energy={energy}")
     _pokey_z = ",".join(
         f"{0x800 + t * 0x40 + i:x}=0"
         for t in range(8) for i in range(32))
     car_q = q23(carrier)
 
-    def _auto_nbr_pokey(pokey, **kw):
-        out_nbr_i1.unlink(missing_ok=True)
-        cmd = [HOST, "-mem", MEM,
-               "-init", f"{init:x},{init:x}", "-proc", f"{proc:x},{proc:x}",
-               "-inst", "2", "-r7", "2,5", "-alloc", "1,3", "-inmask", "2",
-               "-audio", "0", "-frames", str(FRAMES), "-blocks", str(n // FRAMES),
-               "-in", str(src1), "-out", str(out_nbr),
-               "-pokey", pokey,
-               "-params", ",".join(str(x) for x in _lead),
-               "-params", ",".join(str(x) for x in params(**kw))]
-        r = subprocess.run(cmd, capture_output=True, text=True)
-        out_nbr.unlink(missing_ok=True)
-        if r.returncode != 0 or not out_nbr_i1.exists():
-            return None, r.returncode
-        w = struct.unpack(f"<{len(out_nbr_i1.read_bytes()) // 4}i",
-                          out_nbr_i1.read_bytes())
-        L1 = list(w[0::2])[:n]
-        out_nbr_i1.unlink(missing_ok=True)
-        return L1, 0
-
-    # Quiet nbr → AM≈0 → noise stops (no LFO free-run when VOID←VOID).
-    L_q, rcq = _auto_nbr_pokey(_pokey_z, BAL=127, DPTH=127, DRV=0, FDBK=0,
-                               COLR=127, HPF=0, RATE=10, SHPE=0)
+    # Quiet keybus → AM≈0 → noise stops (no LFO free-run).
+    L_q, rcq = _src_render(_pokey_z, SRC=1, BAL=127, DPTH=127, DRV=0, FDBK=0,
+                           COLR=127, HPF=0, RATE=10, SHPE=0)
     _bleed = max(abs(x) for x in car_q) // 64 + 8
-    check("auto-nbr quiet BAL127 ≈ silence",
+    check("SRC=NBR quiet BAL127 ≈ silence",
           rcq == 0 and L_q is not None
           and max(abs(x) for x in L_q) <= _bleed,
           f"rc={rcq} peak={None if not L_q else max(abs(x) for x in L_q)} bleed={_bleed}")
-    check("auto-nbr BAL0 DPTH0 ≈ dry",
+    check("SRC=NBR BAL0 DPTH0 ≈ dry",
           max(abs(a - b) for a, b in zip(L_slow, car_q)) <= 4,
           f"maxd={max(abs(a-b) for a,b in zip(L_slow, car_q))}")
-    # BAL=127 + loud + DPTH0 ⇒ pure noise (not dry at unity).
     L_n, rcn = _auto_nbr(BAL=127, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0,
                          RATE=10, SHPE=0)
     if L_n is not None:
@@ -361,20 +324,18 @@ if L_slow is not None:
         corr0 = sum(a * b for a, b in zip(L_slow, car_q))
     else:
         corr_dry = corr0 = 0
-    check("auto-nbr BAL127 DPTH0 ≠ dry",
+    check("SRC=NBR BAL127 DPTH0 ≠ dry",
           rcn == 0 and L_n is not None and abs(corr_dry) < abs(corr0) // 4,
           f"rc={rcn} corr_n={corr_dry} corr0={corr0}")
-    # Crossfade: BAL mid + loud pulls correlation away from dry.
     L_xf, rcx = _auto_nbr(BAL=100, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0,
                           RATE=10, SHPE=0)
     if L_xf is not None:
         corrx = sum(a * b for a, b in zip(L_xf, car_q))
     else:
         corrx = 0
-    check("auto-nbr BAL mid ducks dry corr",
+    check("SRC=NBR BAL mid ducks dry corr",
           rcx == 0 and L_xf is not None and corrx < corr0 - (1 << 30),
           f"rc={rcx} corr0={corr0} corrx={corrx}")
-    # DRV 0→1 continuous on noise (BAL=127).
     L_d0, _ = _auto_nbr(BAL=127, DPTH=0, DRV=0, FDBK=0, COLR=127, HPF=0,
                         RATE=10, SHPE=0)
     L_d1, rd1 = _auto_nbr(BAL=127, DPTH=0, DRV=1, FDBK=0, COLR=127, HPF=0,
@@ -386,10 +347,9 @@ if L_slow is not None:
     check("DRV 0→1 no click",
           rd1 == 0 and L_d1 is not None and maxd < (1 << 16),
           f"rc={rd1} maxd={maxd}")
-    # BAL0 + hot DRV under nbr still exact dry
     L_safe, rcs = _auto_nbr(BAL=0, DPTH=127, DRV=127, FDBK=100, COLR=0, HPF=127,
                             RATE=10, SHPE=0)
-    check("auto-nbr BAL0 hot DRV ≈ dry",
+    check("SRC=NBR BAL0 hot DRV ≈ dry",
           rcs == 0 and L_safe is not None
           and max(abs(a - b) for a, b in zip(L_safe, car_q)) <= 4,
           f"rc={rcs} maxd={None if not L_safe else max(abs(a-b) for a,b in zip(L_safe, car_q))}")
