@@ -78,17 +78,22 @@
   font-weight: 700;
 }
 
-#octabam-builder .ob-features .ob-row-hover > *,
-#octabam-builder .ob-features .ob-col-hover {
-  background: color-mix(in srgb, var(--ob-accent) 14%, transparent) !important;
+/* Hover must beat thead/row header backgrounds so both axes light up. */
+#octabam-builder .ob-features tr.ob-row-hover > th,
+#octabam-builder .ob-features tr.ob-row-hover > td,
+#octabam-builder .ob-features thead th.ob-col-hover,
+#octabam-builder .ob-features tbody th.ob-col-hover,
+#octabam-builder .ob-features tbody td.ob-col-hover {
+  background: color-mix(in srgb, var(--ob-accent) 22%, var(--ot-th-bg, #1a1410)) !important;
 }
 
 #octabam-builder .ob-features .ob-cell-hover {
-  background: color-mix(in srgb, var(--ob-accent) 30%, transparent) !important;
+  background: color-mix(in srgb, var(--ob-accent) 38%, var(--ot-panel, #0e0e0e)) !important;
 }
 
-#octabam-builder .ob-features tr.ob-selected > * {
-  background: color-mix(in srgb, var(--ob-accent) 18%, var(--ot-panel, #0e0e0e)) !important;
+#octabam-builder .ob-features tr.ob-selected > th,
+#octabam-builder .ob-features tr.ob-selected > td {
+  background: color-mix(in srgb, var(--ob-accent) 20%, var(--ot-panel, #0e0e0e)) !important;
 }
 #octabam-builder .ob-features tr[data-remix] {
   cursor: pointer;
@@ -99,6 +104,27 @@
 }
 #octabam-builder .ob-features tr.ob-selected th[scope="row"] {
   box-shadow: inset 3px 0 0 var(--ob-accent);
+  background: color-mix(in srgb, var(--ob-accent) 28%, var(--ot-th-bg, #1a1410)) !important;
+}
+
+#octabam-builder select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--input, #1a1a1a);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ob-accent) 50%),
+    linear-gradient(135deg, var(--ob-accent) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) calc(50% - 3px),
+    calc(100% - 8px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  color: var(--foreground, #e8e4dc);
+  border: 2px solid var(--border, #3a3a3a);
+  font-family: inherit;
+  padding: 0.35rem 2rem 0.35rem 0.55rem;
+  min-width: 14rem;
+  cursor: pointer;
 }
 
 #octabam-builder button {
@@ -115,11 +141,4 @@
 #octabam-builder button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-}
-#octabam-builder select {
-  background: var(--input, #1a1a1a);
-  color: var(--foreground, #e8e4dc);
-  border: 2px solid var(--border, #3a3a3a);
-  font-family: inherit;
-  padding: 0.3rem 0.5rem;
 }
