@@ -39,7 +39,7 @@ nav:
       - Stuttr: reference/modules/stuttr.md
       - Void: reference/modules/void.md
   - Machines:
-      - Cx Osc: reference/modules/cxosc.md
+      - Complex Oscillator: reference/modules/cxosc.md
       - Euclid Fill: reference/modules/euclid-fill.md
   - Tools:
       - Copy Project: reference/modules/copy-project.md

@@ -28,14 +28,15 @@ Always on both stacks: [Scope](reference/modules/scope.md),
 COMPRESSOR. PLATE and SPRING are harvested so the inserts fit.
 
 - **base\*** — Tim Hastie’s SYNTH MACHINE, plus the fork modules.
-- **cx\*** — [Cx Osc](reference/modules/cxosc.md) instead of SYNTH MACHINE.
+- **cx\*** — [Complex Oscillator](reference/modules/cxosc.md) instead of
+  SYNTH MACHINE.
 
 ## Lineage that stays visible
 
-- **CX OSC** is a local machine derived from **Tim Hastie**’s FM SYNTH engine
-  (octatrick). It is not an edit of the SYNTH MACHINE submodule. Tim’s
-  SYNTH MACHINE, SCALE QUANTIZER and TUNER still ship on `base*` and keep
-  their authorship.
+- **Complex Oscillator** (panel: **CX OSC**) is a local machine derived from
+  **Tim Hastie**’s FM SYNTH engine (octatrick). It is not an edit of the
+  SYNTH MACHINE submodule. Tim’s SYNTH MACHINE, SCALE QUANTIZER and TUNER
+  still ship on `base*` and keep their authorship.
 - **SCOPE** overlays TUNER’s **DOWN+TEMPO** entry when both are present.
   TUNER remains Tim’s; SCOPE is an overlay, not a rewrite.
 

@@ -8,7 +8,7 @@ Always on: [Scope](reference/modules/scope.md),
 [Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
 PLATE and SPRING are harvested so the inserts fit.
 **base\*** includes Tim Hastie’s SYNTH MACHINE;
-**cx\*** includes [Cx Osc](reference/modules/cxosc.md) instead.
+**cx\*** includes [Complex Oscillator](reference/modules/cxosc.md) instead.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),

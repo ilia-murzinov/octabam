@@ -79,6 +79,7 @@ def _label(m) -> str:
         "bbd": "BBD delay",
         "blackpyramids-303": "BlackPyramids 303",
         "character-txtr": "Character TXTR",
+        "cxosc": "Complex oscillator",
         "devilish": "dEVILish",
         "dlcopy": "Effect loader (copier)",
         "dlpump": "Effect loader (sender)",
