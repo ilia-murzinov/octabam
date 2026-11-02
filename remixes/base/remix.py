@@ -1,4 +1,4 @@
-"""ilia -- Ilia's flash stack: Tim v2.15 synth + VOID + SHATTER + SCOPE + DARK.
+"""base -- Ilia FM flash stack: Tim v2.15 synth + VOID + SHATTER + SCOPE + DARK.
 
 CORE + STEM REC + PERSISTENT BUFFERS + EUCLID FILL / RND NAME + synth/FX +
 VOID + SHATTER + SCOPE + DARK REV + COPY. SYNTH / QUANTIZER at v2.15;
@@ -25,7 +25,7 @@ CORE = (
 )
 
 REMIX = Remix(
-    name="ilia",
+    name="base",
     family="mods",
     proof=Proof.RENDER,
     proof_note="v2.15 synth ML_FM_MAX=4 + VOID + SHATTER + SCOPE + DARK + COPY; stock COMP; no SC / RESONATOR / TAPE / STUTTR.",

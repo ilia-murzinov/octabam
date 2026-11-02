@@ -1,7 +1,7 @@
-"""ilia-reson -- ilia with RESONATOR instead of VOID.
+"""base-vres -- base with RESONATOR instead of SHATTER (VOID kept).
 
-Tim v2.15 synth + RESONATOR + SHATTER + SCOPE + DARK + COPY. Stock COMPRESSOR
-+ COMB FILTER. No VOID / SIDECHAIN / STUTTR / TAPE. PLATE / SPRING harvested.
+Tim v2.15 synth + VOID + RESONATOR + SCOPE + DARK + COPY. Stock COMPRESSOR.
+No SHATTER / STUTTR / SIDECHAIN / TAPE. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -23,16 +23,15 @@ CORE = (
 )
 
 REMIX = Remix(
-    name="ilia-reson",
+    name="base-vres",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="v2.15 synth + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock COMP; no VOID / SC / STUTTR.",
-    doc="CORE + STEM REC + SYNTH v2.15 + RESONATOR + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
+    proof_note="v2.15 synth + VOID + RESONATOR + SCOPE + DARK + COPY; stock COMP; no SHATTER / STUTTR / SC.",
+    doc="CORE + STEM REC + SYNTH v2.15 + VOID + RESONATOR + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
         "SYNTH MACHINE",
-        "SHATTER",
         "RESONATOR",
         "LOFI AMF FIX",
         "FILTER",
@@ -42,7 +41,7 @@ REMIX = Remix(
         "FLANGER",
         "CHORUS",
         "SPATIALIZER",
-        "COMB FILTER",
+        "VOID",
         "COMPRESSOR",
         "LO-FI",
         "DELAY",
@@ -55,6 +54,7 @@ REMIX = Remix(
         "PHASER",
         "FLANGER",
         "CHORUS",
+        "VOID",
         "RESONATOR",
         "COMPRESSOR",
         "LO-FI",

@@ -1,4 +1,4 @@
-"""ilia-stuttr -- ilia with STUTTR instead of SHATTER.
+"""base-stuttr -- base with STUTTR instead of SHATTER.
 
 Tim v2.15 synth + VOID + STUTTR + SCOPE + DARK + COPY. Stock COMPRESSOR.
 No SHATTER / SIDECHAIN / RESONATOR / TAPE. PLATE / SPRING harvested.
@@ -23,7 +23,7 @@ CORE = (
 )
 
 REMIX = Remix(
-    name="ilia-stuttr",
+    name="base-stuttr",
     family="mods",
     proof=Proof.RENDER,
     proof_note="v2.15 synth + VOID + STUTTR + SCOPE + DARK + COPY; stock COMP; no SHATTER / SC / RESONATOR.",

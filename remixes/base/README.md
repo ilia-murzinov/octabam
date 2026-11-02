@@ -1,4 +1,4 @@
-# ilia
+# base
 
 Ilia's default flash stack. Tim SYNTH / QUANTIZER v2.15 (`ML_FM_MAX=4`),
 VOID, SHATTER, SCOPE (DOWN+TEMPO), COPY PROJECT, DARK REV kept, stock
