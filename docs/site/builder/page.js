@@ -3,6 +3,16 @@
 // the heavy eft.wasm work is in a worker so the tab stays responsive.
 const root = document.getElementById("octabam-builder");
 
+// Keep dropdown chrome with this module — mkdocs/CDN has desynced builder.css
+// from page.js before and left the control looking like a plain white button.
+if (!document.getElementById("ob-builder-ui-css")) {
+  const link = document.createElement("link");
+  link.id = "ob-builder-ui-css";
+  link.rel = "stylesheet";
+  link.href = new URL("./builder-ui.css", import.meta.url).href;
+  document.head.appendChild(link);
+}
+
 const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
