@@ -6,9 +6,9 @@
 .dark {
   color-scheme: dark;
 
-  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-sans: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-heading: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
@@ -96,10 +96,16 @@ header a[href]:hover {
   color: var(--ot-amber-hot);
 }
 
+body,
+.font-sans {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "liga" 0, "calt" 1;
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-heading) !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.02em !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
   text-transform: none !important;
   text-shadow: none !important;
   color: var(--foreground) !important;
@@ -112,14 +118,14 @@ h2 {
 /* Page title in the content header */
 #page-header h1 {
   font-family: var(--font-heading) !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.02em;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
 }
 
 /* Brand title in the top bar */
 header a[href] h1 {
   font-family: var(--font-heading) !important;
-  font-weight: 650 !important;
+  font-weight: 700 !important;
 }
 
 [aria-current="page"],
