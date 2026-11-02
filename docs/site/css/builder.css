@@ -1,9 +1,18 @@
 /* Personal builder chrome — scoped so the rest of the docs theme is untouched. */
 #octabam-builder {
   --ob-accent: #c45c26;
-  border-left: 3px solid var(--ob-accent);
-  padding-left: 1rem;
+  --ob-accent-soft: color-mix(in srgb, var(--ob-accent) 18%, transparent);
+  --ob-accent-mid: color-mix(in srgb, var(--ob-accent) 32%, transparent);
+  border-left: 4px solid var(--ob-accent);
+  border-top: 1px solid var(--ob-accent-soft);
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--ob-accent) 10%, transparent) 0%,
+    transparent 42%
+  );
+  padding: 1rem 1rem 1rem 1.1rem;
   margin: 1rem 0 1.5rem;
+  border-radius: 0 0.35rem 0.35rem 0;
 }
 
 #octabam-builder .ob-brand {
@@ -11,11 +20,12 @@
   font-size: 1.35rem;
   font-weight: 650;
   letter-spacing: -0.02em;
+  color: var(--ob-accent);
 }
 
 #octabam-builder .ob-sub {
   margin: 0 0 1rem;
-  color: var(--muted-foreground, #666);
+  color: color-mix(in srgb, var(--ob-accent) 55%, var(--muted-foreground, #666));
   font-size: 0.95rem;
 }
 
@@ -24,21 +34,56 @@
   color: var(--muted-foreground, #666);
 }
 
+#octabam-builder .ob-features-wrap {
+  overflow-x: visible;
+  width: 100%;
+}
+
 #octabam-builder .ob-features {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
+  width: 100%;
+  table-layout: fixed;
 }
 
 #octabam-builder .ob-features th,
 #octabam-builder .ob-features td {
-  padding: 0.28rem 0.45rem;
+  padding: 0.22rem 0.2rem;
+  border-color: color-mix(in srgb, var(--ob-accent) 28%, var(--border, #ccc));
+}
+
+#octabam-builder .ob-features thead th {
+  background: var(--ob-accent-soft);
+  color: inherit;
+  font-weight: 650;
+}
+
+#octabam-builder .ob-features th[scope="row"],
+#octabam-builder .ob-features thead th:first-child {
+  background: color-mix(in srgb, var(--ob-accent) 8%, transparent);
+}
+
+#octabam-builder button,
+#octabam-builder select {
+  accent-color: var(--ob-accent);
+}
+
+#octabam-builder #ob-go,
+#octabam-builder #ob-choose {
+  border-color: color-mix(in srgb, var(--ob-accent) 45%, var(--border, #ccc));
+  background: var(--ob-accent-soft);
+}
+
+#octabam-builder #ob-go:not(:disabled):hover,
+#octabam-builder #ob-choose:hover {
+  background: var(--ob-accent-mid);
 }
 
 #octabam-builder .ob-features .ob-row-hover > *,
 #octabam-builder .ob-features .ob-col-hover {
-  background: color-mix(in srgb, var(--ob-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--ob-accent) 16%, transparent);
 }
 
 #octabam-builder .ob-features .ob-cell-hover {
-  background: color-mix(in srgb, var(--ob-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--ob-accent) 34%, transparent);
 }
