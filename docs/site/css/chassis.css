@@ -8,7 +8,7 @@
 
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "Pixeled", "IBM Plex Sans", system-ui, sans-serif;
+  --font-heading: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
@@ -98,39 +98,28 @@ header a[href]:hover {
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.04em !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em !important;
   text-transform: none !important;
   text-shadow: none !important;
   color: var(--foreground) !important;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: unset;
-  font-smooth: never;
 }
-h1 { font-size: 2rem !important; line-height: 1.35 !important; }
 h2 {
-  font-size: 1.25rem !important;
-  line-height: 1.4 !important;
   border-bottom: 1px solid var(--ot-bezel);
   padding-bottom: 0.35rem;
 }
-h3, h4 { font-size: 1rem !important; line-height: 1.4 !important; }
 
 /* Page title in the content header */
 #page-header h1 {
   font-family: var(--font-heading) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.04em;
-  font-size: 1.75rem !important;
-  line-height: 1.35 !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em;
 }
 
 /* Brand title in the top bar */
 header a[href] h1 {
   font-family: var(--font-heading) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0.06em;
-  font-size: 0.95rem !important;
+  font-weight: 650 !important;
 }
 
 [aria-current="page"],

@@ -78,16 +78,16 @@ article .typography p:has(> img) + p:has(> em:only-child) {
   color: var(--muted-foreground);
 }
 
-/* Typefaces: Pixeled headings, IBM Plex Sans body, IBM Plex Mono code. */
+/* Typefaces: Space Grotesk headings, IBM Plex Sans body, IBM Plex Mono code. */
 :root {
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "Pixeled", "IBM Plex Sans", system-ui, sans-serif;
+  --font-heading: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Page header: the title's cap height starts at the top of the buttons. */
