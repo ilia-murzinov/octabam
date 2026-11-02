@@ -29,7 +29,6 @@ nav:
   - Home: index.md
   - Build: web-builder.md
   - Modules:
-      - Overview: reference/modules.md
       - VOID: reference/modules/void.md
       - RESONATOR: reference/modules/resonator.md
       - SHATTER: reference/modules/shatter.md

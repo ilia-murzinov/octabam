@@ -6,7 +6,7 @@ built with the [octabam](https://github.com/sambanks/octabam) remixer by
 
 Most of each image is their work: the remixer, CORE, Tim Hastie’s machines,
 Kyoti’s workflow modules, and the rest listed below. This site documents
-[modules developed on this fork](reference/modules.md) and the
+modules in the Modules menu and the
 [browser builder](web-builder.md). It is not a replacement for the upstream
 octabam manual.
 
@@ -31,8 +31,8 @@ OS 1.40C.
 
 1. [Build and install](web-builder.md) a `base*` or `cx*` image from your own
    1.40C in the browser.
-2. Read the [module pages](reference/modules.md) for VOID, SHATTER, CX OSC,
-   SCOPE and the other fork modules.
+2. Read the Modules pages for VOID, SHATTER, CX OSC, SCOPE and the other
+   fork modules.
 3. Check [who wrote what](#credits) before you credit a feature.
 
 ## Lineage that stays visible
