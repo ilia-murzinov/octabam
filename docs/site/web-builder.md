@@ -21,7 +21,7 @@ nothing is uploaded.
 
 ## Remixes
 
-| | ilia | ilia-stuttr | ilia-reson | ilia-vres | cx | cx-stuttr | cx-reson | cx-vres |
+| | base | base-stuttr | base-reson | base-vres | cx | cx-stuttr | cx-reson | cx-vres |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | SCOPE | ● | ● | ● | ● | ● | ● | ● | ● |
 | COPY PROJECT | ● | ● | ● | ● | ● | ● | ● | ● |
