@@ -58,4 +58,4 @@ at the switch. See
 
 Back up the CF card first. Kits write a file into each project they load.
 A project made on the unit after installing needs no preparation. To return
-to stock OS, follow [Safety and Recovery](../../../safety.md).
+to stock OS, follow [Home § Safety](../../../index.md#safety).

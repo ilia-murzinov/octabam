@@ -435,7 +435,7 @@ def index_page(name: str, r, mods) -> str:
               f"[Build and Install]({_up('index')}web-builder.md). Nothing from Elektron is on this site; "
               f"the builder patches your copy in your browser. After the flash, SYSTEM STATUS → OS VERSION "
               f"shows `{r.name.upper()}` and the build number.", "",
-              f"Back up the card first. To go back to stock, follow [Safety and Recovery]({_up('index')}safety.md).", ""]
+              f"Back up the card first. To go back to stock, follow [Home § Safety]({_up('index')}index.md#safety).", ""]
     return "\n".join([f"# {heading}", ""] + intro) + "\n"
 
 

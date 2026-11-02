@@ -1,7 +1,7 @@
 # Build
 
 Patch your 1.40C in-browser for a `base*` / `cx*` image. Nothing uploads.
-Authors: [Credits](credits.md).
+Authors: [Home](index.md).
 
 Always on: [SCOPE](reference/modules/scope.md),
 [COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMP.
@@ -40,4 +40,4 @@ Contains Elektron's OS — keep private.
 
 ## Confirm
 
-STATUS → OS VERSION = `OCTABAM` + tag (stock = `1.40C`). [Safety](safety.md).
+STATUS → OS VERSION = `OCTABAM` + tag (stock = `1.40C`). Recovery: [Home § Safety](index.md#safety).
