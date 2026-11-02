@@ -111,24 +111,55 @@
   background: color-mix(in srgb, var(--ob-accent) 28%, var(--ot-th-bg, #1a1410)) !important;
 }
 
-#octabam-builder select {
-  appearance: none;
-  -webkit-appearance: none;
-  background-color: var(--input, #1a1a1a);
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--ob-accent) 50%),
-    linear-gradient(135deg, var(--ob-accent) 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) calc(50% - 3px),
-    calc(100% - 8px) calc(50% - 3px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  color: var(--foreground, #e8e4dc);
-  border: 2px solid var(--border, #3a3a3a);
+/* Theme zeroes native select chrome; show an explicit field + ▼. */
+#octabam-builder .ob-select-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+#octabam-builder .ob-select-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground, #9a958c);
+}
+#octabam-builder .ob-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 16rem;
+  max-width: 100%;
+  border: 2px solid var(--ob-accent);
+  background: var(--input, #1a1a1a);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ob-accent) 25%, transparent);
+}
+#octabam-builder .ob-select select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--foreground, #e8e4dc) !important;
+  border: 0 !important;
+  box-shadow: none !important;
   font-family: inherit;
-  padding: 0.35rem 2rem 0.35rem 0.55rem;
-  min-width: 14rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 2.4rem 0.55rem 0.7rem !important;
+  min-height: 2.5rem;
+  width: 100%;
   cursor: pointer;
+}
+#octabam-builder .ob-select-chevron {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ob-accent);
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 #octabam-builder button {

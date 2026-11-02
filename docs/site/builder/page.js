@@ -2,8 +2,19 @@
 // card image of the remix the manifest names. Everything runs in this browser tab;
 // the heavy eft.wasm work is in a worker so the tab stays responsive.
 const root = document.getElementById("octabam-builder");
+
 const el = (tag, attrs = {}, ...kids) => {
-  const n = Object.assign(document.createElement(tag), attrs);
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "className") n.className = v;
+    else if (k === "textContent") n.textContent = v;
+    else if (k === "htmlFor") n.htmlFor = v;
+    else if (k.startsWith("data-") || k.startsWith("aria-")) n.setAttribute(k, String(v));
+    else if (k === "tabIndex") n.tabIndex = v;
+    else if (k in n && typeof n[k] !== "function") n[k] = v;
+    else n.setAttribute(k, String(v));
+  }
   n.append(...kids);
   return n;
 };
@@ -74,7 +85,6 @@ function featureTable(manifest, rows) {
     rows.map((r) => [r.name, r.features || []]));
   if (!featureRows.length || !rows.length) return null;
 
-  // Remixes as rows, features as columns — names stay readable.
   const table = el("table", { className: "ob-features" });
   const head = el("tr", {}, el("th", { scope: "col", className: "ob-corner" }, "REMIX"));
   for (const feat of featureRows) {
@@ -125,16 +135,103 @@ function featureTable(manifest, rows) {
   return el("div", { className: "ob-features-wrap" }, table);
 }
 
+/** Custom dropdown — theme nukes native <select> chrome. */
+function remixDropdown(rows, onChange) {
+  let value = rows[0]?.name || "";
+  const labelOf = (name) => {
+    const r = rows.find((x) => x.name === name) || rows[0];
+    return r ? `${r.name}  ·  ${r.imageName || r.version}` : name;
+  };
+
+  const btn = el("button", {
+    type: "button",
+    className: "ob-dd-btn",
+    id: "ob-remix",
+    "aria-haspopup": "listbox",
+    "aria-expanded": "false",
+  });
+  const btnText = el("span", { className: "ob-dd-value" }, labelOf(value));
+  const btnChev = el("span", { className: "ob-dd-chevron", "aria-hidden": "true" }, "▾");
+  btn.append(btnText, btnChev);
+
+  const menu = el("ul", {
+    className: "ob-dd-menu",
+    role: "listbox",
+    hidden: true,
+    tabIndex: -1,
+  });
+  for (const r of rows) {
+    const opt = el("li", {
+      role: "option",
+      "data-value": r.name,
+      "aria-selected": r.name === value ? "true" : "false",
+      tabIndex: -1,
+      textContent: labelOf(r.name),
+    });
+    menu.append(opt);
+  }
+
+  const wrap = el("div", { className: "ob-dd" },
+    el("span", { className: "ob-dd-label" }, "Remix"),
+    btn, menu);
+
+  const close = () => {
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+    wrap.classList.remove("ob-dd-open");
+  };
+  const open = () => {
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    wrap.classList.add("ob-dd-open");
+  };
+  const setValue = (name, notify = true) => {
+    if (!rows.some((r) => r.name === name)) return;
+    value = name;
+    btnText.textContent = labelOf(name);
+    menu.querySelectorAll("[role=option]").forEach((opt) => {
+      opt.setAttribute("aria-selected", opt.dataset.value === name ? "true" : "false");
+    });
+    if (notify) onChange(name);
+  };
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hidden) open();
+    else close();
+  });
+  menu.addEventListener("click", (e) => {
+    const opt = e.target.closest("[role=option]");
+    if (!opt) return;
+    setValue(opt.dataset.value);
+    close();
+  });
+  document.addEventListener("click", (e) => {
+    if (!wrap.contains(e.target)) close();
+  });
+  btn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      open();
+      menu.querySelector('[aria-selected="true"]')?.focus?.();
+    }
+  });
+
+  return {
+    root: wrap,
+    get value() { return value; },
+    setValue: (name) => setValue(name, true),
+    setValueQuiet: (name) => setValue(name, false),
+  };
+}
+
 async function main() {
   const manifest = await (await fetch(here("manifest.json"))).json();
   const rows = manifest.remixes || [];
   if (!rows.length) throw new Error("manifest has no remixes");
 
-  const pick = el("select", { id: "ob-remix" });
-  for (const r of rows) {
-    pick.append(el("option", { value: r.name, textContent: `${r.name} (${r.imageName || r.version})` }));
-  }
-  const metaOf = () => rows.find((r) => r.name === pick.value) || rows[0];
+  let selected = rows[0].name;
+  const metaOf = () => rows.find((r) => r.name === selected) || rows[0];
 
   const file = el("input", { type: "file", id: "ob-file", accept: ".zip,.syx", hidden: true });
   const choose = el("button", { type: "button", id: "ob-choose", textContent: "Choose OS file" });
@@ -146,16 +243,22 @@ async function main() {
     `octabam ${manifest.version} · commit ${manifest.commit.slice(0, 8)} · ${manifest.date}` +
     (manifest.dev ? " (dev)" : ""));
 
+  const syncPickHighlight = () => {
+    root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
+      tr.classList.toggle("ob-selected", tr.dataset.remix === selected);
+    });
+  };
+
+  const dropdown = remixDropdown(rows, (name) => {
+    selected = name;
+    syncPickHighlight();
+  });
+
   const matrix = featureTable(manifest, rows);
   const kids = [];
   if (matrix) kids.push(matrix);
   kids.push(
-    el("p", { className: "ob-controls" },
-      el("label", { className: "ob-select-wrap", htmlFor: "ob-remix" },
-        el("span", { className: "ob-select-label" }, "Remix"),
-        el("span", { className: "ob-select" },
-          pick,
-          el("span", { className: "ob-select-chevron", "aria-hidden": "true" }, "▼")))),
+    el("div", { className: "ob-controls" }, dropdown.root),
     el("p", { className: "ob-controls" },
       el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
       el("br"),
@@ -164,23 +267,17 @@ async function main() {
     status, links, built);
   root.replaceChildren(...kids);
 
-  const syncPickHighlight = () => {
-    root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
-      tr.classList.toggle("ob-selected", tr.dataset.remix === pick.value);
-    });
-  };
-  const selectRemix = (name) => {
-    if (![...pick.options].some((o) => o.value === name)) return;
-    pick.value = name;
-    pick.dispatchEvent(new Event("change", { bubbles: true }));
-  };
-  pick.addEventListener("change", syncPickHighlight);
   root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
-    tr.addEventListener("click", () => selectRemix(tr.dataset.remix));
+    const pick = () => {
+      selected = tr.dataset.remix;
+      dropdown.setValueQuiet(selected);
+      syncPickHighlight();
+    };
+    tr.addEventListener("click", pick);
     tr.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        selectRemix(tr.dataset.remix);
+        pick();
       }
     });
   });
@@ -200,7 +297,6 @@ async function main() {
       status.textContent = "starting...";
       const bytes = new Uint8Array(await file.files[0].arrayBuffer());
       const patch = new Uint8Array(await (await fetch(here(meta.patch))).arrayBuffer());
-      // Yield once so the status line paints before the worker spins up.
       await new Promise((r) => setTimeout(r, 0));
       const r = await runBuild({
         file: bytes,
