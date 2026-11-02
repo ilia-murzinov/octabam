@@ -5,8 +5,8 @@ Personal octabam stacks on OS 1.40C. Eight images in the
 SHATTER / STUTTR / RESONATOR variants.
 
 Always on every image: SCOPE, COPY PROJECT, DARK REV, stock COMPRESSOR, CORE
-ColdFire (BRAIN, Kits, scenes, USB MAIN, …). No SIDECHAIN, no TAPE. PLATE and
-SPRING are harvested.
+ColdFire (BRAIN, Kits, scenes, USB MAIN, …). PLATE and SPRING are harvested
+so the inserts fit.
 
 ## Matrix
 
@@ -37,7 +37,7 @@ SPRING are harvested.
 
 ## Also in every image
 
-CORE utilities that ship with both families (and have manual pages upstream):
+CORE utilities that ship with both families:
 
 [EUCLID FILL](reference/modules/euclid-fill.md) ·
 [MUTE MODES](reference/modules/mute-modes.md) ·

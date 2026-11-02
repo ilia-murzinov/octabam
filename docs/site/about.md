@@ -1,8 +1,8 @@
 # About
 
-This site is **Ilia's fork** of [octabam](https://github.com/sambanks/octabam):
-personal `base*` / `cx*` images built from OS 1.40C. Upstream octabam is Sam
-Banks' project; this Pages site only documents what those remixes ship.
+**Ilia's remixes** for the Elektron Octatrack (OS 1.40C): the `base*` and
+`cx*` images on this site. Built with the [octabam](https://github.com/sambanks/octabam)
+remixer; this Pages site only documents what those images ship.
 
 ## What it is
 
@@ -12,13 +12,11 @@ image. See [what's in Ilia's remixes](remix-ilia.md) and the
 
 ## How it is made
 
-- Modules are contributed by their authors and credited on each page.
+- Modules are credited to their authors on each page.
 - The build refuses modules that claim the same memory, hook or effect id.
 - Images are derived from your own OS 1.40C in the browser; the built file
   contains Elektron's OS and stays with you.
-- Source: [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam)
-  (fork of sambanks/octabam). MIT for the repository's own code; Elektron's
-  firmware is not distributed.
+- Source: [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam).
 
 ## Unofficial
 

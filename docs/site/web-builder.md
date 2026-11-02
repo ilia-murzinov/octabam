@@ -5,10 +5,9 @@ Build in this browser from your own OS file; nothing is uploaded.
 
 !!! tip "Back up your projects"
     Back up your CF card before installing, or start new projects after
-    installing. Octabam's Kits write a `kits.work` file into each project they
-    load. A project created on the unit after installing needs no preparation.
-    A project made before installing needs one preparation step, described in
-    the [build guide](https://github.com/sambanks/octabam/blob/main/docs/guide/BUILDING.md).
+    installing. Kits write a `kits.work` file into each project they load.
+    A project created on the unit after installing needs no preparation; an
+    older project may need one stamp/prepare step before play.
 
 ## What you need
 
