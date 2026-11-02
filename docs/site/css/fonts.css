@@ -1,5 +1,13 @@
-/* Self-hosted latin subsets (SIL OFL 1.1):
-   Space Grotesk — headings; IBM Plex Sans — body; IBM Plex Mono — code. */
+/* Self-hosted faces:
+   Pixeled (OmegaPC777, 100% free / dafont) — headings;
+   IBM Plex Sans — body; IBM Plex Mono — code (SIL OFL 1.1). */
+@font-face {
+  font-family: 'Pixeled';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(fonts/Pixeled.ttf) format('truetype');
+}
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
