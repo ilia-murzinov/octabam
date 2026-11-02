@@ -149,38 +149,22 @@ def screen_reference(m) -> list[str]:
     return lines
 
 
-def directory_page(mods, manual_page: dict) -> str:
-    """The feature directory: first what is in the release, by the manual's sections, each linked to its
-    manual page; then every other contributed module by category, each linked to its page here."""
-    import gen_manual
+def _builder_keys():
     import release
-    v = release.VERSION
-    builder_keys = set()
+    keys = set()
     for n in getattr(release, "BUILDER_REMIXES", ()) or ():
-        builder_keys |= set(registry.remix(n).modules)
+        keys |= set(registry.remix(n).modules)
+    return keys
+
+
+def directory_page(mods, manual_page: dict) -> str:
+    """Feature directory for this fork: only modules that appear in BUILDER_REMIXES."""
+    builder_keys = _builder_keys()
     lines = ["# Feature Directory", "",
-             f"Every feature the project has. [Ilia's remixes](../remix-ilia.md) are listed next; "
-             f"Octabam {v} is the upstream image; then everything else. "
-             "The stock effects are described in Elektron's own manual.", "",
-             "## In Ilia's remixes", ""]
+             "Modules in [Ilia's remixes](../remix-ilia.md) (`base*` / `cx*`). "
+             "Stock FILTER…DELAY / COMP / DARK are Elektron; see their manual.", ""]
     for cat, ms in index.by_category(mods).items():
         ms = [m for m in ms if not m.is_stock and m.key in builder_keys]
-        if not ms:
-            continue
-        lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
-        lines += [f"| [{_label(m)}](modules/{m.name}.md) | {_author(m)} |" for m in ms] + [""]
-    lines += [f"## In Octabam {v}", ""]
-    mine = {k: m for k, m in mods.items() if k in manual_page and not m.is_stock}
-    for folder, title in gen_manual.SECTIONS:
-        ms = sorted((m for m in mine.values()
-                     if (folder == "brain") == (m.key == "BRAIN") and (m.key == "BRAIN" or gen_manual.section_of(m) == folder)),
-                    key=lambda m: _label(m).lower())
-        if ms:
-            lines += [f"### {title}", "", "| Feature | Author |", "|---|---|"]
-            lines += [f"| [{_label(m)}](manual/{manual_page[m.key]}) | {_author(m)} |" for m in ms] + [""]
-    lines += [f"## Not in Octabam {v} or Ilia's remixes", ""]
-    for cat, ms in index.by_category(mods).items():
-        ms = [m for m in ms if not m.is_stock and m.key not in manual_page and m.key not in builder_keys]
         if not ms:
             continue
         lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
@@ -196,20 +180,14 @@ def module_page(m, mods, manual_page: dict) -> str:
     if m.author_url:
         who = f'<a href="{html.escape(m.author_url)}">{who}</a>'
     lines = ["---", "not_in_nav: true", "---", "", f"# {_label(m)}", "", f'<p class="byline">By {who}</p>', ""]
-    target = manual_page.get(m.key)
     import release
-    v = release.VERSION
     builder = getattr(release, "BUILDER_REMIXES", ()) or ()
     in_builder = sorted(
         n for n in builder
         if m.key in set(registry.remix(n).modules))
-    if target:
-        lines += [f"This feature is in Octabam {v}: see its [manual page](../manual/{target}).", ""]
-    elif in_builder:
+    if in_builder:
         listed = ", ".join(f"`{n}`" for n in in_builder)
         lines += [f"In Ilia's remixes: {listed}.", ""]
-    else:
-        lines += [f'!!! note "Not in Octabam {v}"', f"    This feature is not in the {v} image.", ""]
     lines += hero(m)
     if fragment.is_file():
         lines += [f'--8<-- "usage/{m.name}.md"', ""]
@@ -234,18 +212,26 @@ def module_page(m, mods, manual_page: dict) -> str:
 def main(quiet: bool = False) -> int:
     import gen_manual
     import release
+    import shutil
     mods = registry.modules()
     official = [(n, registry.remix(n)) for n in release.REMIXES]
+    # Drop stale generated pages (e.g. upstream-only modules from a prior run).
+    if OUT.exists():
+        shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
     jobs = {}
     manual_page = gen_manual.published_pages(mods, official)
+    builder_keys = _builder_keys()
     jobs["modules.md"] = directory_page(mods, manual_page)
+    # Fork site: only pages for modules that ship in BUILDER_REMIXES.
     for m in mods.values():
-        if not m.is_stock:
-            jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
+        if m.is_stock or m.key not in builder_keys:
+            continue
+        jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
     for name, r in official:
         jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, r, mods)) + "\n"
-    jobs.update(gen_manual.main(mods, official))
+    if official:
+        jobs.update(gen_manual.main(mods, official))
     for name, text in sorted(jobs.items()):
         (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_text(text)

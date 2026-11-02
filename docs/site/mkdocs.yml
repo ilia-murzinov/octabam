@@ -7,10 +7,13 @@ site_dir: ../../out/site
 use_directory_urls: false
 # the _remix-*.md fragments are snippet includes, not pages; usage/*.md
 # are included into generated module pages, manual/*.md into the manuals; img/ holds image assets.
+# Upstream Sam overview / create-remix kept in tree but not on this fork's site.
 exclude_docs: |
   reference/_remix-*.md
   usage/*.md
   manual/*.md
+  remix-octabam.md
+  own-remix.md
 extra_css:
   - css/fonts.css
   - css/sidebar-spacing.css
@@ -29,91 +32,54 @@ nav:
   - Getting Started:
       - Overview: index.md
       - What's in Ilia's remixes: remix-ilia.md
-      - Build (Ilia's remixes): web-builder.md
+      - Build: web-builder.md
       - Safety and Recovery: safety.md
       - About: about.md
-  - Ilia's modules:
-      - SYNTH: reference/modules/synth.md
-      - CX OSC: reference/modules/cxosc.md
+  - Effects:
       - VOID: reference/modules/void.md
       - RESONATOR: reference/modules/resonator.md
       - SHATTER: reference/modules/shatter.md
       - STUTTR: reference/modules/stuttr.md
+  - Machines:
+      - SYNTH: reference/modules/synth.md
+      - CX OSC: reference/modules/cxosc.md
+  - Sequencer:
       - SCOPE: reference/modules/scope.md
-      - COPY PROJECT: reference/modules/copy-project.md
       - EUCLID FILL: reference/modules/euclid-fill.md
       - MUTE MODES: reference/modules/mute-modes.md
-      - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
+      - SCALE QUANTIZER: reference/modules/quantizer.md
+      - TUNER: reference/modules/tuner.md
+      - DIRECT JUMP: reference/modules/direct-jump-kyoti.md
+      - RLEN PLEN: reference/modules/rlen-plen.md
+      - QUANTIZE LIVE REC: reference/modules/quantize-live-rec-toggle.md
+      - REC TRIG MUTE: reference/modules/rec-trig-mute.md
+      - RELOAD FROM PROJECT: reference/modules/reload-from-project.md
+      - ERASE EMPTY TRIGLESS: reference/modules/erase-empty-trigless-locks.md
       - STEM REC: reference/modules/stems.md
-      - Feature directory: reference/modules.md
-  - Upstream Octabam (reference):
-      - What is in Octabam v0.3: remix-octabam.md
-      - Introduction: reference/manual/octabam/index.md
-      - Effects:
-          - Character: reference/manual/octabam/effects/character.md
-          - Modulation: reference/manual/octabam/effects/modulation.md
-          - Shatter: reference/manual/octabam/effects/shatter.md
-          - Sidechain Compressor: reference/manual/octabam/effects/sidechain-compressor.md
-          - Spectrum: reference/manual/octabam/effects/spectrum.md
-      - Machines:
-          - OCTA-303: reference/manual/octabam/machines/octa303.md
-      - Sequencer and recording:
-          - Direct Jump (Kyoti): reference/manual/octabam/sequencer/direct-jump-kyoti.md
-          - Euclid Fill: reference/manual/octabam/sequencer/euclid-fill.md
-          - Mute Modes: reference/manual/octabam/sequencer/mute-modes.md
-          - Pattern Mute: reference/manual/octabam/sequencer/pattern-mute.md
-          - Quantize Live Rec Toggle: reference/manual/octabam/sequencer/quantize-live-rec-toggle.md
-          - Rec Threshold: reference/manual/octabam/sequencer/rec-threshold.md
-          - Recorder Trig Mute: reference/manual/octabam/sequencer/rec-trig-mute.md
-          - Reload from Project: reference/manual/octabam/sequencer/reload-from-project.md
-          - RLEN PLEN: reference/manual/octabam/sequencer/rlen-plen.md
-          - Scale Quantizer: reference/manual/octabam/sequencer/quantizer.md
-          - Track Patterns: reference/manual/octabam/sequencer/trackpatterns.md
-          - Tuner: reference/manual/octabam/sequencer/tuner.md
-          - Varispeed: reference/manual/octabam/sequencer/varispeed.md
-      - Parts, Kits and scenes:
-          - Kits: reference/manual/octabam/parts/kits.md
-          - MIDI Scenes: reference/manual/octabam/parts/midi-scenes.md
-          - Morph: reference/manual/octabam/parts/morph.md
-          - Page 2 Parameter Locks: reference/manual/octabam/parts/plocks-p2.md
-          - Page 2 Scene Locks: reference/manual/octabam/parts/scenes-p2.md
-      - MIDI and USB:
-          - CC Feedback: reference/manual/octabam/midi-usb/cc-feedback.md
-          - CC Map: reference/manual/octabam/midi-usb/cc-map.md
-          - USB: reference/manual/octabam/midi-usb/usb.md
-      - BRAIN:
-          - BRAIN: reference/manual/octabam/brain/index.md
-          - Templates: reference/manual/octabam/brain/templates.md
-          - Remixes: reference/manual/octabam/brain/remixes.md
-          - Settings: reference/manual/octabam/brain/settings.md
-          - Performance: reference/manual/octabam/brain/performance.md
-          - Log: reference/manual/octabam/brain/log.md
-          - About: reference/manual/octabam/brain/about.md
-          - Files on the card: reference/manual/octabam/brain/files.md
-      - Utilities:
-          - Buffer Saver: reference/manual/octabam/utilities/buffer-saver.md
-          - Copy Project: reference/manual/octabam/utilities/copy-project.md
-          - Mode Defaults: reference/manual/octabam/utilities/mode-defaults.md
-          - Remix Switch: reference/manual/octabam/utilities/remix-switch.md
-      - Fixes to stock behaviour:
-          - ATA Write Guard: reference/manual/octabam/fixes/ata-write-guard.md
-          - Batch Bugfixes: reference/manual/octabam/fixes/batch-bugfixes.md
-          - Erase Empty Trigless Locks: reference/manual/octabam/fixes/erase-empty-trigless-locks.md
-          - Lo-Fi AMF Fix: reference/manual/octabam/fixes/lofi-amf-fix.md
-          - Recorder Loop Fix: reference/manual/octabam/fixes/recorder-loop-fix.md
-      - Behind the scenes:
-          - Effect Loader (Copier): reference/manual/octabam/inside/dlcopy.md
-          - Effect Loader (Sender): reference/manual/octabam/inside/dlpump.md
-          - Events: reference/manual/octabam/inside/events.md
-          - Hooks: reference/manual/octabam/inside/hooks.md
-          - Load Meter: reference/manual/octabam/inside/load-meter.md
-          - Memory: reference/manual/octabam/inside/memory.md
-          - Sc Load Meter Bridge: reference/manual/octabam/inside/sc-loadmeter-bridge.md
-          - Store: reference/manual/octabam/inside/store.md
-      - Credits: reference/manual/octabam/credits.md
-  - More:
-      - Feature Directory: reference/modules.md
-      - Create a Remix: own-remix.md
+  - Parts and scenes:
+      - BRAIN: reference/modules/brain.md
+      - STORE: reference/modules/store.md
+      - KITS: reference/modules/kits.md
+      - MIDI SCENES: reference/modules/midi-scenes.md
+      - SCENES P2: reference/modules/scenes-p2.md
+      - PLOCKS P2: reference/modules/plocks-p2.md
+      - EVENTS: reference/modules/events.md
+  - MIDI and USB:
+      - USB: reference/modules/usb.md
+      - CC MAP: reference/modules/cc-map.md
+      - CC FEEDBACK: reference/modules/cc-feedback.md
+  - Utilities:
+      - COPY PROJECT: reference/modules/copy-project.md
+      - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
+      - REMIX SWITCH: reference/modules/remix-switch.md
+      - RND NAME: reference/modules/rnd-name.md
+      - MEMORY: reference/modules/memory.md
+  - Fixes:
+      - ATA WRITE GUARD: reference/modules/ata-write-guard.md
+      - BATCH BUGFIXES: reference/modules/batch-bugfixes.md
+      - LOFI AMF FIX: reference/modules/lofi-amf-fix.md
+      - RECORDER LOOP FIX: reference/modules/recorder-loop-fix.md
+  - All modules: reference/modules.md
 markdown_extensions:
   - admonition
   - pymdownx.details

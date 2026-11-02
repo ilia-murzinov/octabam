@@ -9,9 +9,10 @@ On fork/ilia, BUILDER_REMIXES adds personal stacks to the web builder without
 putting them in the official manual (gen_pages / gen_manual still use REMIXES).
 """
 
-VERSION = "v0.4"          # the git tag the builder's patches are built from
-REMIXES = ("octabam",)
-# Web builder dropdown (fork tip). Official site keeps REMIXES only.
+VERSION = "v0.3"          # the git tag the builder's patches are built from
+# Fork tip: no upstream Sam manual. Official sambanks/octabam keeps REMIXES=("octabam",).
+REMIXES = ()
+# Web builder dropdown (this fork).
 BUILDER_REMIXES = (
     "base", "base-stuttr", "base-reson", "base-vres",
     "cx", "cx-stuttr", "cx-reson", "cx-vres",
