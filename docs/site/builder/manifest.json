@@ -200,6 +200,23 @@
     "SCOPE",
     "SHATTER"
    ]
+  },
+  {
+   "name": "cx-vres",
+   "title": "cx-vres",
+   "version": "OCTABAMI2",
+   "imageName": "CX-VRES I2",
+   "patch": "patches/cx-vres.obp",
+   "patchBytes": 117321,
+   "sha256": "b27e961e72c20cbed0499fde97fdf68f9417a2186cb67bf2f016c817edae9e65",
+   "features": [
+    "COPY PROJECT",
+    "CX OSC",
+    "DARK REV",
+    "RESONATOR",
+    "SCOPE",
+    "VOID"
+   ]
   }
  ]
 }
