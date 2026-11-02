@@ -44,8 +44,12 @@ function featureTable(manifest, rows) {
 
   const body = el("tbody");
   for (const r of rows) {
-    const tr = el("tr", { "data-remix": r.name },
-      el("th", { scope: "row", title: r.title || r.name }, r.name));
+    const tr = el("tr", {
+      "data-remix": r.name,
+      tabIndex: 0,
+      role: "button",
+      title: `Select ${r.name}`,
+    }, el("th", { scope: "row" }, r.name));
     const has = new Set(byRemix[r.name] || []);
     for (const feat of featureRows) {
       tr.append(el("td", {}, has.has(feat) ? "●" : ""));
@@ -116,7 +120,21 @@ async function main() {
       tr.classList.toggle("ob-selected", tr.dataset.remix === pick.value);
     });
   };
+  const selectRemix = (name) => {
+    if (![...pick.options].some((o) => o.value === name)) return;
+    pick.value = name;
+    pick.dispatchEvent(new Event("change", { bubbles: true }));
+  };
   pick.addEventListener("change", syncPickHighlight);
+  root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
+    tr.addEventListener("click", () => selectRemix(tr.dataset.remix));
+    tr.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selectRemix(tr.dataset.remix);
+      }
+    });
+  });
   syncPickHighlight();
 
   choose.addEventListener("click", () => file.click());
