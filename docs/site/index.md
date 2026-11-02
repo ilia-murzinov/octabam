@@ -1,26 +1,27 @@
 # ilia · octabam
 
-Personal **base** / **cx** remix stacks for the Elektron Octatrack (OS 1.40C),
-built with the [octabam](https://github.com/sambanks/octabam) remixer by
-[Sam Banks](https://github.com/sambanks) and many contributors.
+Personal **base** / **cx** remix stacks for the Elektron Octatrack
+(OS 1.40C). Built with the [octabam](https://github.com/sambanks/octabam)
+remixer by [Sam Banks](https://github.com/sambanks) and many contributors.
 
 Most of each image is their work: the remixer, CORE, Tim Hastie’s machines,
-Kyoti’s workflow modules, and the rest listed below. This site documents
-modules in the Modules menu and the
-[browser builder](web-builder.md). It is not a replacement for the upstream
-octabam manual.
+Kyoti’s workflow modules, and the rest credited below. This site documents
+the fork modules and the [browser builder](web-builder.md). It is not a
+replacement for the upstream octabam manual.
 
-| | |
-|---|---|
-| Upstream | [sambanks/octabam](https://github.com/sambanks/octabam) |
-| This fork | [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam) |
+[**Build an image →**](web-builder.md)
+· [Modules](reference/modules/void.md)
+· [Credits](#credits)
+
+Upstream: [sambanks/octabam](https://github.com/sambanks/octabam).
+This fork: [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam).
 
 ## Unofficial firmware
 
 These images are unofficial community firmware, not made, endorsed or
 supported by Elektron. Installing them is generally safe and can be reverted
-by reinstalling stock OS (see [Safety and recovery](#safety-and-recovery)
-below). Elektron is not responsible for any damage to your Octatrack.
+by reinstalling stock OS (see [Safety and recovery](#safety-and-recovery)).
+Elektron is not responsible for any damage to your Octatrack.
 
 The repository licence is MIT
 ([upstream LICENSE](https://github.com/sambanks/octabam/blob/main/LICENSE)).
@@ -30,10 +31,22 @@ OS 1.40C.
 ## Get started
 
 1. [Build and install](web-builder.md) a `base*` or `cx*` image from your own
-   1.40C in the browser.
+   1.40C in the browser. The OS file is read locally; nothing is uploaded.
 2. Read the Modules pages for VOID, SHATTER, CX OSC, SCOPE and the other
    fork modules.
 3. Check [who wrote what](#credits) before you credit a feature.
+
+## What ships
+
+Always on both stacks: [SCOPE](reference/modules/scope.md),
+[COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock
+COMPRESSOR. PLATE and SPRING are harvested so the inserts fit.
+
+- **base\*** — Tim Hastie’s SYNTH MACHINE, plus the fork modules.
+- **cx\*** — [CX OSC](reference/modules/cxosc.md) instead of SYNTH MACHINE.
+
+Pick a lettered remix on [Build](web-builder.md), then flash the `.bin` /
+`.syx` or boot an `.RMX` on a unit that already runs octabam.
 
 ## Lineage that stays visible
 

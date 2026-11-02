@@ -1,8 +1,8 @@
 # Build and Install
 
-Builds a **base** / **cx** remix ([who wrote what](index.md#credits)) from
-your own copy of Octatrack OS 1.40C, in this browser tab. The OS file is
-read locally and nothing is uploaded.
+Build a **base** / **cx** remix from your own Octatrack OS 1.40C in this
+browser tab. The OS file is read locally; nothing is uploaded. See
+[who wrote what](index.md#credits) before you credit a feature.
 
 Always on: [SCOPE](reference/modules/scope.md),
 [COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
