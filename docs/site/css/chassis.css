@@ -1,25 +1,87 @@
-/* Chassis look: dark hardware panel + amber LEDs + hard pixels.
-   Homage only — no Elektron logos, product marks, or proprietary fonts. */
+/* Chassis look: hardware panel + amber LEDs + hard pixels.
+   Homage only — no Elektron logos, product marks, or proprietary fonts.
+   Dark tokens live under .dark so the theme toggle can switch. */
 
-:root,
-.dark {
-  color-scheme: dark;
-
+:root {
   --font-sans: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
-
   --radius: 0;
 
-  /* OT-ish chassis: charcoal + amber LED */
+  --ot-amber: #e86a12;
+  --ot-amber-dim: #c45c26;
+  --ot-lcd: #3a6b12;
+  --ot-chassis: #f2efe8;
+  --ot-panel: #fffdf8;
+  --ot-bezel: #c8c2b6;
+  --ot-ink: #1a1a1a;
+  --ot-muted: #6a655c;
+  --ot-scan: rgba(0, 0, 0, 0.04);
+  --ot-glow: transparent;
+  --ot-code-bg: #1a1a1a;
+  --ot-code-fg: #c8f07a;
+  --ot-table-bg: #fffdf8;
+  --ot-th-bg: #f3e6d4;
+  --ot-admon: #f7efe4;
+  --ot-img-frame: #e8e4dc;
+
+  color-scheme: light;
+  --background: #f2efe8;
+  --foreground: #1a1a1a;
+  --card: #fffdf8;
+  --card-foreground: #1a1a1a;
+  --popover: #fffdf8;
+  --popover-foreground: #1a1a1a;
+  --primary: #e86a12;
+  --primary-foreground: #fffdf8;
+  --secondary: #e8e4dc;
+  --secondary-foreground: #1a1a1a;
+  --muted: #e8e4dc;
+  --muted-foreground: #6a655c;
+  --accent: #f3e6d4;
+  --accent-foreground: #e86a12;
+  --destructive: #c23b2a;
+  --border: #c8c2b6;
+  --input: #e8e4dc;
+  --ring: #e86a12;
+  --sidebar: #ebe6dc;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #e86a12;
+  --sidebar-primary-foreground: #fffdf8;
+  --sidebar-accent: #f3e6d4;
+  --sidebar-accent-foreground: #e86a12;
+  --sidebar-border: #c8c2b6;
+  --sidebar-ring: #e86a12;
+  --surface: #fffdf8;
+  --surface-foreground: #4a463e;
+  --code: #1a1a1a;
+  --code-foreground: #c8f07a;
+  --code-highlight: #2a2a2a;
+  --selection: #e86a12;
+  --selection-foreground: #fffdf8;
+}
+
+.dark {
+  color-scheme: dark;
+
   --ot-amber: #ff7a18;
   --ot-amber-dim: #c45c26;
   --ot-lcd: #c8f07a;
   --ot-chassis: #121212;
   --ot-panel: #1a1a1a;
   --ot-bezel: #2a2a2a;
+  --ot-ink: #e8e4dc;
+  --ot-muted: #9a958c;
+  --ot-scan: rgba(0, 0, 0, 0.12);
+  --ot-glow: rgba(255, 122, 24, 0.25);
+  --ot-code-bg: #0a0a0a;
+  --ot-code-fg: #c8f07a;
+  --ot-table-bg: #0a0a0a;
+  --ot-th-bg: #1f1810;
+  --ot-admon: #16120e;
+  --ot-img-frame: #0a0a0a;
 
   --background: #121212;
   --foreground: #e8e4dc;
@@ -63,20 +125,20 @@ html {
 body {
   font-family: var(--font-sans) !important;
   letter-spacing: 0.01em;
+  color: var(--foreground);
   background:
-    linear-gradient(180deg, rgba(255, 122, 24, 0.04), transparent 120px),
+    linear-gradient(180deg, color-mix(in srgb, var(--ot-amber) 8%, transparent), transparent 120px),
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      rgba(0, 0, 0, 0.12) 2px,
-      rgba(0, 0, 0, 0.12) 3px
+      var(--ot-scan) 2px,
+      var(--ot-scan) 3px
     ),
     var(--ot-chassis) !important;
   image-rendering: pixelated;
 }
 
-/* Hard UI edges — no soft cards */
 *,
 *::before,
 *::after {
@@ -100,60 +162,56 @@ h1, h2, h3, h4 {
 }
 h1 {
   color: var(--ot-amber) !important;
-  text-shadow: 0 0 12px rgba(255, 122, 24, 0.25);
+  text-shadow: 0 0 12px var(--ot-glow);
 }
 h2 {
   border-bottom: 2px solid var(--ot-amber-dim);
   padding-bottom: 0.35rem;
 }
 
-/* Site title / brand strip */
 header,
 [data-slot="sidebar"],
 nav {
   font-family: var(--font-mono) !important;
 }
 
-/* Tables like LCD grids */
 .table-wrapper,
 article table {
   border: 2px solid var(--ot-bezel) !important;
-  background: #0a0a0a;
+  background: var(--ot-table-bg);
 }
 .table-wrapper th,
 .table-wrapper td,
 article th,
 article td {
-  border-color: #333 !important;
+  border-color: var(--border) !important;
   font-variant-numeric: tabular-nums;
 }
 .table-wrapper th,
 article th {
-  background: #1f1810 !important;
+  background: var(--ot-th-bg) !important;
   color: var(--ot-amber) !important;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-size: 0.75rem;
 }
 
-/* Code / LCD green */
 pre, code, .highlight {
   font-family: var(--font-mono) !important;
 }
 pre, .highlight {
-  border: 2px solid #333 !important;
-  background: #0a0a0a !important;
-  box-shadow: inset 0 0 24px rgba(200, 240, 122, 0.05);
+  border: 2px solid var(--border) !important;
+  background: var(--ot-code-bg) !important;
+  box-shadow: inset 0 0 24px color-mix(in srgb, var(--ot-lcd) 8%, transparent);
 }
 code {
-  color: var(--ot-lcd) !important;
+  color: var(--ot-code-fg) !important;
 }
 
-/* Admonitions as panel bezels */
 .admonition,
 details {
   border: 2px solid var(--ot-amber-dim) !important;
-  background: #16120e !important;
+  background: var(--ot-admon) !important;
 }
 .admonition-title,
 summary {
@@ -163,27 +221,24 @@ summary {
   font-size: 0.8rem !important;
 }
 
-/* Screenshot frames: LCD bezel, keep pixelated OT screens */
 article .typography img {
-  background: #0a0a0a !important;
-  border: 3px solid #3a3a3a !important;
+  background: var(--ot-img-frame) !important;
+  border: 3px solid var(--ot-bezel) !important;
   box-shadow:
-    inset 0 0 0 1px #111,
-    0 0 0 1px #000,
-    0 8px 0 #0a0a0a;
+    inset 0 0 0 1px var(--border),
+    0 0 0 1px var(--ot-bezel),
+    0 8px 0 color-mix(in srgb, var(--ot-chassis) 80%, #000);
   padding: 10px !important;
   image-rendering: pixelated;
   filter: contrast(1.05) saturate(0.95);
 }
 
-/* Active nav hint */
 [aria-current="page"],
 .active {
   color: var(--ot-amber) !important;
 }
 
-/* Selection like an LED latch */
 ::selection {
   background: var(--ot-amber);
-  color: #121212;
+  color: var(--primary-foreground);
 }
