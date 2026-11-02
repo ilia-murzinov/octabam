@@ -12,4 +12,32 @@ putting them in the official manual (gen_pages / gen_manual still use REMIXES).
 VERSION = "v0.4"          # the git tag the builder's patches are built from
 REMIXES = ("octabam",)
 # Web builder dropdown (fork tip). Official site keeps REMIXES only.
-BUILDER_REMIXES = ("octabam", "latest", "vrcs-cx")
+BUILDER_REMIXES = (
+    "ilia", "ilia-stuttr", "ilia-reson", "ilia-vres",
+    "cx", "cx-stuttr", "cx-reson", "cx-vres",
+)
+
+# Feature matrix for the builder page (custom modules only; stock FX omitted).
+# Rows top-to-bottom = always-on first, then the axes that differ.
+BUILDER_FEATURE_ROWS = (
+    "SCOPE",
+    "COPY PROJECT",
+    "DARK REV",
+    "SYNTH",
+    "CX OSC",
+    "VOID",
+    "RESONATOR",
+    "SHATTER",
+    "STUTTR",
+)
+
+BUILDER_FEATURES = {
+    "ilia":        {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "SHATTER"},
+    "ilia-stuttr": {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "STUTTR"},
+    "ilia-reson":  {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "RESONATOR", "SHATTER"},
+    "ilia-vres":   {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "RESONATOR"},
+    "cx":          {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "SHATTER"},
+    "cx-stuttr":   {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "STUTTR"},
+    "cx-reson":    {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "RESONATOR", "SHATTER"},
+    "cx-vres":     {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "RESONATOR"},
+}

@@ -95,13 +95,18 @@ def main():
             shutil.copyfile(TREE / src, ref / dst)
         patch = obpatch.make(stock, (ref / "mainos_bus.bin").read_bytes())
         (out / "patches" / f"{remix}.obp").write_bytes(patch)
+        feats = sorted(release.BUILDER_FEATURES.get(remix, ()))
         rows.append({"name": remix, "title": remix, "version": version, "imageName": name,
                      "patch": f"patches/{remix}.obp", "patchBytes": len(patch),
-                     "sha256": hashlib.sha256(patch).hexdigest()})
+                     "sha256": hashlib.sha256(patch).hexdigest(),
+                     "features": feats})
         print(f"   patch {len(patch):,} bytes")
 
     manifest = {"version": release.VERSION, "commit": commit, "dev": dirty or behind, "build": args.build,
-                "date": datetime.date.today().isoformat(), "remixes": rows}
+                "date": datetime.date.today().isoformat(),
+                "featureRows": list(getattr(release, "BUILDER_FEATURE_ROWS", ())),
+                "features": {k: sorted(v) for k, v in getattr(release, "BUILDER_FEATURES", {}).items()},
+                "remixes": rows}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
     print(f"wrote {args.out}/manifest.json for {commit[:8]}")
     if manifest["dev"]:

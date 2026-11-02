@@ -19,6 +19,20 @@ nothing is uploaded.
 - A CompactFlash card in the unit for the card install, or a 5-pin DIN MIDI
   interface into the Octatrack's MIDI IN for the MIDI install.
 
+## Remixes
+
+| | ilia | ilia-stuttr | ilia-reson | ilia-vres | cx | cx-stuttr | cx-reson | cx-vres |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| SCOPE | ● | ● | ● | ● | ● | ● | ● | ● |
+| COPY PROJECT | ● | ● | ● | ● | ● | ● | ● | ● |
+| DARK REV | ● | ● | ● | ● | ● | ● | ● | ● |
+| SYNTH | ● | ● | ● | ● | | | | |
+| CX OSC | | | | | ● | ● | ● | ● |
+| VOID | ● | ● | | ● | ● | ● | | ● |
+| RESONATOR | | | ● | ● | | | ● | ● |
+| SHATTER | ● | | ● | | ● | | ● | |
+| STUTTR | | ● | | | | ● | | |
+
 ## Build
 
 <div id="octabam-builder">This page needs JavaScript.</div>

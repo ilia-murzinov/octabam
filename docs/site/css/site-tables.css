@@ -19,3 +19,27 @@
   height: 0;
   padding: 0;
 }
+
+/* Web builder remix feature matrix (page.js). */
+.ob-features-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.5rem;
+}
+.ob-features {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  width: max-content;
+  max-width: 100%;
+}
+.ob-features th,
+.ob-features td {
+  border: 1px solid var(--border, #ccc);
+  padding: 0.35rem 0.55rem;
+  text-align: center;
+  white-space: nowrap;
+}
+.ob-features th[scope="row"],
+.ob-features thead th:first-child {
+  text-align: left;
+  font-weight: 600;
+}

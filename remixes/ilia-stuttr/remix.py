@@ -1,9 +1,7 @@
-"""vrcs-cx -- base ColdFire + CX OSC + SC + SHATTER + VOID + RESONATOR + SCOPE.
+"""ilia-stuttr -- ilia with STUTTR instead of SHATTER.
 
-No SYNTH MACHINE (conflicts with CX OSC). No STUTTR (conflicts with SHATTER).
-No DARK REV: SPRING must be fully harvested so SC + VOID + RESONATOR fit.
-Stock COMP replaced by SIDECHAIN on FX1. SCOPE: DOWN+TEMPO (owns TUNER
-detours). No COPY PROJECT (PROJECT table does not fit with SCOPE).
+Tim v2.15 synth + VOID + STUTTR + SCOPE + DARK + COPY. Stock COMPRESSOR.
+No SHATTER / SIDECHAIN / RESONATOR / TAPE. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -18,25 +16,23 @@ CORE = (
     "ATA WRITE GUARD", "EVENTS",
     "RND NAME",
     "EUCLID FILL",
+    "COPY PROJECT",
     "PERSISTENT BUFFERS",
     "REMIX SWITCH",
     "SCOPE",
 )
 
 REMIX = Remix(
-    name="vrcs-cx",
+    name="ilia-stuttr",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="CX OSC + SC + SHATTER + VOID + RESONATOR + SCOPE; no DARK / SYNTH / STUTTR.",
-    doc="CORE + STEM REC + CX OSC + sidechain + SHATTER + VOID + RESONATOR + SCOPE. No DARK REV.",
+    proof_note="v2.15 synth + VOID + STUTTR + SCOPE + DARK + COPY; stock COMP; no SHATTER / SC / RESONATOR.",
+    doc="CORE + STEM REC + SYNTH v2.15 + VOID + STUTTR + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
-        "CX OSC",
-        "SIDECHAIN_COMPRESSOR",
-        "SHATTER",
-        "RESONATOR",
-        "VOID",
+        "SYNTH MACHINE",
+        "STUTTR",
         "LOFI AMF FIX",
         "FILTER",
         "EQUALIZER",
@@ -45,8 +41,11 @@ REMIX = Remix(
         "FLANGER",
         "CHORUS",
         "SPATIALIZER",
+        "VOID",
+        "COMPRESSOR",
         "LO-FI",
         "DELAY",
+        "DARK REV",
     ),
     fx1=(
         "FILTER",
@@ -56,8 +55,7 @@ REMIX = Remix(
         "FLANGER",
         "CHORUS",
         "VOID",
-        "RESONATOR",
-        "SIDECHAIN_COMPRESSOR",
+        "COMPRESSOR",
         "LO-FI",
     ),
     fallback="NONE",
@@ -68,5 +66,6 @@ REMIX = Remix(
         ("octabam.usb", "MASTER"): 0,
         ("octabam.usb", "IN"): "OFF",
         ("kyoti.mute-modes", "PLACE"): Pin("DRAM"),
+        ("timhastie.synth", "PLACE"): "DRAM",
     },
 )

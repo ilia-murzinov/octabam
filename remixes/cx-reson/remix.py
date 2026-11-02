@@ -1,10 +1,7 @@
-"""latest -- Ilia's flash stack: Tim v2.15 synth + VOID nbr + RESONATOR.
+"""cx-reson -- cx with RESONATOR instead of VOID.
 
-CORE + STEM REC + COPY PROJECT + PERSISTENT BUFFERS + EUCLID FILL / RND NAME
-+ synth/FX + VOID + RESONATOR + sidechain. SYNTH / QUANTIZER at v2.15;
-ML_FM_MAX=4. VOID from feature/void-neighbour (SETUP SRC).
-No TAPE / SHATTER / STUTTR. No DARK REV (SPRING harvested so VOID + SC +
-RESONATOR fit).
+CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY. Stock COMPRESSOR + COMB.
+No VOID / SIDECHAIN / STUTTR / SYNTH / TAPE. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -22,19 +19,20 @@ CORE = (
     "COPY PROJECT",
     "PERSISTENT BUFFERS",
     "REMIX SWITCH",
+    "SCOPE",
 )
 
 REMIX = Remix(
-    name="latest",
+    name="cx-reson",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="v2.15 synth ML_FM_MAX=4 + VOID nbr + RESONATOR; no TAPE / SHATTER / STUTTR / DARK.",
-    doc="CORE + STEM REC + SYNTH v2.15 + sidechain + VOID + RESONATOR + USB TRACKS MAIN CUE.",
+    proof_note="CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock COMP; no VOID / SC / STUTTR / SYNTH.",
+    doc="CORE + STEM REC + CX OSC + RESONATOR + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
-        "SYNTH MACHINE",
-        "SIDECHAIN_COMPRESSOR",
+        "CX OSC",
+        "SHATTER",
         "RESONATOR",
         "LOFI AMF FIX",
         "FILTER",
@@ -44,9 +42,11 @@ REMIX = Remix(
         "FLANGER",
         "CHORUS",
         "SPATIALIZER",
-        "VOID",
+        "COMB FILTER",
+        "COMPRESSOR",
         "LO-FI",
         "DELAY",
+        "DARK REV",
     ),
     fx1=(
         "FILTER",
@@ -55,9 +55,8 @@ REMIX = Remix(
         "PHASER",
         "FLANGER",
         "CHORUS",
-        "VOID",
         "RESONATOR",
-        "SIDECHAIN_COMPRESSOR",
+        "COMPRESSOR",
         "LO-FI",
     ),
     fallback="NONE",
@@ -68,6 +67,5 @@ REMIX = Remix(
         ("octabam.usb", "MASTER"): 0,
         ("octabam.usb", "IN"): "OFF",
         ("kyoti.mute-modes", "PLACE"): Pin("DRAM"),
-        ("timhastie.synth", "PLACE"): "DRAM",
     },
 )

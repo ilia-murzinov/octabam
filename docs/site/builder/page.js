@@ -11,6 +11,31 @@ const el = (tag, attrs = {}, ...kids) => {
 };
 const here = (p) => new URL(p, import.meta.url);
 
+function featureTable(manifest, rows) {
+  const names = rows.map((r) => r.name);
+  const featureRows = manifest.featureRows || [];
+  const byRemix = manifest.features || Object.fromEntries(
+    rows.map((r) => [r.name, r.features || []]));
+  if (!featureRows.length || !names.length) return null;
+
+  const table = el("table", { className: "ob-features" });
+  const head = el("tr", {}, el("th", {}, ""));
+  for (const name of names) head.append(el("th", {}, name));
+  table.append(el("thead", {}, head));
+
+  const body = el("tbody");
+  for (const feat of featureRows) {
+    const tr = el("tr", {}, el("th", { scope: "row" }, feat));
+    for (const name of names) {
+      const has = (byRemix[name] || []).includes(feat);
+      tr.append(el("td", {}, has ? "●" : ""));
+    }
+    body.append(tr);
+  }
+  table.append(body);
+  return el("div", { className: "ob-features-wrap" }, table);
+}
+
 async function main() {
   const manifest = await (await fetch(here("manifest.json"))).json();
   const rows = manifest.remixes || [];
@@ -32,12 +57,17 @@ async function main() {
     `Built from the ${manifest.version} release, commit ${manifest.commit.slice(0, 8)}, ${manifest.date}` +
     (manifest.dev ? " (dev)." : "."));
 
-  root.replaceChildren(
+  const matrix = featureTable(manifest, rows);
+  const kids = [
     el("p", {}, `Octabam ${manifest.version}`),
+  ];
+  if (matrix) kids.push(matrix);
+  kids.push(
     el("p", {}, "Remix: ", pick),
     el("p", {}, "Your OCTATRACK_OS1.40C_dist.zip or OCTATRACK_OS1.40C.syx:"),
     el("p", {}, choose, chosen, file),
     el("p", {}, go), status, links, built);
+  root.replaceChildren(...kids);
 
   choose.addEventListener("click", () => file.click());
   file.addEventListener("change", () => {
