@@ -1,7 +1,7 @@
-site_name: Octabam
-site_url: https://sambanks.github.io/octabam/
-repo_url: https://github.com/sambanks/octabam
-repo_name: sambanks/octabam
+site_name: ilia · octabam
+site_url: https://ilia-murzinov.github.io/octabam/
+repo_url: https://github.com/ilia-murzinov/octabam
+repo_name: ilia-murzinov/octabam
 docs_dir: .
 site_dir: ../../out/site
 use_directory_urls: false
@@ -15,6 +15,7 @@ extra_css:
   - css/fonts.css
   - css/sidebar-spacing.css
   - css/site-tables.css
+  - css/builder.css
   - css/manual.css
 theme:
   name: shadcn
@@ -28,7 +29,7 @@ nav:
   - Getting Started:
       - Overview: index.md
       - What is in Octabam: remix-octabam.md
-      - Build and Install: web-builder.md
+      - Ilia's remixes: web-builder.md
       - Safety and Recovery: safety.md
       - About: about.md
   - Octabam Remix Manual:

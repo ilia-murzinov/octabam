@@ -75,12 +75,13 @@ async function main() {
   const status = el("p", { id: "ob-status", role: "status" });
   const links = el("p", { id: "ob-links" });
   const built = el("p", { className: "ob-meta" },
-    `Built from the ${manifest.version} release, commit ${manifest.commit.slice(0, 8)}, ${manifest.date}` +
-    (manifest.dev ? " (dev)." : "."));
+    `octabam ${manifest.version} · commit ${manifest.commit.slice(0, 8)} · ${manifest.date}` +
+    (manifest.dev ? " (dev)" : ""));
 
   const matrix = featureTable(manifest, rows);
   const kids = [
-    el("p", {}, `Octabam ${manifest.version}`),
+    el("p", { className: "ob-brand" }, "Ilia's remixes"),
+    el("p", { className: "ob-sub" }, "personal stacks on 1.40C — base / cx"),
   ];
   if (matrix) kids.push(matrix);
   kids.push(

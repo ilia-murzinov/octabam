@@ -1,6 +1,6 @@
 {
  "version": "v0.3",
- "commit": "pending",
+ "commit": "d2732398259d24c88ce506d8a2d7879d2071bbe6",
  "dev": true,
  "build": "I2",
  "date": "2026-11-02",
@@ -16,7 +16,7 @@
   "STUTTR"
  ],
  "features": {
-  "ilia": [
+  "base": [
    "COPY PROJECT",
    "DARK REV",
    "SCOPE",
@@ -24,7 +24,7 @@
    "SYNTH",
    "VOID"
   ],
-  "ilia-stuttr": [
+  "base-stuttr": [
    "COPY PROJECT",
    "DARK REV",
    "SCOPE",
@@ -32,7 +32,7 @@
    "SYNTH",
    "VOID"
   ],
-  "ilia-reson": [
+  "base-reson": [
    "COPY PROJECT",
    "DARK REV",
    "RESONATOR",
@@ -40,7 +40,7 @@
    "SHATTER",
    "SYNTH"
   ],
-  "ilia-vres": [
+  "base-vres": [
    "COPY PROJECT",
    "DARK REV",
    "RESONATOR",
@@ -83,11 +83,11 @@
  },
  "remixes": [
   {
-   "name": "ilia",
-   "title": "ilia",
+   "name": "base",
+   "title": "base",
    "version": "OCTABAMI2",
-   "imageName": "ILIA I2",
-   "patch": "patches/ilia.obp",
+   "imageName": "BASE I2",
+   "patch": "patches/base.obp",
    "patchBytes": 117724,
    "sha256": "83c55f946e43615011d65abf6a38cf1d355624da1fc719e3a2e303291681e9fd",
    "features": [
@@ -100,11 +100,11 @@
    ]
   },
   {
-   "name": "ilia-stuttr",
-   "title": "ilia-stuttr",
+   "name": "base-stuttr",
+   "title": "base-stuttr",
    "version": "OCTABAMI2",
-   "imageName": "ILIA-STUTTR I2",
-   "patch": "patches/ilia-stuttr.obp",
+   "imageName": "BASE-STUTTR I2",
+   "patch": "patches/base-stuttr.obp",
    "patchBytes": 118081,
    "sha256": "d5dc100456100bfe89ef2c44dab0b39781a81a5c80813b48d9c0eb3aa348b36a",
    "features": [
@@ -117,11 +117,11 @@
    ]
   },
   {
-   "name": "ilia-reson",
-   "title": "ilia-reson",
+   "name": "base-reson",
+   "title": "base-reson",
    "version": "OCTABAMI2",
-   "imageName": "ILIA-RESON I2",
-   "patch": "patches/ilia-reson.obp",
+   "imageName": "BASE-RESON I2",
+   "patch": "patches/base-reson.obp",
    "patchBytes": 116618,
    "sha256": "0a0994e757017c6efb499d43b958045eba84e1903349b0282f7cfff93146954a",
    "features": [
@@ -134,11 +134,11 @@
    ]
   },
   {
-   "name": "ilia-vres",
-   "title": "ilia-vres",
+   "name": "base-vres",
+   "title": "base-vres",
    "version": "OCTABAMI2",
-   "imageName": "ILIA-VRES I2",
-   "patch": "patches/ilia-vres.obp",
+   "imageName": "BASE-VRES I2",
+   "patch": "patches/base-vres.obp",
    "patchBytes": 117812,
    "sha256": "181b4d049f43178c8d4df4943f801d389ece73a6b166f6168b90acd56d916d1a",
    "features": [

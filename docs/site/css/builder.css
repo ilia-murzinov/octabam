@@ -1,0 +1,44 @@
+/* Personal builder chrome — scoped so the rest of the docs theme is untouched. */
+#octabam-builder {
+  --ob-accent: #c45c26;
+  border-left: 3px solid var(--ob-accent);
+  padding-left: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+#octabam-builder .ob-brand {
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+#octabam-builder .ob-sub {
+  margin: 0 0 1rem;
+  color: var(--muted-foreground, #666);
+  font-size: 0.95rem;
+}
+
+#octabam-builder .ob-meta {
+  font-size: 0.8rem;
+  color: var(--muted-foreground, #666);
+}
+
+#octabam-builder .ob-features {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+#octabam-builder .ob-features th,
+#octabam-builder .ob-features td {
+  padding: 0.28rem 0.45rem;
+}
+
+#octabam-builder .ob-features .ob-row-hover > *,
+#octabam-builder .ob-features .ob-col-hover {
+  background: color-mix(in srgb, var(--ob-accent) 14%, transparent);
+}
+
+#octabam-builder .ob-features .ob-cell-hover {
+  background: color-mix(in srgb, var(--ob-accent) 30%, transparent);
+}
