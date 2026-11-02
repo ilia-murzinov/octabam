@@ -162,12 +162,9 @@ def screen_reference(m) -> list[str]:
 def directory_page(mods, manual_page: dict) -> str:
     """Directory of Ilia's modules documented on this site."""
     site_keys = _site_keys()
-    lines = ["# Modules documented here", "",
-             "These ten modules were developed on this fork and have usage pages "
-             "on this site. **They are not the whole image** — every `base*` / `cx*` "
-             "build also ships many modules by [other authors](../credits.md), "
-             "composed with the [octabam](https://github.com/sambanks/octabam) remixer. "
-             "Build: [Build](../web-builder.md).", ""]
+    lines = ["# Modules", "",
+             "Fork modules with docs here. Rest of each image: [Credits](../credits.md). "
+             "[Build](../web-builder.md).", ""]
     for cat, ms in index.by_category(mods).items():
         ms = [m for m in ms if m.key in site_keys]
         if not ms:

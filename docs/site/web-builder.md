@@ -1,27 +1,21 @@
 # Build
 
-Eight **base** / **cx** images — pick one, patch your own 1.40C in the
-browser. Nothing is uploaded.
-
-These images are **octabam compositions**: CORE (Sam and others), Tim’s
-SYNTH / QUANTIZER / TUNER on `base*`, Kyoti’s workflow modules, plus the
-fork modules below. Full list and links: [Credits](credits.md).
+Patch your 1.40C in-browser for a `base*` / `cx*` image. Nothing uploads.
+Authors: [Credits](credits.md).
 
 Always on: [SCOPE](reference/modules/scope.md),
 [COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMP.
-PLATE and SPRING are harvested so the inserts fit.
-**base\*** = Tim [SYNTH](credits.md) (upstream); **cx\*** =
-[CX OSC](reference/modules/cxosc.md) (fork, Tim FM lineage).
+PLATE + SPRING harvested. **base\*** = Tim SYNTH; **cx\*** =
+[CX OSC](reference/modules/cxosc.md).
 
-!!! tip "Back up your projects"
-    Back up the CF card before installing. Kits write `kits.work` into each
-    project they load. Prefer new projects after a first flash of a new stack.
+!!! tip "Back up"
+    Back up the CF card first. Kits write `kits.work`. Prefer a new project after a first flash of a new stack.
 
-## What you need
+## Need
 
-- `OCTATRACK_OS1.40C_dist.zip` or `OCTATRACK_OS1.40C.syx` from Elektron  
-- A current desktop browser  
-- CF card (card install) or DIN MIDI interface (MIDI install)
+- `OCTATRACK_OS1.40C_dist.zip` or `.syx` (Elektron)
+- Desktop browser
+- CF card or DIN MIDI
 
 ## Patch
 
@@ -30,31 +24,20 @@ PLATE and SPRING are harvested so the inserts fit.
 
 | file | use |
 |---|---|
-| `.bin` | CF root → PROJECT → SYSTEM → OS UPGRADE |
+| `.bin` | CF root → OS UPGRADE |
 | `.syx` | DIN MIDI install |
-| `.RMX` | `/BRAIN/REMIXES/` on a unit already running an octabam image |
+| `.RMX` | `/BRAIN/REMIXES/` |
 
-The files contain Elektron's OS — keep them private.
+Contains Elektron's OS — keep private.
 
 ## Install
 
-### CF card
+**CF:** USB DISK MODE → copy `.bin` to root → eject → OS UPGRADE → YES → power-cycle once.
 
-1. PROJECT → SYSTEM → USB DISK MODE → YES  
-2. Copy the `.bin` to the card root  
-3. Eject, leave USB DISK MODE  
-4. PROJECT → SYSTEM → OS UPGRADE → YES  
-5. Power-cycle once after the reboot  
+**MIDI:** Elektron's MIDI OS upgrade with the `.syx`.
 
-### MIDI
-
-Follow Elektron's MIDI OS upgrade flow with the `.syx`.
-
-### RMX switch
-
-Copy `.RMX` to `/BRAIN/REMIXES/`, then PROJ → BRAIN → REMIXES.
+**RMX:** copy to `/BRAIN/REMIXES/` → PROJ → BRAIN → REMIXES.
 
 ## Confirm
 
-SYSTEM STATUS → OS VERSION should show `OCTABAM` plus the build tag. Stock
-shows `1.40C`. Recovery: [Safety](safety.md).
+STATUS → OS VERSION = `OCTABAM` + tag (stock = `1.40C`). [Safety](safety.md).
