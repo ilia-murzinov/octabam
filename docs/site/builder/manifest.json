@@ -1,18 +1,36 @@
 {
- "version": "v0.4",
- "commit": "9e2545bc951c5379649b61f0a7577e05cd8e9d25",
- "dev": false,
- "build": "04",
- "date": "2026-11-04",
+ "version": "v0.3",
+ "commit": "3df6c3e504b39cc0daa22747bebddf9cb7aebf47",
+ "dev": true,
+ "build": "I1",
+ "date": "2026-11-02",
  "remixes": [
   {
    "name": "octabam",
    "title": "octabam",
-   "version": "OCTABAM04",
-   "imageName": "OCTABAM 04",
+   "version": "OCTABAMI1",
+   "imageName": "OCTABAM I1",
    "patch": "patches/octabam.obp",
-   "patchBytes": 203074,
-   "sha256": "9159aca19b927478c9be8ebe5f86028c0f1a6f43c80d54d69fc739d753362977"
+   "patchBytes": 199486,
+   "sha256": "41c9ec0ed0b2a88bc342c5128884b09e3bc205f2b083942698116388a616006a"
+  },
+  {
+   "name": "latest",
+   "title": "latest",
+   "version": "OCTABAMI1",
+   "imageName": "LATEST I1",
+   "patch": "patches/latest.obp",
+   "patchBytes": 118179,
+   "sha256": "edec8d985a1fe3ac15a094a5e17600cf7e0e71ce52b8e8bac72d46cee76ebf29"
+  },
+  {
+   "name": "vrcs-cx",
+   "title": "vrcs-cx",
+   "version": "OCTABAMI1",
+   "imageName": "VRCS-CX I1",
+   "patch": "patches/vrcs-cx.obp",
+   "patchBytes": 118503,
+   "sha256": "cccfaa424229c7afd54ef413326e14b4af236d999faf6211a17b44445dd73e58"
   }
  ]
 }

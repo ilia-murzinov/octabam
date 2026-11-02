@@ -44,7 +44,8 @@ def git(*a):
 
 
 def remixes():
-    return [r for r in release.REMIXES if (TREE / "remixes" / r / "remix.py").exists()]
+    names = getattr(release, "BUILDER_REMIXES", None) or release.REMIXES
+    return [r for r in names if (TREE / "remixes" / r / "remix.py").exists()]
 
 
 def image_name(remix, build):

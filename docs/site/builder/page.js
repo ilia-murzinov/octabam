@@ -1,5 +1,5 @@
 // The web builder page: give it your own OCTATRACK_OS1.40C zip, download the
-// card image of the release the manifest names. Everything runs in this browser tab.
+// card image of the remix the manifest names. Everything runs in this browser tab.
 import { build } from "./builder.js";
 import { makeEft } from "./eft-run.js";
 
@@ -13,8 +13,15 @@ const here = (p) => new URL(p, import.meta.url);
 
 async function main() {
   const manifest = await (await fetch(here("manifest.json"))).json();
+  const rows = manifest.remixes || [];
+  if (!rows.length) throw new Error("manifest has no remixes");
 
-  const meta = manifest.remixes[0];
+  const pick = el("select", { id: "ob-remix" });
+  for (const r of rows) {
+    pick.append(el("option", { value: r.name, textContent: `${r.title || r.name} (${r.imageName || r.version})` }));
+  }
+  const metaOf = () => rows.find((r) => r.name === pick.value) || rows[0];
+
   const file = el("input", { type: "file", id: "ob-file", accept: ".zip,.syx", hidden: true });
   const choose = el("button", { type: "button", id: "ob-choose", textContent: "Choose OS file" });
   const chosen = el("span", { id: "ob-chosen", textContent: " No file chosen." });
@@ -22,10 +29,12 @@ async function main() {
   const status = el("p", { id: "ob-status", role: "status" });
   const links = el("p", { id: "ob-links" });
   const built = el("p", { className: "ob-meta" },
-    `Built from the ${manifest.version} release, commit ${manifest.commit.slice(0, 8)}, ${manifest.date}.`);
+    `Built from the ${manifest.version} release, commit ${manifest.commit.slice(0, 8)}, ${manifest.date}` +
+    (manifest.dev ? " (dev)." : "."));
 
   root.replaceChildren(
     el("p", {}, `Octabam ${manifest.version}`),
+    el("p", {}, "Remix: ", pick),
     el("p", {}, "Your OCTATRACK_OS1.40C_dist.zip or OCTATRACK_OS1.40C.syx:"),
     el("p", {}, choose, chosen, file),
     el("p", {}, go), status, links, built);
@@ -39,6 +48,7 @@ async function main() {
   go.addEventListener("click", async () => {
     go.disabled = true;
     links.replaceChildren();
+    const meta = metaOf();
     try {
       const bytes = new Uint8Array(await file.files[0].arrayBuffer());
       const patch = new Uint8Array(await (await fetch(here(meta.patch))).arrayBuffer());
