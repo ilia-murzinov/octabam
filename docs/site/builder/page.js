@@ -1,8 +1,6 @@
 // The web builder page: give it your own OCTATRACK_OS1.40C zip, download the
-// card image of the remix the manifest names. Everything runs in this browser tab.
-import { build } from "./builder.js";
-import { makeEft } from "./eft-run.js";
-
+// card image of the remix the manifest names. Everything runs in this browser tab;
+// the heavy eft.wasm work is in a worker so the tab stays responsive.
 const root = document.getElementById("octabam-builder");
 const el = (tag, attrs = {}, ...kids) => {
   const n = Object.assign(document.createElement(tag), attrs);
@@ -10,6 +8,52 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const here = (p) => new URL(p, import.meta.url);
+
+let buildWorker = null;
+let buildSeq = 0;
+
+function getBuildWorker() {
+  if (!buildWorker) {
+    buildWorker = new Worker(here("build-worker.js"), { type: "module" });
+  }
+  return buildWorker;
+}
+
+function runBuild({ file, patch, meta, onStep }) {
+  const worker = getBuildWorker();
+  const id = ++buildSeq;
+  return new Promise((resolve, reject) => {
+    const onMessage = (ev) => {
+      if (ev.data.id !== id) return;
+      if (ev.data.type === "step") {
+        onStep(ev.data.step);
+        return;
+      }
+      worker.removeEventListener("message", onMessage);
+      worker.removeEventListener("error", onError);
+      if (ev.data.type === "done") {
+        resolve({
+          bin: new Uint8Array(ev.data.bin),
+          syx: new Uint8Array(ev.data.syx),
+          rmx: new Uint8Array(ev.data.rmx),
+          names: ev.data.names,
+        });
+      } else {
+        reject(new Error(ev.data.message || "build failed"));
+      }
+    };
+    const onError = (err) => {
+      worker.removeEventListener("message", onMessage);
+      worker.removeEventListener("error", onError);
+      reject(err && err.message ? err : new Error(String(err)));
+    };
+    worker.addEventListener("message", onMessage);
+    worker.addEventListener("error", onError);
+    const fileBuf = file.slice().buffer;
+    const patchBuf = patch.slice().buffer;
+    worker.postMessage({ id, file: fileBuf, patch: patchBuf, meta }, [fileBuf, patchBuf]);
+  });
+}
 
 /** Short column labels so the matrix fits without overlapping headers. */
 const FEAT_SHORT = {
