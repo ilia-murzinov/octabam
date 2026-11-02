@@ -33,6 +33,27 @@ function featureTable(manifest, rows) {
     body.append(tr);
   }
   table.append(body);
+
+  const clearHover = () => {
+    table.querySelectorAll(".ob-row-hover").forEach((n) => n.classList.remove("ob-row-hover"));
+    table.querySelectorAll(".ob-col-hover").forEach((n) => n.classList.remove("ob-col-hover"));
+    table.querySelectorAll(".ob-cell-hover").forEach((n) => n.classList.remove("ob-cell-hover"));
+  };
+  table.addEventListener("mouseleave", clearHover);
+  table.addEventListener("mouseover", (e) => {
+    const cell = e.target.closest("td, th");
+    if (!cell || !table.contains(cell)) return;
+    clearHover();
+    const col = cell.cellIndex;
+    const row = cell.parentElement;
+    row.classList.add("ob-row-hover");
+    for (const tr of table.rows) {
+      const c = tr.cells[col];
+      if (c) c.classList.add("ob-col-hover");
+    }
+    cell.classList.add("ob-cell-hover");
+  });
+
   return el("div", { className: "ob-features-wrap" }, table);
 }
 
