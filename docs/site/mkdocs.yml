@@ -8,6 +8,7 @@ use_directory_urls: false
 exclude_docs: |
   reference/_remix-*.md
   reference/_credits-shipped.md
+  reference/modules.md
   usage/*.md
   manual/*.md
 extra_css:
@@ -28,19 +29,23 @@ theme:
     light: shadcn-light
     dark: github-dark
 nav:
-  - Home: index.md
+  # This site has one job: build a personal image, then read the fork
+  # modules that image carries. Grouped by what they are on the unit.
+  - ilia · octabam: index.md
   - Build: web-builder.md
-  - Modules:
-      - VOID: reference/modules/void.md
-      - RESONATOR: reference/modules/resonator.md
-      - SHATTER: reference/modules/shatter.md
-      - STUTTR: reference/modules/stuttr.md
-      - CX OSC: reference/modules/cxosc.md
-      - SCOPE: reference/modules/scope.md
-      - COPY PROJECT: reference/modules/copy-project.md
-      - EUCLID FILL: reference/modules/euclid-fill.md
-      - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
-      - RND NAME: reference/modules/rnd-name.md
+  - Effects:
+      - Resonator: reference/modules/resonator.md
+      - Shatter: reference/modules/shatter.md
+      - Stuttr: reference/modules/stuttr.md
+      - Void: reference/modules/void.md
+  - Machines:
+      - Cx Osc: reference/modules/cxosc.md
+      - Euclid Fill: reference/modules/euclid-fill.md
+  - Tools:
+      - Copy Project: reference/modules/copy-project.md
+      - Persistent Buffers: reference/modules/persistent-buffers.md
+      - Random Naming: reference/modules/rnd-name.md
+      - Scope: reference/modules/scope.md
 markdown_extensions:
   - admonition
   - pymdownx.details

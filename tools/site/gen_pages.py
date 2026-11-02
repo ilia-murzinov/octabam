@@ -281,7 +281,7 @@ def module_page(m, mods, manual_page: dict) -> str:
             _mod_ref(o) + f" — {why}" for o, why in m.conflicts) + " |")
     lines += ['??? note "Module facts"', ""]
     lines += ["    " + line if line else "" for line in [m.doc, "", "| Detail | Value |", "|---|---|"] + rows + ["", f"On GitHub: {_module_url(m)}"]]
-    lines += ["", "[Modules](../modules.md)", " · ", "[Home](../../index.md)"]
+    lines += ["", "[Build](../../web-builder.md)", " · ", "[ilia · octabam](../../index.md)"]
     return "\n".join(lines) + "\n"
 
 

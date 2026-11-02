@@ -1,14 +1,14 @@
-# Build and Install
+# Build
 
 Build a **base** / **cx** remix from your own Octatrack OS 1.40C in this
 browser tab. The OS file is read locally; nothing is uploaded. See
 [who wrote what](index.md#credits) before you credit a feature.
 
-Always on: [SCOPE](reference/modules/scope.md),
-[COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
+Always on: [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
 PLATE and SPRING are harvested so the inserts fit.
 **base\*** includes Tim Hastie’s SYNTH MACHINE;
-**cx\*** includes [CX OSC](reference/modules/cxosc.md) instead.
+**cx\*** includes [Cx Osc](reference/modules/cxosc.md) instead.
 
 !!! tip "Back up your projects"
     Back up your CF card before installing, or start new projects after
