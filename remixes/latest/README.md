@@ -1,6 +1,6 @@
 # latest
 
-Ilia's rolling flash stack on branch `ilia`: Tim v2.22 synth (ML_FM_MAX=4,
+Ilia's rolling flash stack on branch `ilia`: Tim v2.15 synth (ML_FM_MAX=4,
 PLACE=DRAM) + VOID neighbour (SETUP SRC) + RESONATOR +
 sidechain + STEM REC / EUCLID / …  
 No TAPE / SHATTER / STUTTR / DARK REV.

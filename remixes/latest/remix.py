@@ -1,7 +1,7 @@
-"""latest -- Ilia's flash stack: Tim v2.22 synth + VOID nbr + RESONATOR.
+"""latest -- Ilia's flash stack: Tim v2.15 synth + VOID nbr + RESONATOR.
 
 CORE + STEM REC + COPY PROJECT + PERSISTENT BUFFERS + EUCLID FILL / RND NAME
-+ synth/FX + VOID + RESONATOR + sidechain. SYNTH / QUANTIZER at v2.22;
++ synth/FX + VOID + RESONATOR + sidechain. SYNTH / QUANTIZER at v2.15;
 ML_FM_MAX=4. VOID from feature/void-neighbour (SETUP SRC).
 No TAPE / SHATTER / STUTTR. No DARK REV (SPRING harvested so VOID + SC +
 RESONATOR fit).
@@ -28,8 +28,8 @@ REMIX = Remix(
     name="latest",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="v2.22 synth ML_FM_MAX=4 + VOID nbr + RESONATOR; no TAPE / SHATTER / STUTTR / DARK.",
-    doc="CORE + STEM REC + SYNTH v2.22 + sidechain + VOID + RESONATOR + USB TRACKS MAIN CUE.",
+    proof_note="v2.15 synth ML_FM_MAX=4 + VOID nbr + RESONATOR; no TAPE / SHATTER / STUTTR / DARK.",
+    doc="CORE + STEM REC + SYNTH v2.15 + sidechain + VOID + RESONATOR + USB TRACKS MAIN CUE.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
