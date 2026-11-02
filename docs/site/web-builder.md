@@ -56,7 +56,7 @@ Use this method when the Octatrack boots normally:
 ### Over DIN MIDI
 
 Follow Elektron's MIDI OS upgrade flow with the `.syx`, or the Startup Menu
-path in [Safety and recovery](index.md#safety-and-recovery).
+path under [Safety and recovery](index.md#safety-and-recovery).
 
 ### Switch with an RMX file
 
