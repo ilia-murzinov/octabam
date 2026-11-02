@@ -1,60 +1,131 @@
 # ilia · octabam
 
-`base*` / `cx*` stacks for Octatrack OS 1.40C.
-Fork of [octabam](https://github.com/sambanks/octabam)
-([Sam Banks](https://github.com/sambanks) + contributors).
-Remixer + most of every image: theirs. This site docs
-[these modules](reference/modules.md) and the [builder](web-builder.md).
+Personal **base** / **cx** remix stacks for the Elektron Octatrack (OS 1.40C),
+built with the [octabam](https://github.com/sambanks/octabam) remixer by
+[Sam Banks](https://github.com/sambanks) and many contributors.
 
+Most of each image is their work: the remixer, CORE, Tim Hastie’s machines,
+Kyoti’s workflow modules, and the rest listed below. This site documents
+[modules developed on this fork](reference/modules.md) and the
+[browser builder](web-builder.md). It is not a replacement for the upstream
+octabam manual.
+
+| | |
+|---|---|
 | Upstream | [sambanks/octabam](https://github.com/sambanks/octabam) |
-| Fork | [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam) |
+| This fork | [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam) |
 
-Unofficial — not Elektron. MIT
-([LICENSE](https://github.com/sambanks/octabam/blob/main/LICENSE)).
-No Elektron firmware in the repo; you supply 1.40C.
+## Unofficial firmware
 
-- **CX OSC** — Tim Hastie’s FM SYNTH engine (not an edit of SYNTH MACHINE). Tim’s SYNTH / QUANTIZER / TUNER on `base*`.
-- **SCOPE** — overlays TUNER’s DOWN+TEMPO; TUNER stays Tim’s.
-- Stock FX — Elektron.
+These images are unofficial community firmware, not made, endorsed or
+supported by Elektron. Installing them is generally safe and can be reverted
+by reinstalling stock OS (see [Safety and recovery](#safety-and-recovery)
+below). Elektron is not responsible for any damage to your Octatrack.
 
-## Shipped in `base*` / `cx*`
+The repository licence is MIT
+([upstream LICENSE](https://github.com/sambanks/octabam/blob/main/LICENSE)).
+Elektron's firmware is not distributed; you build from your own copy of
+OS 1.40C.
+
+## Get started
+
+1. [Build and install](web-builder.md) a `base*` or `cx*` image from your own
+   1.40C in the browser.
+2. Read the [module pages](reference/modules.md) for VOID, SHATTER, CX OSC,
+   SCOPE and the other fork modules.
+3. Check [who wrote what](#credits) before you credit a feature.
+
+## Lineage that stays visible
+
+- **CX OSC** is a local machine derived from **Tim Hastie**’s FM SYNTH engine
+  (octatrick). It is not an edit of the SYNTH MACHINE submodule. Tim’s
+  SYNTH MACHINE, SCALE QUANTIZER and TUNER still ship on `base*` and keep
+  their authorship.
+- **SCOPE** overlays TUNER’s **DOWN+TEMPO** entry when both are present.
+  TUNER remains Tim’s; SCOPE is an overlay, not a rewrite.
+- Stock FILTER…DELAY, COMPRESSOR, DARK REV and the rest of Elektron's FX
+  remain Elektron.
+
+## Credits
+
+Every non-stock module that appears in at least one `base*` / `cx*` image,
+plus the modules documented on this site. Authors and URLs come from each
+module's `manifest.py`.
 
 --8<-- "reference/_credits-shipped.md"
 
-## Safety
+## Safety and recovery
 
-Not supported by Elektron. Flashing can brick until you reinstall stock.
-Need: working Startup Menu, DIN MIDI, your own `OCTATRACK_OS1.40C.syx`.
+Read this before flashing. Keep the recovery files and equipment available
+whenever you install a modified OS.
 
-### Stock over MIDI
+### Recovery requirements
 
-1. Power off. FUNC + power → STARTUP MENU.
-2. TRIG 3 → MIDI UPGRADE.
-3. Send stock `.syx` over DIN MIDI (or `make midi-flash PORT=… SYX=downloads/extracted/OCTATRACK_OS1.40C.syx`).
-4. Wait through PREPARING / UPDATING FLASH. Do not power off.
+Octabam-based images are community maintained and are not supported by
+Elektron. Flashing modified firmware carries a risk of data loss or a unit
+that cannot boot. A failed flash can leave the installed OS unable to boot
+until stock OS is reinstalled.
 
-USB DISK MODE can also take a stock `.bin` on the CF root. The OT USB port cannot send an OS upgrade.
+Recovery needs a working Startup Menu, a DIN MIDI interface, and a copy of
+the stock OS. The Startup Menu is separate from the operating system, but
+this procedure cannot recover a unit whose Startup Menu or MIDI input is
+unavailable.
 
-TRIG 2 → EMPTY RESET clears battery-backed RAM/settings, not the card.
+### Reinstall stock OS over MIDI
 
-### Saved-data warning (page-2 / Kits / scenes)
+1. Power off. Hold **FUNC** and power on → STARTUP MENU.
+2. **TRIG 3** → MIDI UPGRADE → "READY TO RECEIVE MIDI UPGRADE".
+3. Send `downloads/extracted/OCTATRACK_OS1.40C.syx` (created by `make os`)
+   over DIN MIDI with a SysEx app, or run:
 
-**NO** keeps the file. **YES** then LEVEL:
+   ```bash
+   make midi-flash PORT=<port> SYX=downloads/extracted/OCTATRACK_OS1.40C.syx
+   ```
+4. Wait through PREPARING FLASH → UPDATING FLASH. Do not power off.
 
-| Choice | Effect |
+If the unit boots far enough to enter USB DISK MODE, you can also install
+stock OS from the CF card. The Octatrack USB port cannot send an OS upgrade.
+
+**TRIG 2** → EMPTY RESET clears battery-backed RAM and settings, not the card.
+
+### Resolve a saved-data file warning
+
+If a project file for FX page 2 parameter locks, Kits or MIDI scenes is
+unreadable or incompatible, a message names the affected data and file.
+This can happen with damaged or incomplete files as well as older formats.
+An ordinary stock project without these extra files does not need them.
+
+Press **NO** to dismiss the message and keep the original file protected,
+or **YES** to see the options. Turn **LEVEL** to choose, then press **YES**:
+
+| Choice | What happens |
 |---|---|
-| KEEP FILE / SKIP | File untouched; data unused this session |
-| START FRESH / REPLACE | Next save replaces the file |
-| BACKUP THEN FRESH | Next save copies original to `.bak` first |
+| KEEP FILE / SKIP SAVED DATA | Leaves the original file untouched. Its saved data is unavailable for this session. |
+| START FRESH / REPLACE FILE | Continues without the old saved data. The next save replaces the file. For Kits, the project's stock Parts become the starting Kits. |
+| BACKUP FILE THEN START FRESH | Starts fresh, but the next save first copies the original to a `.bak` file. |
 
-### FAQ
+These choices do not upgrade or recover the old contents. Keep the file if
+you want to investigate or recover its data later. Pressing **NO** from the
+choices also leaves it protected until the next project load.
 
-**Official?** No.
+### Common questions
 
-**Does flash wipe projects?** No. Exceptions: Kits writes `kits.work` into loaded projects; BRAIN writes its own card files.
+**Is this official Elektron firmware?**
+No. Nothing here is endorsed by, supported by, or affiliated with Elektron.
 
-**MKI / MKII?** Same 1.40C; both flash.
+**Does flashing touch my card or projects?**
+No. An OS upgrade does not touch the CF card. Two exceptions: Kits write a
+`kits.work` file into each project they load (a stock OS ignores the file),
+and BRAIN writes its own files to the card.
 
-**Why no downloadable image?** A built `.bin`/`.syx` contains Elektron's OS — you build from your copy.
+**MKI or MKII?**
+Both run the same OS 1.40C file, and both can flash an octabam image.
 
-**Failures:** [register](https://github.com/sambanks/octabam/blob/main/docs/contributing/FAILURE_MODES.md).
+**Why can I not download a built image?**
+A built `.bin` or `.syx` contains Elektron's OS. Distributing it would
+distribute their software, so you build it yourself from your own copy.
+
+**Where are hardware failures recorded?**
+The [failure register](https://github.com/sambanks/octabam/blob/main/docs/contributing/FAILURE_MODES.md)
+records observed failures, causes and fixes. It cannot guarantee that a
+particular unit or flash attempt will recover.
