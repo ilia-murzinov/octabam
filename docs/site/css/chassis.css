@@ -6,9 +6,9 @@
 .dark {
   color-scheme: dark;
 
-  --font-sans: "Atkinson Hyperlegible", "Geist", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "Fraunces", "Atkinson Hyperlegible", serif;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-heading: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
