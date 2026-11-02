@@ -149,22 +149,20 @@ def screen_reference(m) -> list[str]:
     return lines
 
 
-def _builder_keys():
+def _site_keys():
     import release
-    keys = set()
-    for n in getattr(release, "BUILDER_REMIXES", ()) or ():
-        keys |= set(registry.remix(n).modules)
-    return keys
+    return set(getattr(release, "SITE_MODULES", ()) or ())
 
 
 def directory_page(mods, manual_page: dict) -> str:
-    """Feature directory for this fork: only modules that appear in BUILDER_REMIXES."""
-    builder_keys = _builder_keys()
-    lines = ["# Feature Directory", "",
-             "Modules in [Ilia's remixes](../remix-ilia.md) (`base*` / `cx*`). "
-             "Stock FILTER…DELAY / COMP / DARK are Elektron; see their manual.", ""]
+    """Directory of Ilia's modules documented on this site."""
+    site_keys = _site_keys()
+    lines = ["# Modules", "",
+             "Modules developed for these remixes (docs on this site). "
+             "Other modules in `base*` / `cx*` come from [octabam](https://github.com/sambanks/octabam) "
+             "contributors — see [Credits](../credits.md).", ""]
     for cat, ms in index.by_category(mods).items():
-        ms = [m for m in ms if not m.is_stock and m.key in builder_keys]
+        ms = [m for m in ms if m.key in site_keys]
         if not ms:
             continue
         lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
@@ -187,7 +185,7 @@ def module_page(m, mods, manual_page: dict) -> str:
         if m.key in set(registry.remix(n).modules))
     if in_builder:
         listed = ", ".join(f"`{n}`" for n in in_builder)
-        lines += [f"In Ilia's remixes: {listed}.", ""]
+        lines += [f"Ships in: {listed}.", ""]
     lines += hero(m)
     if fragment.is_file():
         lines += [f'--8<-- "usage/{m.name}.md"', ""]
@@ -205,7 +203,7 @@ def module_page(m, mods, manual_page: dict) -> str:
             for o, why in m.conflicts) + " |")
     lines += ['??? note "Module facts"', ""]
     lines += ["    " + line if line else "" for line in [m.doc, "", "| Detail | Value |", "|---|---|"] + rows + ["", f"On GitHub: {_module_url(m)}"]]
-    lines += ["", "[Feature directory](../modules.md)"]
+    lines += ["", "[Modules](../modules.md)", " · ", "[Credits](../../credits.md)"]
     return "\n".join(lines) + "\n"
 
 
@@ -215,17 +213,15 @@ def main(quiet: bool = False) -> int:
     import shutil
     mods = registry.modules()
     official = [(n, registry.remix(n)) for n in release.REMIXES]
-    # Drop stale generated pages (e.g. upstream-only modules from a prior run).
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
     jobs = {}
     manual_page = gen_manual.published_pages(mods, official)
-    builder_keys = _builder_keys()
+    site_keys = _site_keys()
     jobs["modules.md"] = directory_page(mods, manual_page)
-    # Fork site: only pages for modules that ship in BUILDER_REMIXES.
     for m in mods.values():
-        if m.is_stock or m.key not in builder_keys:
+        if m.key not in site_keys:
             continue
         jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
     for name, r in official:

@@ -80,8 +80,8 @@ async function main() {
 
   const matrix = featureTable(manifest, rows);
   const kids = [
-    el("p", { className: "ob-brand" }, "Ilia's remixes"),
-    el("p", { className: "ob-sub" }, "personal stacks on 1.40C — base / cx"),
+    el("p", { className: "ob-brand" }, "base / cx"),
+    el("p", { className: "ob-sub" }, "remix stacks on 1.40C · built with octabam"),
   ];
   if (matrix) kids.push(matrix);
   kids.push(

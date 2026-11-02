@@ -5,8 +5,6 @@ repo_name: ilia-murzinov/octabam
 docs_dir: .
 site_dir: ../../out/site
 use_directory_urls: false
-# the _remix-*.md fragments are snippet includes, not pages; usage/*.md
-# are included into generated module pages, manual/*.md into the manuals; img/ holds image assets.
 exclude_docs: |
   reference/_remix-*.md
   usage/*.md
@@ -19,64 +17,30 @@ extra_css:
   - css/manual.css
 theme:
   name: shadcn
-  # The theme follows the system appearance; its header toggle can override it.
   show_title: true
   show_stargazers: false
   pygments_style:
     light: shadcn-light
     dark: github-dark
 nav:
-  - Getting Started:
-      - Overview: index.md
-      - What's in Ilia's remixes: remix-ilia.md
-      - Build: web-builder.md
-      - Safety and Recovery: safety.md
-      - About: about.md
-  - Effects:
+  - Home: index.md
+  - Remixes: remix-ilia.md
+  - Build: web-builder.md
+  - Modules:
+      - Overview: reference/modules.md
       - VOID: reference/modules/void.md
       - RESONATOR: reference/modules/resonator.md
       - SHATTER: reference/modules/shatter.md
       - STUTTR: reference/modules/stuttr.md
-  - Machines:
-      - SYNTH: reference/modules/synth.md
       - CX OSC: reference/modules/cxosc.md
-  - Sequencer:
       - SCOPE: reference/modules/scope.md
-      - EUCLID FILL: reference/modules/euclid-fill.md
-      - MUTE MODES: reference/modules/mute-modes.md
-      - SCALE QUANTIZER: reference/modules/quantizer.md
-      - TUNER: reference/modules/tuner.md
-      - DIRECT JUMP: reference/modules/direct-jump-kyoti.md
-      - RLEN PLEN: reference/modules/rlen-plen.md
-      - QUANTIZE LIVE REC: reference/modules/quantize-live-rec-toggle.md
-      - REC TRIG MUTE: reference/modules/rec-trig-mute.md
-      - RELOAD FROM PROJECT: reference/modules/reload-from-project.md
-      - ERASE EMPTY TRIGLESS: reference/modules/erase-empty-trigless-locks.md
-      - STEM REC: reference/modules/stems.md
-  - Parts and scenes:
-      - BRAIN: reference/modules/brain.md
-      - STORE: reference/modules/store.md
-      - KITS: reference/modules/kits.md
-      - MIDI SCENES: reference/modules/midi-scenes.md
-      - SCENES P2: reference/modules/scenes-p2.md
-      - PLOCKS P2: reference/modules/plocks-p2.md
-      - EVENTS: reference/modules/events.md
-  - MIDI and USB:
-      - USB: reference/modules/usb.md
-      - CC MAP: reference/modules/cc-map.md
-      - CC FEEDBACK: reference/modules/cc-feedback.md
-  - Utilities:
       - COPY PROJECT: reference/modules/copy-project.md
+      - EUCLID FILL: reference/modules/euclid-fill.md
       - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
-      - REMIX SWITCH: reference/modules/remix-switch.md
       - RND NAME: reference/modules/rnd-name.md
-      - MEMORY: reference/modules/memory.md
-  - Fixes:
-      - ATA WRITE GUARD: reference/modules/ata-write-guard.md
-      - BATCH BUGFIXES: reference/modules/batch-bugfixes.md
-      - LOFI AMF FIX: reference/modules/lofi-amf-fix.md
-      - RECORDER LOOP FIX: reference/modules/recorder-loop-fix.md
-  - All modules: reference/modules.md
+  - Credits: credits.md
+  - Safety: safety.md
+  - About: about.md
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -86,5 +50,4 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets:
-      # resolved from the repository root: mkdocs runs there, locally and in CI
       base_path: [docs/site]

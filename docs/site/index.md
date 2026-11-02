@@ -1,16 +1,17 @@
 # ilia · octabam
 
-Personal Octatrack OS 1.40C remixes: Tim SYNTH / CX OSC, VOID, SHATTER,
-STUTTR, RESONATOR, SCOPE, COPY PROJECT, DARK REV kept.
+Personal **base** / **cx** remix stacks for the Elektron Octatrack (OS 1.40C),
+built with the [octabam](https://github.com/sambanks/octabam) remixer.
+
+This site documents **the remixes** and **modules developed here**. Everything
+else in those images comes from octabam contributors — see [Credits](credits.md).
 
 ## Get started
 
-1. Read [what's in Ilia's remixes](remix-ilia.md).
-2. [Build and install](web-builder.md) from your own 1.40C.
-3. Look up a module in the [feature directory](reference/modules.md).
+1. [Remixes](remix-ilia.md) — what each `base*` / `cx*` image includes  
+2. [Build](web-builder.md) — patch your own 1.40C in the browser  
+3. [Modules](reference/modules.md) — VOID, SHATTER, CX OSC, SCOPE, …
 
-## Unofficial firmware
+## Unofficial
 
-Not made, endorsed or supported by Elektron. Installing is generally safe and
-can be reverted by reinstalling stock OS ([Safety and Recovery](safety.md)).
-Elektron is not responsible for any damage to your Octatrack.
+Not made, endorsed or supported by Elektron. See [Safety](safety.md).
