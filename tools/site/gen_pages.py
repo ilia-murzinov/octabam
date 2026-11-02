@@ -160,7 +160,8 @@ def directory_page(mods, manual_page: dict) -> str:
     lines = ["# Modules", "",
              "Modules developed for these remixes (docs on this site). "
              "Other modules in `base*` / `cx*` come from [octabam](https://github.com/sambanks/octabam) "
-             "contributors — see [Credits](../credits.md).", ""]
+             "contributors — see [Credits](../credits.md). "
+             "Build images on the [Build](../web-builder.md) page.", ""]
     for cat, ms in index.by_category(mods).items():
         ms = [m for m in ms if m.key in site_keys]
         if not ms:

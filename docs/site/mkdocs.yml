@@ -26,7 +26,6 @@ theme:
     dark: github-dark
 nav:
   - Home: index.md
-  - Remixes: remix-ilia.md
   - Build: web-builder.md
   - Modules:
       - Overview: reference/modules.md

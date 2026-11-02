@@ -176,36 +176,6 @@ article .typography img {
   filter: contrast(1.05) saturate(0.95);
 }
 
-/* Builder chrome inherits chassis amber */
-#octabam-builder {
-  --ob-accent: var(--ot-amber);
-  border-left: 4px solid var(--ot-amber);
-}
-#octabam-builder .ob-brand {
-  color: var(--ot-amber);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-shadow: 0 0 10px rgba(255, 122, 24, 0.3);
-}
-#octabam-builder .ob-sub {
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-}
-
-.ob-features th,
-.ob-features td {
-  border-color: #333 !important;
-}
-.ob-features .ob-row-hover > *,
-.ob-features .ob-col-hover {
-  background: color-mix(in srgb, var(--ot-amber) 16%, transparent) !important;
-}
-.ob-features .ob-cell-hover {
-  background: color-mix(in srgb, var(--ot-amber) 32%, transparent) !important;
-}
-
 /* Active nav hint */
 [aria-current="page"],
 .active {

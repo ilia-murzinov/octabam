@@ -1,7 +1,12 @@
 # Build
 
-Patch your own Octatrack OS 1.40C in the browser for a **base** / **cx**
-remix. Nothing is uploaded. Composition: [Remixes](remix-ilia.md).
+Eight **base** / **cx** images — pick one, patch your own 1.40C in the
+browser. Nothing is uploaded.
+
+Always on: [SCOPE](reference/modules/scope.md),
+[COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMP,
+plus CORE from [octabam](credits.md). PLATE and SPRING are harvested so the
+inserts fit. **base\*** = Tim SYNTH; **cx\*** = [CX OSC](reference/modules/cxosc.md).
 
 !!! tip "Back up your projects"
     Back up the CF card before installing. Kits write `kits.work` into each
@@ -13,7 +18,7 @@ remix. Nothing is uploaded. Composition: [Remixes](remix-ilia.md).
 - A current desktop browser  
 - CF card (card install) or DIN MIDI interface (MIDI install)
 
-## Build
+## Patch
 
 <div id="octabam-builder">This page needs JavaScript.</div>
 <script type="module" src="builder/page.js"></script>

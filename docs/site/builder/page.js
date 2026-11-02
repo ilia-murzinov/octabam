@@ -11,24 +11,44 @@ const el = (tag, attrs = {}, ...kids) => {
 };
 const here = (p) => new URL(p, import.meta.url);
 
+/** Short column labels so the matrix fits without overlapping headers. */
+const FEAT_SHORT = {
+  "SCOPE": "SCOPE",
+  "COPY PROJECT": "COPY",
+  "DARK REV": "DARK",
+  "SYNTH": "SYNTH",
+  "CX OSC": "CX",
+  "VOID": "VOID",
+  "RESONATOR": "RESON",
+  "SHATTER": "SHTR",
+  "STUTTR": "STUT",
+};
+
 function featureTable(manifest, rows) {
-  const names = rows.map((r) => r.name);
   const featureRows = manifest.featureRows || [];
   const byRemix = manifest.features || Object.fromEntries(
     rows.map((r) => [r.name, r.features || []]));
-  if (!featureRows.length || !names.length) return null;
+  if (!featureRows.length || !rows.length) return null;
 
+  // Remixes as rows, features as columns — names stay readable.
   const table = el("table", { className: "ob-features" });
-  const head = el("tr", {}, el("th", {}, ""));
-  for (const name of names) head.append(el("th", {}, name));
+  const head = el("tr", {}, el("th", { scope: "col", className: "ob-corner" }, "REMIX"));
+  for (const feat of featureRows) {
+    head.append(el("th", {
+      scope: "col",
+      title: feat,
+      textContent: FEAT_SHORT[feat] || feat,
+    }));
+  }
   table.append(el("thead", {}, head));
 
   const body = el("tbody");
-  for (const feat of featureRows) {
-    const tr = el("tr", {}, el("th", { scope: "row" }, feat));
-    for (const name of names) {
-      const has = (byRemix[name] || []).includes(feat);
-      tr.append(el("td", {}, has ? "●" : ""));
+  for (const r of rows) {
+    const tr = el("tr", { "data-remix": r.name },
+      el("th", { scope: "row", title: r.title || r.name }, r.name));
+    const has = new Set(byRemix[r.name] || []);
+    for (const feat of featureRows) {
+      tr.append(el("td", {}, has.has(feat) ? "●" : ""));
     }
     body.append(tr);
   }
@@ -64,7 +84,7 @@ async function main() {
 
   const pick = el("select", { id: "ob-remix" });
   for (const r of rows) {
-    pick.append(el("option", { value: r.name, textContent: `${r.title || r.name} (${r.imageName || r.version})` }));
+    pick.append(el("option", { value: r.name, textContent: `${r.name} (${r.imageName || r.version})` }));
   }
   const metaOf = () => rows.find((r) => r.name === pick.value) || rows[0];
 
@@ -79,17 +99,25 @@ async function main() {
     (manifest.dev ? " (dev)" : ""));
 
   const matrix = featureTable(manifest, rows);
-  const kids = [
-    el("p", { className: "ob-brand" }, "base / cx"),
-    el("p", { className: "ob-sub" }, "remix stacks on 1.40C · built with octabam"),
-  ];
+  const kids = [];
   if (matrix) kids.push(matrix);
   kids.push(
-    el("p", {}, "Remix: ", pick),
-    el("p", {}, "Your OCTATRACK_OS1.40C_dist.zip or OCTATRACK_OS1.40C.syx:"),
-    el("p", {}, choose, chosen, file),
-    el("p", {}, go), status, links, built);
+    el("p", { className: "ob-controls" }, el("label", {}, "Remix ", pick)),
+    el("p", { className: "ob-controls" },
+      el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
+      el("br"),
+      choose, chosen, file),
+    el("p", { className: "ob-controls" }, go),
+    status, links, built);
   root.replaceChildren(...kids);
+
+  const syncPickHighlight = () => {
+    root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
+      tr.classList.toggle("ob-selected", tr.dataset.remix === pick.value);
+    });
+  };
+  pick.addEventListener("change", syncPickHighlight);
+  syncPickHighlight();
 
   choose.addEventListener("click", () => file.click());
   file.addEventListener("change", () => {
@@ -118,12 +146,14 @@ async function main() {
         dl(r.bin, r.names.bin, `${r.names.bin} (card)`), " · ",
         dl(r.syx, r.names.syx, `${r.names.syx} (MIDI)`), " · ",
         dl(r.rmx, r.names.rmx, `${r.names.rmx} (REMIX SWITCH)`));
-    } catch (e) {
-      status.textContent = `Failed: ${e.message}`;
+    } catch (err) {
+      status.textContent = String(err && err.message ? err.message : err);
     } finally {
       go.disabled = !file.files.length;
     }
   });
 }
 
-main().catch((e) => { root.textContent = `The builder could not start: ${e.message}`; });
+main().catch((err) => {
+  root.textContent = String(err && err.message ? err.message : err);
+});

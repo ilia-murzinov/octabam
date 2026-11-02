@@ -1,52 +1,117 @@
-/* Personal builder chrome — scoped so the rest of the docs theme is untouched. */
+/* Builder chrome — chassis amber, readable matrix (remixes as rows). */
 #octabam-builder {
   --ob-accent: #ff7a18;
-
-  border-left: 3px solid var(--ob-accent);
-  padding-left: 1rem;
+  border: 2px solid #3a3a3a;
+  border-left: 4px solid var(--ob-accent);
+  padding: 1rem 1rem 0.75rem;
   margin: 1rem 0 1.5rem;
-}
-
-#octabam-builder .ob-brand {
-  margin: 0 0 0.25rem;
-  font-size: 1.35rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-
-#octabam-builder .ob-sub {
-  margin: 0 0 1rem;
-  color: var(--muted-foreground, #666);
-  font-size: 0.95rem;
+  background: #0e0e0e;
 }
 
 #octabam-builder .ob-meta {
-  font-size: 0.8rem;
-  color: var(--muted-foreground, #666);
+  font-size: 0.75rem;
+  color: var(--muted-foreground, #9a958c);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#octabam-builder .ob-hint {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground, #9a958c);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#octabam-builder .ob-controls {
+  margin: 0.75rem 0;
 }
 
 #octabam-builder .ob-features-wrap {
-  overflow-x: visible;
+  overflow-x: auto;
   width: 100%;
+  margin: 0 0 1rem;
 }
 
 #octabam-builder .ob-features {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.72rem;
+  font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.7rem;
   width: 100%;
+  min-width: 36rem;
   table-layout: fixed;
+  border-collapse: collapse;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 #octabam-builder .ob-features th,
 #octabam-builder .ob-features td {
-  padding: 0.22rem 0.2rem;
+  border: 1px solid #333;
+  padding: 0.35rem 0.25rem;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.7rem !important;
+  background: transparent !important;
+  color: #e8e4dc !important;
+}
+
+#octabam-builder .ob-features thead th {
+  color: var(--ob-accent) !important;
+  background: #1f1810 !important;
+  font-weight: 700;
+}
+
+#octabam-builder .ob-features th[scope="row"],
+#octabam-builder .ob-features .ob-corner {
+  text-align: left;
+  padding-left: 0.5rem;
+  width: 7.5rem;
+  color: var(--ob-accent) !important;
+  background: #1a1410 !important;
+  font-weight: 700;
 }
 
 #octabam-builder .ob-features .ob-row-hover > *,
 #octabam-builder .ob-features .ob-col-hover {
-  background: color-mix(in srgb, var(--ob-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--ob-accent) 14%, transparent) !important;
 }
 
 #octabam-builder .ob-features .ob-cell-hover {
-  background: color-mix(in srgb, var(--ob-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--ob-accent) 30%, transparent) !important;
+}
+
+#octabam-builder .ob-features tr.ob-selected > * {
+  background: color-mix(in srgb, var(--ob-accent) 18%, #0e0e0e) !important;
+}
+#octabam-builder .ob-features tr.ob-selected th[scope="row"] {
+  box-shadow: inset 3px 0 0 var(--ob-accent);
+}
+
+#octabam-builder button {
+  background: var(--ob-accent);
+  color: #121212;
+  border: 2px solid var(--ob-accent);
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+#octabam-builder button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+#octabam-builder select {
+  background: #1a1a1a;
+  color: #e8e4dc;
+  border: 2px solid #3a3a3a;
+  font-family: inherit;
+  padding: 0.3rem 0.5rem;
 }
