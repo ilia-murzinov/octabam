@@ -185,29 +185,13 @@ article .typography img {
   image-rendering: pixelated;
 }
 
-/* Builder primary actions share the chassis amber */
-#octabam-builder button#ob-choose,
-#octabam-builder button#ob-go {
-  background: var(--ot-amber);
-  color: #121212;
-  border: 1px solid var(--ot-amber);
-  transition: background 120ms ease, border-color 120ms ease;
-}
-#octabam-builder button#ob-choose:hover,
-#octabam-builder button#ob-go:hover:not(:disabled) {
-  background: var(--ot-amber-hot);
-  border-color: var(--ot-amber-hot);
-}
-
 ::selection {
   background: var(--ot-amber);
   color: #121212;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  a,
-  #octabam-builder button#ob-choose,
-  #octabam-builder button#ob-go {
+  a {
     transition: none;
   }
 }
