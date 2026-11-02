@@ -1,44 +1,39 @@
 # Credits
 
-## This site / these remixes
+This site is a **personal fork** of
+**[octabam](https://github.com/sambanks/octabam)** by
+[Sam Banks](https://github.com/sambanks) and many contributors.
 
-Built as a fork of **[octabam](https://github.com/sambanks/octabam)** by
-[Sam Banks](https://github.com/sambanks) and many contributors. The remixer,
-build system, stock ports, and most CORE modules are theirs. This Pages site
-only documents modules developed on this fork; it is not the upstream octabam
-manual.
+The remixer, build system, stock ports, BRAIN / REMIX SWITCH stack, and most
+of what ships in every `base*` / `cx*` image are **their work**. This Pages
+site only adds usage docs for [modules developed on this fork](reference/modules.md).
+It is **not** a replacement for the upstream octabam manual.
 
-Source: [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam).
-
-## Modules documented here
-
-| Module | Author |
+| | |
 |---|---|
-| VOID, RESONATOR, SHATTER, STUTTR | ilia-murzinov |
-| CX OSC | ilia-murzinov (Tim FM engine lineage — see module page) |
-| SCOPE, COPY PROJECT, EUCLID FILL, PERSISTENT BUFFERS, RND NAME | ilia-murzinov |
+| Upstream | [sambanks/octabam](https://github.com/sambanks/octabam) |
+| This fork | [ilia-murzinov/octabam](https://github.com/ilia-murzinov/octabam) |
 
-## Also in `base*` / `cx*` (not documented here)
+## Lineage that must stay visible
 
-These ship in the images but keep their upstream docs / authors. See
-[sambanks/octabam](https://github.com/sambanks/octabam) and each module's
-`modules/<name>/` tree.
+- **CX OSC** (documented here) is a local machine derived from
+  **Tim Hastie**’s FM SYNTH engine (octatrick). It is not an edit of the
+  SYNTH MACHINE submodule; Tim’s SYNTH / QUANTIZER / TUNER still ship in
+  `base*` and keep their authorship.
+- **SCOPE** overrides TUNER’s DOWN+TEMPO entry when both are present — TUNER
+  remains Tim’s; SCOPE is an overlay, not a rewrite of Tim’s work.
+- Stock FILTER…DELAY, COMPRESSOR, DARK REV, and the rest of Elektron's FX
+  remain **Elektron**.
 
-| Author | Modules (examples) |
-|---|---|
-| Sam Banks / sambanks | BRAIN, STORE, KITS, SCENES P2, PLOCKS P2, CC MAP, CC FEEDBACK, MEMORY, RLEN PLEN, ATA WRITE GUARD, RECORDER LOOP FIX, … |
-| Tim Hastie | SYNTH MACHINE, SCALE QUANTIZER, TUNER (octatrick) |
-| Zac Kyoti | MUTE MODES, DIRECT JUMP, RELOAD FROM PROJECT, REC TRIG MUTE, QUANTIZE LIVE REC, BATCH BUGFIXES, ERASE EMPTY TRIGLESS LOCKS |
-| markandrus | USB |
-| sanderlegit | REMIX SWITCH |
-| bkkbrls-del | MIDI SCENES |
-| radiohagen | EVENTS |
-| bryantysinger | LOFI AMF FIX |
-| yvesrosius | STEM REC |
+## Everything that ships in `base*` / `cx*`
 
-Stock Elektron effects (FILTER…DELAY, COMPRESSOR, DARK REV, …) remain Elektron.
+Generated from the manifests at build time (complete list, not a highlight reel):
+
+--8<-- "reference/_credits-shipped.md"
 
 ## Licence
 
-Repository code and documentation: MIT (as upstream). Elektron's firmware is
-not distributed; images are built from your own 1.40C.
+Repository code and documentation: **MIT** (copyright Sam Banks and
+contributors — see the [LICENSE](https://github.com/sambanks/octabam/blob/main/LICENSE)
+in upstream). Fork changes keep that licence. Elektron's firmware is **not**
+distributed; images are built from your own 1.40C.

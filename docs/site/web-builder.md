@@ -3,10 +3,15 @@
 Eight **base** / **cx** images — pick one, patch your own 1.40C in the
 browser. Nothing is uploaded.
 
+These images are **octabam compositions**: CORE (Sam and others), Tim’s
+SYNTH / QUANTIZER / TUNER on `base*`, Kyoti’s workflow modules, plus the
+fork modules below. Full list and links: [Credits](credits.md).
+
 Always on: [SCOPE](reference/modules/scope.md),
-[COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMP,
-plus CORE from [octabam](credits.md). PLATE and SPRING are harvested so the
-inserts fit. **base\*** = Tim SYNTH; **cx\*** = [CX OSC](reference/modules/cxosc.md).
+[COPY PROJECT](reference/modules/copy-project.md), DARK REV, stock COMP.
+PLATE and SPRING are harvested so the inserts fit.
+**base\*** = Tim [SYNTH](credits.md) (upstream); **cx\*** =
+[CX OSC](reference/modules/cxosc.md) (fork, Tim FM lineage).
 
 !!! tip "Back up your projects"
     Back up the CF card before installing. Kits write `kits.work` into each

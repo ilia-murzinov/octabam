@@ -7,6 +7,7 @@ site_dir: ../../out/site
 use_directory_urls: false
 exclude_docs: |
   reference/_remix-*.md
+  reference/_credits-shipped.md
   usage/*.md
   manual/*.md
 extra_css:
@@ -27,6 +28,7 @@ theme:
 nav:
   - Home: index.md
   - Build: web-builder.md
+  - Credits: credits.md
   - Modules:
       - Overview: reference/modules.md
       - VOID: reference/modules/void.md
@@ -39,7 +41,6 @@ nav:
       - EUCLID FILL: reference/modules/euclid-fill.md
       - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
       - RND NAME: reference/modules/rnd-name.md
-  - Credits: credits.md
   - Safety: safety.md
   - About: about.md
 markdown_extensions:

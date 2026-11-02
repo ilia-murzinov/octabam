@@ -33,7 +33,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1])); import too
 from remix import index, registry  # noqa: E402
 from remix.schema import CATEGORY_TITLE, Category  # noqa: E402
 
-GH = "https://github.com/sambanks/octabam"
+GH_UPSTREAM = "https://github.com/sambanks/octabam"
+GH_FORK = "https://github.com/ilia-murzinov/octabam"
+# Back-compat for any leftover GH uses in this file / tests.
+GH = GH_UPSTREAM
 
 _SMALL = {"a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "of", "on", "or", "the", "to", "with", "over"}
 _UPPER = {"os", "din", "dj", "eq", "bd", "usb", "midi", "cc", "cpu", "dsp", "cf", "lfo", "ata", "txtr", "amf",
@@ -105,6 +108,11 @@ def _author(m) -> str:
     return f"[{m.author}]({m.author_url})" if m.author_url else (m.author or "?")
 
 
+def _site_keys():
+    import release
+    return set(getattr(release, "SITE_MODULES", ()) or ())
+
+
 def _records(m) -> dict:
     path = OUT.parent / "screenshots.json"
     records = json.loads(path.read_text()) if path.exists() else {}
@@ -112,10 +120,12 @@ def _records(m) -> dict:
 
 
 def _module_url(m) -> str:
+    """Canonical tree for the module: fork for SITE_MODULES, upstream otherwise."""
     d = pathlib.Path("modules") / m.name
+    base = GH_FORK if m.key in _site_keys() else GH_UPSTREAM
     if (ROOT / d / "README.md").exists():
-        return f"{GH}/blob/main/{d}/README.md"
-    return f"{GH}/tree/main/{d}"
+        return f"{base}/blob/main/{d}/README.md"
+    return f"{base}/tree/main/{d}"
 
 
 def _figure(record: dict) -> list[str]:
@@ -149,25 +159,90 @@ def screen_reference(m) -> list[str]:
     return lines
 
 
-def _site_keys():
-    import release
-    return set(getattr(release, "SITE_MODULES", ()) or ())
-
-
 def directory_page(mods, manual_page: dict) -> str:
     """Directory of Ilia's modules documented on this site."""
     site_keys = _site_keys()
-    lines = ["# Modules", "",
-             "Modules developed for these remixes (docs on this site). "
-             "Other modules in `base*` / `cx*` come from [octabam](https://github.com/sambanks/octabam) "
-             "contributors — see [Credits](../credits.md). "
-             "Build images on the [Build](../web-builder.md) page.", ""]
+    lines = ["# Modules documented here", "",
+             "These ten modules were developed on this fork and have usage pages "
+             "on this site. **They are not the whole image** — every `base*` / `cx*` "
+             "build also ships many modules by [other authors](../credits.md), "
+             "composed with the [octabam](https://github.com/sambanks/octabam) remixer. "
+             "Build: [Build](../web-builder.md).", ""]
     for cat, ms in index.by_category(mods).items():
         ms = [m for m in ms if m.key in site_keys]
         if not ms:
             continue
         lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
         lines += [f"| [{_label(m)}](modules/{m.name}.md) | {_author(m)} |" for m in ms] + [""]
+    return "\n".join(lines) + "\n"
+
+
+def _display_author(m) -> tuple[str, str]:
+    """(sort_key, markdown author cell) — normalize known author spellings."""
+    if m.is_stock:
+        return ("Elektron", "Elektron (stock)")
+    raw = (m.author or "?").strip()
+    url = (m.author_url or "").strip()
+    # Collapse alternate spellings used across manifests.
+    aliases = {
+        "sambanks": ("Sam Banks", "https://github.com/sambanks"),
+        "Sam Banks": ("Sam Banks", "https://github.com/sambanks"),
+        "iliamurzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "ilia-murzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "timhastie/octatrick-modules": (
+            "Tim Hastie (octatrick)", "https://github.com/timhastie/octatrick-modules"),
+        "Zac Kyoti": ("Zac Kyoti", "https://github.com/Zac-Kyoti"),
+        "markandrus/octemu": ("markandrus", "https://github.com/markandrus/octemu"),
+        "bkkbrls-del/midisc": ("bkkbrls-del", "https://github.com/bkkbrls-del/midisc"),
+        "bryantysinger/octa-bt-pt": (
+            "bryantysinger", "https://github.com/bryantysinger/octa-bt-pt"),
+        "sanderlegit": ("sanderlegit", "https://github.com/sanderlegit"),
+        "radiohagen": ("radiohagen", "https://github.com/radiohagen"),
+        "yvesrosius": ("yvesrosius", "https://github.com/yvesrosius"),
+    }
+    name, href = aliases.get(raw, (raw, url))
+    if href:
+        return (name, f"[{name}]({href})")
+    return (name, name)
+
+
+def shipped_credits_page(mods) -> str:
+    """Complete author → modules table for everything in BUILDER_REMIXES (+ SITE_MODULES)."""
+    import release
+    keys = set(getattr(release, "SITE_MODULES", ()) or ())
+    for n in getattr(release, "BUILDER_REMIXES", ()) or ():
+        keys |= set(registry.remix(n).modules)
+    by: dict[str, list] = {}
+    author_md: dict[str, str] = {}
+    for key in keys:
+        m = mods[key]
+        sort_name, md = _display_author(m)
+        author_md[sort_name] = md
+        by.setdefault(sort_name, []).append(m)
+    lines = [
+        "<!-- generated by tools/site/gen_pages.py — do not edit -->",
+        "",
+        "Every non-stock module that appears in at least one `base*` / `cx*` "
+        "image, plus the modules documented on this site. Authors and URLs "
+        "come from each module's `manifest.py`.",
+        "",
+    ]
+    for author in sorted(by, key=lambda a: (a == "Elektron", a.lower())):
+        ms = sorted(by[author], key=lambda m: _label(m).lower())
+        lines += [f"### {author_md[author]}", "", "| Module | Notes |", "|---|---|"]
+        for m in ms:
+            if m.is_stock:
+                note = "stock Elektron effect (kept / available in the image)"
+                cell = _label(m)
+            elif m.key in _site_keys():
+                # Paths are from docs/site/ (credits.md includes this fragment).
+                note = "documented on this site"
+                cell = f"[{_label(m)}](reference/modules/{m.name}.md)"
+            else:
+                note = f"[source]({_module_url(m)})"
+                cell = _label(m)
+            lines.append(f"| {cell} | {note} |")
+        lines.append("")
     return "\n".join(lines) + "\n"
 
 
@@ -230,6 +305,7 @@ def main(quiet: bool = False) -> int:
     manual_page = gen_manual.published_pages(mods, official)
     site_keys = _site_keys()
     jobs["modules.md"] = directory_page(mods, manual_page)
+    jobs["_credits-shipped.md"] = shipped_credits_page(mods)
     for m in mods.values():
         if m.key not in site_keys:
             continue
