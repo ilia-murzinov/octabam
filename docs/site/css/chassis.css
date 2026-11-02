@@ -1,0 +1,219 @@
+/* Chassis look: dark hardware panel + amber LEDs + hard pixels.
+   Homage only — no Elektron logos, product marks, or proprietary fonts. */
+
+:root,
+.dark {
+  color-scheme: dark;
+
+  --font-sans: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-inter: var(--font-sans);
+  --default-font-family: var(--font-sans);
+  --default-mono-font-family: var(--font-mono);
+
+  --radius: 0;
+
+  /* OT-ish chassis: charcoal + amber LED */
+  --ot-amber: #ff7a18;
+  --ot-amber-dim: #c45c26;
+  --ot-lcd: #c8f07a;
+  --ot-chassis: #121212;
+  --ot-panel: #1a1a1a;
+  --ot-bezel: #2a2a2a;
+
+  --background: #121212;
+  --foreground: #e8e4dc;
+  --card: #1a1a1a;
+  --card-foreground: #e8e4dc;
+  --popover: #1a1a1a;
+  --popover-foreground: #e8e4dc;
+  --primary: #ff7a18;
+  --primary-foreground: #121212;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #e8e4dc;
+  --muted: #222;
+  --muted-foreground: #9a958c;
+  --accent: #2a2118;
+  --accent-foreground: #ff7a18;
+  --destructive: #e2553d;
+  --border: #3a3a3a;
+  --input: #2a2a2a;
+  --ring: #ff7a18;
+  --sidebar: #0e0e0e;
+  --sidebar-foreground: #e8e4dc;
+  --sidebar-primary: #ff7a18;
+  --sidebar-primary-foreground: #121212;
+  --sidebar-accent: #1f1810;
+  --sidebar-accent-foreground: #ff7a18;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: #ff7a18;
+  --surface: #1a1a1a;
+  --surface-foreground: #c8c4bc;
+  --code: #0e0e0e;
+  --code-foreground: #c8f07a;
+  --code-highlight: #222;
+  --selection: #ff7a18;
+  --selection-foreground: #121212;
+}
+
+html {
+  background: var(--ot-chassis);
+}
+
+body {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.01em;
+  background:
+    linear-gradient(180deg, rgba(255, 122, 24, 0.04), transparent 120px),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(0, 0, 0, 0.12) 3px
+    ),
+    var(--ot-chassis) !important;
+  image-rendering: pixelated;
+}
+
+/* Hard UI edges — no soft cards */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+a {
+  color: var(--ot-amber);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--ot-lcd);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700 !important;
+}
+h1 {
+  color: var(--ot-amber) !important;
+  text-shadow: 0 0 12px rgba(255, 122, 24, 0.25);
+}
+h2 {
+  border-bottom: 2px solid var(--ot-amber-dim);
+  padding-bottom: 0.35rem;
+}
+
+/* Site title / brand strip */
+header,
+[data-slot="sidebar"],
+nav {
+  font-family: var(--font-mono) !important;
+}
+
+/* Tables like LCD grids */
+.table-wrapper,
+article table {
+  border: 2px solid var(--ot-bezel) !important;
+  background: #0a0a0a;
+}
+.table-wrapper th,
+.table-wrapper td,
+article th,
+article td {
+  border-color: #333 !important;
+  font-variant-numeric: tabular-nums;
+}
+.table-wrapper th,
+article th {
+  background: #1f1810 !important;
+  color: var(--ot-amber) !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+/* Code / LCD green */
+pre, code, .highlight {
+  font-family: var(--font-mono) !important;
+}
+pre, .highlight {
+  border: 2px solid #333 !important;
+  background: #0a0a0a !important;
+  box-shadow: inset 0 0 24px rgba(200, 240, 122, 0.05);
+}
+code {
+  color: var(--ot-lcd) !important;
+}
+
+/* Admonitions as panel bezels */
+.admonition,
+details {
+  border: 2px solid var(--ot-amber-dim) !important;
+  background: #16120e !important;
+}
+.admonition-title,
+summary {
+  color: var(--ot-amber) !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.8rem !important;
+}
+
+/* Screenshot frames: LCD bezel, keep pixelated OT screens */
+article .typography img {
+  background: #0a0a0a !important;
+  border: 3px solid #3a3a3a !important;
+  box-shadow:
+    inset 0 0 0 1px #111,
+    0 0 0 1px #000,
+    0 8px 0 #0a0a0a;
+  padding: 10px !important;
+  image-rendering: pixelated;
+  filter: contrast(1.05) saturate(0.95);
+}
+
+/* Builder chrome inherits chassis amber */
+#octabam-builder {
+  --ob-accent: var(--ot-amber);
+  border-left: 4px solid var(--ot-amber);
+}
+#octabam-builder .ob-brand {
+  color: var(--ot-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px rgba(255, 122, 24, 0.3);
+}
+#octabam-builder .ob-sub {
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.ob-features th,
+.ob-features td {
+  border-color: #333 !important;
+}
+.ob-features .ob-row-hover > *,
+.ob-features .ob-col-hover {
+  background: color-mix(in srgb, var(--ot-amber) 16%, transparent) !important;
+}
+.ob-features .ob-cell-hover {
+  background: color-mix(in srgb, var(--ot-amber) 32%, transparent) !important;
+}
+
+/* Active nav hint */
+[aria-current="page"],
+.active {
+  color: var(--ot-amber) !important;
+}
+
+/* Selection like an LED latch */
+::selection {
+  background: var(--ot-amber);
+  color: #121212;
+}

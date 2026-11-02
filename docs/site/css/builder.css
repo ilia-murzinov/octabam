@@ -1,6 +1,7 @@
 /* Personal builder chrome — scoped so the rest of the docs theme is untouched. */
 #octabam-builder {
-  --ob-accent: #c45c26;
+  --ob-accent: #ff7a18;
+
   border-left: 3px solid var(--ob-accent);
   padding-left: 1rem;
   margin: 1rem 0 1.5rem;

@@ -15,10 +15,12 @@ extra_css:
   - css/site-tables.css
   - css/builder.css
   - css/manual.css
+  - css/chassis.css
 theme:
   name: shadcn
   show_title: true
   show_stargazers: false
+  accent: orange
   pygments_style:
     light: shadcn-light
     dark: github-dark

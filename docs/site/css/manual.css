@@ -31,9 +31,9 @@ article .typography img {
   padding: 16px;
   box-sizing: content-box;
   max-width: calc(100% - 34px);
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  background: #0a0a0a;
+  border: 3px solid #3a3a3a;
+  border-radius: 0;
   image-rendering: pixelated;
 }
 article .table-wrapper {

@@ -192,15 +192,24 @@ def module_page(m, mods, manual_page: dict) -> str:
     else:
         lines += [m.doc, ""]
     lines += screen_reference(m)
+    site_keys = _site_keys()
+
+    def _mod_ref(key: str) -> str:
+        """Link only modules that have a page on this site; else plain name."""
+        if key not in mods or mods[key].is_stock:
+            return key
+        other = mods[key]
+        if other.key in site_keys:
+            return f"[{_label(other)}]({other.name}.md)"
+        return _label(other)
+
     rows = [f"| Author | {_author(m)} |",
             f"| Category | {CATEGORY_TITLE[m.category or Category.REFERENCE]} |"]
     if m.requires:
-        rows.append("| Requires | " + ", ".join(
-            f"[{k}]({mods[k].name}.md)" if k in mods and not mods[k].is_stock else k for k in m.requires) + " |")
+        rows.append("| Requires | " + ", ".join(_mod_ref(k) for k in m.requires) + " |")
     if m.conflicts:
         rows.append("| Conflicts | " + "; ".join(
-            (f"[{o}]({mods[o].name}.md)" if o in mods and not mods[o].is_stock else o) + f" — {why}"
-            for o, why in m.conflicts) + " |")
+            _mod_ref(o) + f" — {why}" for o, why in m.conflicts) + " |")
     lines += ['??? note "Module facts"', ""]
     lines += ["    " + line if line else "" for line in [m.doc, "", "| Detail | Value |", "|---|---|"] + rows + ["", f"On GitHub: {_module_url(m)}"]]
     lines += ["", "[Modules](../modules.md)", " · ", "[Credits](../../credits.md)"]
