@@ -163,8 +163,10 @@ def directory_page(mods, manual_page: dict) -> str:
     """Directory of Ilia's modules documented on this site."""
     site_keys = _site_keys()
     lines = ["# Modules", "",
-             "Fork modules with docs here. Rest of each image: [Home](../index.md). "
-             "[Build](../web-builder.md).", ""]
+             "Modules developed on this fork, with usage notes on this site. "
+             "The rest of each `base*` / `cx*` image is credited on "
+             "[Home](../index.md#credits). "
+             "Build an image on [Build and Install](../web-builder.md).", ""]
     for cat, ms in index.by_category(mods).items():
         ms = [m for m in ms if m.key in site_keys]
         if not ms:
