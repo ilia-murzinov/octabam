@@ -28,11 +28,26 @@ theme:
 nav:
   - Getting Started:
       - Overview: index.md
-      - What is in Octabam: remix-octabam.md
-      - Ilia's remixes: web-builder.md
+      - What's in Ilia's remixes: remix-ilia.md
+      - Build (Ilia's remixes): web-builder.md
       - Safety and Recovery: safety.md
       - About: about.md
-  - Octabam Remix Manual:
+  - Ilia's modules:
+      - SYNTH: reference/modules/synth.md
+      - CX OSC: reference/modules/cxosc.md
+      - VOID: reference/modules/void.md
+      - RESONATOR: reference/modules/resonator.md
+      - SHATTER: reference/modules/shatter.md
+      - STUTTR: reference/modules/stuttr.md
+      - SCOPE: reference/modules/scope.md
+      - COPY PROJECT: reference/modules/copy-project.md
+      - EUCLID FILL: reference/modules/euclid-fill.md
+      - MUTE MODES: reference/modules/mute-modes.md
+      - PERSISTENT BUFFERS: reference/modules/persistent-buffers.md
+      - STEM REC: reference/modules/stems.md
+      - Feature directory: reference/modules.md
+  - Upstream Octabam (reference):
+      - What is in Octabam v0.3: remix-octabam.md
       - Introduction: reference/manual/octabam/index.md
       - Effects:
           - Character: reference/manual/octabam/effects/character.md
