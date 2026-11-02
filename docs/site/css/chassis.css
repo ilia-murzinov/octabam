@@ -1,87 +1,22 @@
-/* Chassis look: hardware panel + amber LEDs + hard pixels.
-   Homage only — no Elektron logos, product marks, or proprietary fonts.
-   Dark tokens live under .dark so the theme toggle can switch. */
+/* Dark chassis + amber accents. Typography stays with the theme/fonts.css.
+   Homage only — no Elektron logos or proprietary fonts. */
 
-:root {
-  --font-sans: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+:root,
+.dark {
+  color-scheme: dark;
+
+  --font-sans: "Atkinson Hyperlegible", "Geist", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
   --radius: 0;
 
-  --ot-amber: #b85a22;
-  --ot-amber-dim: #8f4519;
-  --ot-lcd: #3a6b12;
-  --ot-chassis: #f2efe8;
-  --ot-panel: #fffdf8;
-  --ot-bezel: #c8c2b6;
-  --ot-ink: #1a1a1a;
-  --ot-muted: #6a655c;
-  --ot-scan: rgba(0, 0, 0, 0.04);
-  --ot-glow: transparent;
-  --ot-code-bg: #1a1a1a;
-  --ot-code-fg: #c8f07a;
-  --ot-table-bg: #fffdf8;
-  --ot-th-bg: #f3e6d4;
-  --ot-admon: #f7efe4;
-  --ot-img-frame: #e8e4dc;
-
-  color-scheme: light;
-  --background: #f2efe8;
-  --foreground: #1a1a1a;
-  --card: #fffdf8;
-  --card-foreground: #1a1a1a;
-  --popover: #fffdf8;
-  --popover-foreground: #1a1a1a;
-  --primary: #b85a22;
-  --primary-foreground: #fffdf8;
-  --secondary: #e8e4dc;
-  --secondary-foreground: #1a1a1a;
-  --muted: #e8e4dc;
-  --muted-foreground: #6a655c;
-  --accent: #f3e6d4;
-  --accent-foreground: #b85a22;
-  --destructive: #c23b2a;
-  --border: #c8c2b6;
-  --input: #e8e4dc;
-  --ring: #b85a22;
-  --sidebar: #ebe6dc;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #b85a22;
-  --sidebar-primary-foreground: #fffdf8;
-  --sidebar-accent: #f3e6d4;
-  --sidebar-accent-foreground: #b85a22;
-  --sidebar-border: #c8c2b6;
-  --sidebar-ring: #b85a22;
-  --surface: #fffdf8;
-  --surface-foreground: #4a463e;
-  --code: #1a1a1a;
-  --code-foreground: #c8f07a;
-  --code-highlight: #2a2a2a;
-  --selection: #b85a22;
-  --selection-foreground: #fffdf8;
-}
-
-.dark {
-  color-scheme: dark;
-
   --ot-amber: #c45c26;
   --ot-amber-dim: #8f4519;
-  --ot-lcd: #9ab85a;
   --ot-chassis: #121212;
   --ot-panel: #1a1a1a;
   --ot-bezel: #2a2a2a;
-  --ot-ink: #e8e4dc;
-  --ot-muted: #9a958c;
-  --ot-scan: rgba(0, 0, 0, 0.12);
-  --ot-glow: rgba(196, 92, 38, 0.2);
-  --ot-code-bg: #0a0a0a;
-  --ot-code-fg: #c8f07a;
-  --ot-table-bg: #0a0a0a;
-  --ot-th-bg: #1f1810;
-  --ot-admon: #16120e;
-  --ot-img-frame: #0a0a0a;
 
   --background: #121212;
   --foreground: #e8e4dc;
@@ -112,7 +47,7 @@
   --surface: #1a1a1a;
   --surface-foreground: #c8c4bc;
   --code: #0e0e0e;
-  --code-foreground: #9ab85a;
+  --code-foreground: #c8f07a;
   --code-highlight: #222;
   --selection: #c45c26;
   --selection-foreground: #121212;
@@ -123,20 +58,8 @@ html {
 }
 
 body {
-  font-family: var(--font-sans) !important;
-  letter-spacing: 0.01em;
+  background: var(--ot-chassis) !important;
   color: var(--foreground);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ot-amber) 8%, transparent), transparent 120px),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      var(--ot-scan) 2px,
-      var(--ot-scan) 3px
-    ),
-    var(--ot-chassis) !important;
-  image-rendering: pixelated;
 }
 
 *,
@@ -147,90 +70,22 @@ body {
 
 a {
   color: var(--ot-amber);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
 }
 a:hover {
-  color: var(--ot-lcd);
+  color: #e8a06a;
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-mono) !important;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 700 !important;
-}
-h1 {
-  color: var(--ot-amber) !important;
-  text-shadow: 0 0 12px var(--ot-glow);
+  font-family: "Fraunces", "Atkinson Hyperlegible", serif !important;
+  font-weight: 650 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  color: var(--foreground) !important;
 }
 h2 {
-  border-bottom: 2px solid var(--ot-amber-dim);
+  border-bottom: 1px solid var(--ot-bezel);
   padding-bottom: 0.35rem;
-}
-
-header,
-[data-slot="sidebar"],
-nav {
-  font-family: var(--font-mono) !important;
-}
-
-.table-wrapper,
-article table {
-  border: 2px solid var(--ot-bezel) !important;
-  background: var(--ot-table-bg);
-}
-.table-wrapper th,
-.table-wrapper td,
-article th,
-article td {
-  border-color: var(--border) !important;
-  font-variant-numeric: tabular-nums;
-}
-.table-wrapper th,
-article th {
-  background: var(--ot-th-bg) !important;
-  color: var(--ot-amber) !important;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-pre, code, .highlight {
-  font-family: var(--font-mono) !important;
-}
-pre, .highlight {
-  border: 2px solid var(--border) !important;
-  background: var(--ot-code-bg) !important;
-  box-shadow: inset 0 0 24px color-mix(in srgb, var(--ot-lcd) 8%, transparent);
-}
-code {
-  color: var(--ot-code-fg) !important;
-}
-
-.admonition,
-details {
-  border: 2px solid var(--ot-amber-dim) !important;
-  background: var(--ot-admon) !important;
-}
-.admonition-title,
-summary {
-  color: var(--ot-amber) !important;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-size: 0.8rem !important;
-}
-
-article .typography img {
-  background: var(--ot-img-frame) !important;
-  border: 3px solid var(--ot-bezel) !important;
-  box-shadow:
-    inset 0 0 0 1px var(--border),
-    0 0 0 1px var(--ot-bezel),
-    0 8px 0 color-mix(in srgb, var(--ot-chassis) 80%, #000);
-  padding: 10px !important;
-  image-rendering: pixelated;
-  filter: contrast(1.05) saturate(0.95);
 }
 
 [aria-current="page"],
@@ -238,7 +93,37 @@ article .typography img {
   color: var(--ot-amber) !important;
 }
 
+.table-wrapper,
+article table {
+  border: 1px solid var(--ot-bezel) !important;
+}
+.table-wrapper th,
+article th {
+  background: #1f1810 !important;
+  color: var(--ot-amber) !important;
+}
+
+pre, .highlight {
+  border: 1px solid var(--ot-bezel) !important;
+  background: #0e0e0e !important;
+}
+code {
+  font-family: var(--font-mono) !important;
+}
+
+.admonition,
+details {
+  border: 1px solid var(--ot-amber-dim) !important;
+  background: #16120e !important;
+}
+
+article .typography img {
+  background: #0a0a0a !important;
+  border: 1px solid var(--ot-bezel) !important;
+  image-rendering: pixelated;
+}
+
 ::selection {
   background: var(--ot-amber);
-  color: var(--primary-foreground);
+  color: #121212;
 }

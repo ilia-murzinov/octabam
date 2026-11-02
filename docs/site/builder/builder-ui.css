@@ -1,4 +1,15 @@
-/* Loaded by page.js so it cannot desync from the builder markup. */
+/* Builder chrome — matches chassis amber; type size follows the page. */
+
+#octabam-builder {
+  --ob-accent: #c45c26;
+  border: 1px solid #3a3a3a;
+  border-left: 3px solid var(--ob-accent);
+  padding: 1rem;
+  margin: 1rem 0 1.5rem;
+  background: #1a1a1a;
+  color: inherit;
+  font: inherit;
+}
 
 #octabam-builder .ob-dd {
   position: relative;
@@ -7,13 +18,13 @@
   margin: 0.25rem 0 0.75rem;
 }
 
-#octabam-builder .ob-dd-label {
+#octabam-builder .ob-dd-label,
+#octabam-builder .ob-hint,
+#octabam-builder .ob-meta {
   display: block;
   margin-bottom: 0.35rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #9a958c;
+  color: var(--muted-foreground, #9a958c);
+  font-size: 0.875em;
 }
 
 #octabam-builder button.ob-dd-btn,
@@ -23,18 +34,16 @@
   justify-content: space-between;
   gap: 0.75rem;
   width: 100% !important;
-  min-height: 2.75rem;
-  padding: 0.5rem 0.65rem 0.5rem 0.75rem !important;
-  background: #141414 !important;
-  color: #e8e4dc !important;
-  border: 2px solid #c45c26 !important;
-  box-shadow: none !important;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.65rem !important;
+  background: #121212 !important;
+  color: inherit !important;
+  border: 1px solid var(--ob-accent) !important;
   text-align: left !important;
   text-transform: none !important;
-  letter-spacing: 0.02em !important;
-  font-family: inherit !important;
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  font: inherit !important;
+  font-weight: 600 !important;
   cursor: pointer;
 }
 
@@ -49,12 +58,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border: 1px solid #c45c26;
-  background: #2a1810;
-  color: #c45c26;
-  font-size: 1rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid var(--ob-accent);
+  color: var(--ob-accent);
+  font-size: 0.85em;
   line-height: 1;
 }
 
@@ -65,18 +73,16 @@
 #octabam-builder .ob-dd-menu {
   position: absolute;
   z-index: 40;
-  top: calc(100% + 3px);
+  top: calc(100% + 2px);
   left: 0;
   right: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 2px solid #c45c26;
-  background: #141414;
-  color: #e8e4dc;
+  border: 1px solid var(--ob-accent);
+  background: #121212;
   max-height: 16rem;
   overflow: auto;
-  box-shadow: 0 8px 0 #0a0a0a;
 }
 
 #octabam-builder .ob-dd-menu[hidden] {
@@ -85,45 +91,90 @@
 
 #octabam-builder .ob-dd-menu li {
   margin: 0;
-  padding: 0.6rem 0.75rem;
+  padding: 0.5rem 0.65rem;
   cursor: pointer;
   border-bottom: 1px solid #333;
-  font-size: 0.8rem;
-  font-weight: 650;
-  color: #e8e4dc;
-  background: #141414;
+  font: inherit;
 }
 
 #octabam-builder .ob-dd-menu li:last-child {
   border-bottom: 0;
 }
 
-#octabam-builder .ob-dd-menu li:hover {
-  background: #2a1810;
-  color: #f0e6dc;
-}
-
+#octabam-builder .ob-dd-menu li:hover,
 #octabam-builder .ob-dd-menu li[aria-selected="true"] {
-  background: #3a2418;
-  color: #f0e6dc;
-  box-shadow: inset 3px 0 0 #c45c26;
+  background: #1f1810;
 }
 
-/* Action buttons only — never the dropdown trigger. */
-#octabam-builder > .ob-controls > button,
 #octabam-builder button#ob-choose,
 #octabam-builder button#ob-go {
-  background: #c45c26;
+  background: var(--ob-accent);
   color: #121212;
-  border: 2px solid #c45c26;
-  font-family: inherit;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  border: 1px solid var(--ob-accent);
+  font: inherit;
+  font-weight: 650;
   padding: 0.4rem 0.75rem;
   cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
 }
 #octabam-builder button#ob-go:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+#octabam-builder .ob-features-wrap {
+  overflow-x: auto;
+  width: 100%;
+  margin: 0 0 1rem;
+}
+#octabam-builder .ob-features {
+  font: inherit;
+  font-size: 0.875em;
+  width: 100%;
+  min-width: 36rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+#octabam-builder .ob-features th,
+#octabam-builder .ob-features td {
+  border: 1px solid #333;
+  padding: 0.35rem 0.3rem;
+  text-align: center;
+  background: transparent;
+  color: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  font: inherit;
+  font-size: inherit;
+}
+#octabam-builder .ob-features thead th,
+#octabam-builder .ob-features th[scope="row"],
+#octabam-builder .ob-features .ob-corner {
+  color: var(--ob-accent);
+  background: #1f1810;
+  text-align: left;
+  padding-left: 0.5rem;
+  font-weight: 650;
+}
+#octabam-builder .ob-features tr.ob-row-hover > td,
+#octabam-builder .ob-features tbody td.ob-col-hover {
+  background: color-mix(in srgb, var(--ob-accent) 14%, transparent);
+}
+#octabam-builder .ob-features tr.ob-row-hover > th[scope="row"],
+#octabam-builder .ob-features thead th.ob-col-hover {
+  background: color-mix(in srgb, var(--ob-accent) 35%, #1f1810);
+}
+#octabam-builder .ob-features .ob-cell-hover {
+  background: color-mix(in srgb, var(--ob-accent) 28%, transparent);
+}
+#octabam-builder .ob-features tr[data-remix] {
+  cursor: pointer;
+}
+#octabam-builder .ob-features tr.ob-selected > th,
+#octabam-builder .ob-features tr.ob-selected > td {
+  background: color-mix(in srgb, var(--ob-accent) 16%, #121212);
+}
+#octabam-builder .ob-features tr.ob-selected th[scope="row"] {
+  box-shadow: inset 3px 0 0 var(--ob-accent);
 }
