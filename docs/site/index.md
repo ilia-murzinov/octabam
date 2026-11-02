@@ -1,9 +1,18 @@
 # ilia · octabam
 
-Personal **base** / **cx** remix stacks for the Octatrack (OS 1.40C), built
-with [octabam](https://sambanks.github.io/octabam/). This site covers the
-fork modules and the builder for these stacks — not the general octabam
-manual.
+Eight Octatrack remixes for live sampling and sound design: a **base**
+family with Tim Hastie’s SYNTH MACHINE, and a **cx** family with
+[Complex Oscillator](reference/modules/cxosc.md) instead. Every image
+keeps [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV and stock
+COMPRESSOR, then swaps the space and glitch slots —
+[Void](reference/modules/void.md), [Shatter](reference/modules/shatter.md),
+[Stuttr](reference/modules/stuttr.md),
+[Resonator](reference/modules/resonator.md).
+
+Built with [octabam](https://sambanks.github.io/octabam/) from your own
+OS 1.40C. This site is the builder and the fork-module notes; the general
+manual, safety and FAQ stay upstream.
 
 [**Build an image →**](web-builder.md)
 · [Credits](#credits)
@@ -11,34 +20,30 @@ manual.
 · [Safety & FAQ](https://sambanks.github.io/octabam/safety.html)
 
 Unofficial community firmware; not made, endorsed or supported by Elektron.
-Licence, recovery, and the usual questions live on the
-[upstream site](https://sambanks.github.io/octabam/).
 
-## Get started
+## The two families
 
-1. Open [Build](web-builder.md), pick a `base*` or `cx*` remix, and make an
-   image from your own 1.40C. Nothing is uploaded.
-2. Read Effects, Machines and Tools in the sidebar for what that image adds.
-3. Check [who wrote what](#credits) before you credit a feature.
+| | Machine | What you pick next |
+|---|---|---|
+| **base\*** | Tim’s SYNTH MACHINE | Space + glitch: Void / Shatter / Stuttr / Resonator combinations |
+| **cx\*** | Complex Oscillator (panel **CX OSC**) | Same space + glitch matrix; no SYNTH MACHINE (same machine-list hooks) |
 
-## What ships
+Always on both: Scope, Copy Project, DARK REV, stock COMPRESSOR. PLATE and
+SPRING are harvested so the inserts fit. No tape echo, no sidechain — stock
+compressor stays.
 
-Always on both stacks: [Scope](reference/modules/scope.md),
-[Copy Project](reference/modules/copy-project.md), DARK REV, stock
-COMPRESSOR. PLATE and SPRING are harvested so the inserts fit.
+Open [Build](web-builder.md), pick a lettered remix, flash the `.bin` /
+`.syx`, or boot an `.RMX` on a unit that already runs octabam.
 
-- **base\*** — Tim Hastie’s SYNTH MACHINE, plus the fork modules.
-- **cx\*** — [Complex Oscillator](reference/modules/cxosc.md) instead of
-  SYNTH MACHINE.
+## Why the split exists
 
-## Lineage that stays visible
-
-- **Complex Oscillator** (panel: **CX OSC**) is a local machine derived from
-  **Tim Hastie**’s FM SYNTH engine (octatrick). It is not an edit of the
-  SYNTH MACHINE submodule. Tim’s SYNTH MACHINE, SCALE QUANTIZER and TUNER
-  still ship on `base*` and keep their authorship.
-- **SCOPE** overlays TUNER’s **DOWN+TEMPO** entry when both are present.
-  TUNER remains Tim’s; SCOPE is an overlay, not a rewrite.
+- **Complex Oscillator** is a local two-operator FM machine with a sine
+  wavefolder, derived from Tim’s FM SYNTH engine. It is not an edit of the
+  SYNTH MACHINE submodule, and it cannot share an image with it.
+- **Scope** overlays TUNER’s **DOWN+TEMPO** entry when both are present.
+  TUNER remains Tim’s.
+- Everything else in CORE — Kits, scenes, USB, Kyoti workflow modules,
+  and the rest in [Credits](#credits) — is still those authors’ work.
 
 ## Credits
 
