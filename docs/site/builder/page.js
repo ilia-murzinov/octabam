@@ -244,8 +244,8 @@ async function main() {
   const metaOf = () => rows.find((r) => r.name === selected) || rows[0];
 
   const file = el("input", { type: "file", id: "ob-file", accept: ".zip,.syx", hidden: true });
-  const choose = el("button", { type: "button", id: "ob-choose", textContent: "Choose OS file" });
-  const chosen = el("span", { id: "ob-chosen", textContent: " No file chosen." });
+  const choose = el("button", { type: "button", id: "ob-choose", textContent: "Choose OS file…" });
+  const chosen = el("span", { id: "ob-chosen", textContent: "No file chosen" });
   const go = el("button", { id: "ob-go", textContent: "Build", disabled: true });
   const status = el("p", { id: "ob-status", role: "status" });
   const links = el("p", { id: "ob-links" });
@@ -267,10 +267,10 @@ async function main() {
   const matrix = featureTable(manifest, rows);
   const form = el("div", { className: "ob-form" },
     dropdown.root,
-    el("div", { className: "ob-file" },
-      el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
-      el("div", { className: "ob-file-row" }, choose, chosen, file)),
-    el("div", { className: "ob-actions" }, go),
+    el("div", { className: "ob-field" },
+      el("span", { className: "ob-hint" }, "OS 1.40C (.zip or .syx)"),
+      choose, chosen, file),
+    go,
     status, links, built);
   const kids = [];
   if (matrix) kids.push(matrix);
@@ -296,7 +296,7 @@ async function main() {
   choose.addEventListener("click", () => file.click());
   file.addEventListener("change", () => {
     go.disabled = !file.files.length;
-    chosen.textContent = ` ${file.files.length ? file.files[0].name : "No file chosen."}`;
+    chosen.textContent = file.files.length ? file.files[0].name : "No file chosen";
   });
 
   go.addEventListener("click", async () => {
