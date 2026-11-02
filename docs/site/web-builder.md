@@ -10,6 +10,10 @@ PLATE and SPRING are harvested so the inserts fit.
 **base\*** includes Tim Hastie’s SYNTH MACHINE;
 **cx\*** includes [Cx Osc](reference/modules/cxosc.md) instead.
 
+General install, safety and FAQ:
+[upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),
+[Safety & FAQ](https://sambanks.github.io/octabam/safety.html).
+
 !!! tip "Back up your projects"
     Back up your CF card before installing, or start new projects after
     installing. Kits write a `kits.work` file into each project they load.
@@ -38,32 +42,12 @@ The build takes a few seconds. The page offers three files:
 
 The files contain Elektron's OS, so keep them to yourself.
 
-## Install the image
+## Install
 
-### From the CF card
-
-Use this method when the Octatrack boots normally:
-
-1. On the unit, select **PROJECT → SYSTEM → USB DISK MODE → YES**.
-2. Copy the `.bin` file to the root of the mounted CF card, not into a
-   folder.
-3. Eject the card from the computer, then leave USB DISK MODE on the unit.
-   This ensures the copy has finished writing.
-4. Select **PROJECT → SYSTEM → OS UPGRADE → YES**, then confirm.
-5. Wait for the unit to finish and restart. Power-cycle it once more before
-   testing; an OS upgrade does not clear DSP RAM.
-
-### Over DIN MIDI
-
-Follow Elektron's MIDI OS upgrade flow with the `.syx`, or the Startup Menu
-path under [Safety and recovery](index.md#safety-and-recovery).
-
-### Switch with an RMX file
-
-Copy the `.RMX` to `/BRAIN/REMIXES/` on a unit that already runs an octabam
-image, then **PROJ → BRAIN → REMIXES**.
-
-## Confirm the install
+Card, MIDI and RMX steps match upstream —
+[Build and Install](https://sambanks.github.io/octabam/web-builder.html).
+Recovery and FAQ:
+[Safety & FAQ](https://sambanks.github.io/octabam/safety.html).
 
 **SYSTEM STATUS → OS VERSION** should show `OCTABAM` plus the build tag.
-Stock shows `1.40C`. Recovery: [Safety and recovery](index.md#safety-and-recovery).
+Stock shows `1.40C`.
