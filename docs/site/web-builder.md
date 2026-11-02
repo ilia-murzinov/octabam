@@ -77,7 +77,8 @@ installs above, for a unit that already runs an octabam image:
 3. The choice is kept across reboots. To return to the flashed image, select
    the name under the FLASHED separator in the same list.
 
-See [BRAIN: Remixes](reference/manual/octabam/brain/remixes.md) for the details.
+REMIX SWITCH lives under **PROJ → BRAIN → REMIXES** on a unit already
+running one of these images.
 
 ## Confirm the installation
 
@@ -90,14 +91,11 @@ the same steps, or see [Safety and recovery](safety.md).
 
 ## How it works
 
-The page holds the patch for Octabam v0.3: its bytes, plus instructions to
-copy ranges from your 1.40C. It applies the patch to the MAIN OS section of
-your file, rebuilds the firmware container with Elektron's container tool
+The page holds the patch for the selected remix: its bytes, plus instructions
+to copy ranges from your 1.40C. It applies the patch to the MAIN OS section
+of your file, rebuilds the firmware container with Elektron's container tool
 compiled to WebAssembly, and wraps it for the card. It refuses a file whose
 MAIN OS is not the 1.40C the patches were made against.
 
 The output is byte-identical to `make image` for the same commit and build
-tag. The page shows the version and commit the patch was built from. To build
-from source or choose modules, see the
-[build guide](https://github.com/sambanks/octabam/blob/main/docs/guide/BUILDING.md)
-and [Create your own remix](own-remix.md).
+tag. The page shows the version and commit the patch was built from.
