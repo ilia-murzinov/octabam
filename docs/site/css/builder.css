@@ -1,11 +1,12 @@
 /* Builder chrome — chassis amber, readable matrix (remixes as rows). */
 #octabam-builder {
-  --ob-accent: #ff7a18;
-  border: 2px solid #3a3a3a;
+  --ob-accent: var(--ot-amber, #ff7a18);
+  border: 2px solid var(--border, #3a3a3a);
   border-left: 4px solid var(--ob-accent);
   padding: 1rem 1rem 0.75rem;
   margin: 1rem 0 1.5rem;
-  background: #0e0e0e;
+  background: var(--ot-panel, #0e0e0e);
+  color: var(--foreground, #e8e4dc);
 }
 
 #octabam-builder .ob-meta {
@@ -47,7 +48,7 @@
 
 #octabam-builder .ob-features th,
 #octabam-builder .ob-features td {
-  border: 1px solid #333;
+  border: 1px solid var(--border, #333);
   padding: 0.35rem 0.25rem;
   text-align: center;
   vertical-align: middle;
@@ -58,12 +59,12 @@
   letter-spacing: 0 !important;
   font-size: 0.7rem !important;
   background: transparent !important;
-  color: #e8e4dc !important;
+  color: var(--foreground, #e8e4dc) !important;
 }
 
 #octabam-builder .ob-features thead th {
   color: var(--ob-accent) !important;
-  background: #1f1810 !important;
+  background: var(--ot-th-bg, #1f1810) !important;
   font-weight: 700;
 }
 
@@ -73,7 +74,7 @@
   padding-left: 0.5rem;
   width: 7.5rem;
   color: var(--ob-accent) !important;
-  background: #1a1410 !important;
+  background: var(--ot-th-bg, #1a1410) !important;
   font-weight: 700;
 }
 
@@ -87,7 +88,7 @@
 }
 
 #octabam-builder .ob-features tr.ob-selected > * {
-  background: color-mix(in srgb, var(--ob-accent) 18%, #0e0e0e) !important;
+  background: color-mix(in srgb, var(--ob-accent) 18%, var(--ot-panel, #0e0e0e)) !important;
 }
 #octabam-builder .ob-features tr.ob-selected th[scope="row"] {
   box-shadow: inset 3px 0 0 var(--ob-accent);
@@ -95,7 +96,7 @@
 
 #octabam-builder button {
   background: var(--ob-accent);
-  color: #121212;
+  color: var(--primary-foreground, #121212);
   border: 2px solid var(--ob-accent);
   font-family: inherit;
   font-weight: 700;
@@ -109,9 +110,9 @@
   cursor: not-allowed;
 }
 #octabam-builder select {
-  background: #1a1a1a;
-  color: #e8e4dc;
-  border: 2px solid #3a3a3a;
+  background: var(--input, #1a1a1a);
+  color: var(--foreground, #e8e4dc);
+  border: 2px solid var(--border, #3a3a3a);
   font-family: inherit;
   padding: 0.3rem 0.5rem;
 }
