@@ -150,7 +150,12 @@ async function main() {
   const kids = [];
   if (matrix) kids.push(matrix);
   kids.push(
-    el("p", { className: "ob-controls" }, el("label", {}, "Remix ", pick)),
+    el("p", { className: "ob-controls" },
+      el("label", { className: "ob-select-wrap", htmlFor: "ob-remix" },
+        el("span", { className: "ob-select-label" }, "Remix"),
+        el("span", { className: "ob-select" },
+          pick,
+          el("span", { className: "ob-select-chevron", "aria-hidden": "true" }, "▼")))),
     el("p", { className: "ob-controls" },
       el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
       el("br"),
@@ -192,11 +197,15 @@ async function main() {
     links.replaceChildren();
     const meta = metaOf();
     try {
+      status.textContent = "starting...";
       const bytes = new Uint8Array(await file.files[0].arrayBuffer());
       const patch = new Uint8Array(await (await fetch(here(meta.patch))).arrayBuffer());
-      const createModule = (await import("./eft.mjs")).default;
-      const r = await build({
-        file: bytes, patch, meta, eft: makeEft(createModule),
+      // Yield once so the status line paints before the worker spins up.
+      await new Promise((r) => setTimeout(r, 0));
+      const r = await runBuild({
+        file: bytes,
+        patch,
+        meta,
         onStep: (s) => { status.textContent = s + "..."; },
       });
       status.textContent = "Done. Nothing was uploaded; the files below exist only in this tab.";
