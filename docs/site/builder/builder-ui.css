@@ -1,7 +1,8 @@
-/* Builder chrome — matches chassis amber; type size follows the page. */
+/* Builder chrome — matches chassis amber; one aligned form column. */
 
 #octabam-builder {
   --ob-accent: #c45c26;
+  --ob-col: min(100%, 28rem);
   border: 1px solid #3a3a3a;
   border-left: 3px solid var(--ob-accent);
   padding: 1rem;
@@ -9,22 +10,52 @@
   background: #1a1a1a;
   color: inherit;
   font: inherit;
+  box-sizing: border-box;
+}
+
+#octabam-builder *,
+#octabam-builder *::before,
+#octabam-builder *::after {
+  box-sizing: border-box;
+}
+
+/* Single column: remix → file → build share the same left edge + width. */
+#octabam-builder .ob-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  width: var(--ob-col);
+  max-width: 100%;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+#octabam-builder .ob-form > * {
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 #octabam-builder .ob-dd {
   position: relative;
-  display: block;
-  width: min(100%, 22rem);
-  margin: 0.25rem 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  margin: 0;
 }
 
 #octabam-builder .ob-dd-label,
 #octabam-builder .ob-hint,
 #octabam-builder .ob-meta {
   display: block;
-  margin-bottom: 0.35rem;
+  margin: 0;
   color: var(--muted-foreground, #9a958c);
   font-size: 0.875em;
+  line-height: 1.35;
 }
 
 #octabam-builder button.ob-dd-btn,
@@ -35,7 +66,8 @@
   gap: 0.75rem;
   width: 100% !important;
   min-height: 2.5rem;
-  padding: 0.45rem 0.65rem !important;
+  margin: 0 !important;
+  padding: 0.5rem 0.65rem !important;
   background: #121212 !important;
   color: inherit !important;
   border: 1px solid var(--ob-accent) !important;
@@ -45,12 +77,14 @@
   font: inherit !important;
   font-weight: 600 !important;
   cursor: pointer;
+  line-height: 1.25 !important;
 }
 
 #octabam-builder .ob-dd-value {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.25;
 }
 
 #octabam-builder .ob-dd-chevron {
@@ -106,28 +140,76 @@
   background: #1f1810;
 }
 
+#octabam-builder .ob-file {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+#octabam-builder .ob-file-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.75rem;
+  width: 100%;
+  min-height: 2.5rem;
+}
+
+#octabam-builder .ob-actions {
+  display: flex;
+  width: 100%;
+}
+
 #octabam-builder button#ob-choose,
 #octabam-builder button#ob-go {
-  background: var(--ob-accent);
-  color: #121212;
-  border: 1px solid var(--ob-accent);
-  font: inherit;
-  font-weight: 650;
-  padding: 0.4rem 0.75rem;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  margin: 0 !important;
+  padding: 0.5rem 0.85rem !important;
+  background: var(--ob-accent) !important;
+  color: #121212 !important;
+  border: 1px solid var(--ob-accent) !important;
+  font: inherit !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
   cursor: pointer;
-  text-transform: none;
-  letter-spacing: normal;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  white-space: nowrap;
 }
+
+#octabam-builder button#ob-go {
+  width: 100%;
+}
+
 #octabam-builder button#ob-go:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
+#octabam-builder #ob-chosen {
+  color: var(--muted-foreground, #9a958c);
+  font-size: 0.875em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+#octabam-builder #ob-status,
+#octabam-builder #ob-links,
+#octabam-builder .ob-meta {
+  margin: 0;
+  width: 100%;
+}
+
 #octabam-builder .ob-features-wrap {
   overflow-x: auto;
   width: 100%;
-  margin: 0 0 1rem;
+  margin: 0 0 0.25rem;
 }
+
 #octabam-builder .ob-features {
   font: inherit;
   font-size: 0.875em;
@@ -136,6 +218,7 @@
   table-layout: fixed;
   border-collapse: collapse;
 }
+
 #octabam-builder .ob-features th,
 #octabam-builder .ob-features td {
   border: 1px solid #333;
@@ -148,6 +231,7 @@
   font: inherit;
   font-size: inherit;
 }
+
 #octabam-builder .ob-features thead th,
 #octabam-builder .ob-features th[scope="row"],
 #octabam-builder .ob-features .ob-corner {
@@ -157,24 +241,30 @@
   padding-left: 0.5rem;
   font-weight: 650;
 }
+
 #octabam-builder .ob-features tr.ob-row-hover > td,
 #octabam-builder .ob-features tbody td.ob-col-hover {
   background: color-mix(in srgb, var(--ob-accent) 14%, transparent);
 }
+
 #octabam-builder .ob-features tr.ob-row-hover > th[scope="row"],
 #octabam-builder .ob-features thead th.ob-col-hover {
   background: color-mix(in srgb, var(--ob-accent) 35%, #1f1810);
 }
+
 #octabam-builder .ob-features .ob-cell-hover {
   background: color-mix(in srgb, var(--ob-accent) 28%, transparent);
 }
+
 #octabam-builder .ob-features tr[data-remix] {
   cursor: pointer;
 }
+
 #octabam-builder .ob-features tr.ob-selected > th,
 #octabam-builder .ob-features tr.ob-selected > td {
   background: color-mix(in srgb, var(--ob-accent) 16%, #121212);
 }
+
 #octabam-builder .ob-features tr.ob-selected th[scope="row"] {
   box-shadow: inset 3px 0 0 var(--ob-accent);
 }

@@ -265,16 +265,16 @@ async function main() {
   });
 
   const matrix = featureTable(manifest, rows);
+  const form = el("div", { className: "ob-form" },
+    dropdown.root,
+    el("div", { className: "ob-file" },
+      el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
+      el("div", { className: "ob-file-row" }, choose, chosen, file)),
+    el("div", { className: "ob-actions" }, go),
+    status, links, built);
   const kids = [];
   if (matrix) kids.push(matrix);
-  kids.push(
-    el("div", { className: "ob-controls" }, dropdown.root),
-    el("p", { className: "ob-controls" },
-      el("span", { className: "ob-hint" }, "OCTATRACK_OS1.40C_dist.zip or .syx"),
-      el("br"),
-      choose, chosen, file),
-    el("p", { className: "ob-controls" }, go),
-    status, links, built);
+  kids.push(form);
   root.replaceChildren(...kids);
 
   root.querySelectorAll(".ob-features tr[data-remix]").forEach((tr) => {
