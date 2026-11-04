@@ -1,5 +1,4 @@
 | Megabyte in the stock Echo Freeze filter/mix seam.
-| Same protocol as Tape Echo (docs/firmware/COLDFIRE_DELAY.md).
         .text
         .balign 4
         .global mb_cpu_hook, mb_cpu_reset, mb_states
