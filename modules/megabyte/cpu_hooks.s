@@ -7,7 +7,7 @@ mb_cpu_reset:
         lea     -12(%sp),%sp
         movem.l %d0-%d1/%a0,(%sp)
         lea     mb_states,%a0
-        move.l  #((8*44)/4)-1,%d1
+        move.l  #((8*48)/4)-1,%d1
         moveq   #0,%d0
 mb_clear_loop:
         move.l  %d0,(%a0)+
@@ -37,4 +37,4 @@ mb_stock_path:
         jmp     0x40003624
         .balign 4
 mb_states:
-        .zero   352
+        .zero   384

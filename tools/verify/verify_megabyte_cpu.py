@@ -16,7 +16,8 @@ class State(C.Structure):
     _fields_ = (
         [(k, C.c_uint32) for k in ('active', 'valid', 'phase', 'rng')]
         + [(k, C.c_int32) for k in (
-            'mix', 'feedback', 'gain', 'mod_amt', 'delay', 'lp_z', 'havoc')]
+            'mix', 'feedback', 'drive1', 'drive2',
+            'delay', 'lp_z', 'havoc', 'mod_depth')]
     )
 
 
@@ -125,15 +126,14 @@ def main():
     check('HAVC with FDBK=0 leaves no regenerating tail',
           late < Q // 1000, f'late={late}')
 
-    # Second-echo peak: HAVC boosts feedback into the ring after the first hit.
+    # HAVC sustains: mid FDBK decays, same FDBK+HAVC keeps the 4th repeat alive.
     src = lambda n, c: Q // 5 if 64 <= n < 80 else 0
-    # TIME=20 → ~10.2k; second echo ~20.4k.
-    e0 = Engine(lib, params(time=20, feedback=100, gain=30, havoc=0, mix=127))
-    e1 = Engine(lib, params(time=20, feedback=100, gain=30, havoc=127, mix=127))
-    p0 = max(abs(x) for x in e0.render(28000, src)[19000:23000])
-    p1 = max(abs(x) for x in e1.render(28000, src)[19000:23000])
-    check('HAVC raises the second-echo peak vs same FDBK',
-          p1 > p0, f'no={p0} havoc={p1}')
+    e0 = Engine(lib, params(time=20, feedback=70, gain=40, havoc=0, mix=127))
+    e1 = Engine(lib, params(time=20, feedback=70, gain=40, havoc=127, mix=127))
+    late0 = max(abs(x) for x in e0.render(50000, src)[38000:46000])
+    late1 = max(abs(x) for x in e1.render(50000, src)[38000:46000])
+    check('HAVC sustains late repeats vs same FDBK',
+          late1 > late0 * 1.5, f'no={late0} havoc={late1}')
 
     if FAILS:
         print(f'{FAILS} failure(s)')
