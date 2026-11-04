@@ -1,7 +1,7 @@
 """cx-reson -- cx with RESONATOR instead of VOID.
 
 CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY. Stock COMPRESSOR + COMB.
-No VOID / SIDECHAIN / STUTTR / SYNTH / TAPE. PLATE / SPRING harvested.
+No VOID / SIDECHAIN / STUTTR / SYNTH / TAPE. MEGABYTE replaces stock DELAY. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -26,8 +26,8 @@ REMIX = Remix(
     name="cx-reson",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock COMP; no VOID / SC / STUTTR / SYNTH.",
-    doc="CORE + STEM REC + CX OSC + RESONATOR + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
+    proof_note="CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY; MEGABYTE for DELAY; stock COMP; no VOID / SC / STUTTR / SYNTH.",
+    doc="CORE + STEM REC + CX OSC + RESONATOR + SHATTER + SCOPE + DARK REV + MEGABYTE + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -45,7 +45,7 @@ REMIX = Remix(
         "COMB FILTER",
         "COMPRESSOR",
         "LO-FI",
-        "DELAY",
+        "MEGABYTE",
         "DARK REV",
     ),
     fx1=(

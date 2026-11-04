@@ -1,8 +1,9 @@
 """cx -- Ilia's CX OSC flash stack: SHATTER + VOID + SCOPE + DARK + COPY.
 
 No SYNTH MACHINE (conflicts with CX OSC). No STUTTR (conflicts with SHATTER).
-No RESONATOR / SIDECHAIN. Stock COMPRESSOR kept. PLATE / SPRING harvested so
-VOID fits; DARK REV kept. SCOPE: DOWN+TEMPO (owns TUNER detours).
+No RESONATOR / SIDECHAIN. MEGABYTE replaces stock DELAY. Stock COMPRESSOR kept.
+PLATE / SPRING harvested so VOID fits; DARK REV kept. SCOPE: DOWN+TEMPO
+(owns TUNER detours).
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -27,8 +28,8 @@ REMIX = Remix(
     name="cx",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="CX OSC + SHATTER + VOID + SCOPE + DARK + COPY; stock COMP; no SC / RESONATOR / SYNTH / STUTTR.",
-    doc="CORE + STEM REC + CX OSC + SHATTER + VOID + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
+    proof_note="CX OSC + SHATTER + VOID + SCOPE + DARK + COPY; MEGABYTE for DELAY; stock COMP; no SC / RESONATOR / SYNTH / STUTTR.",
+    doc="CORE + STEM REC + CX OSC + SHATTER + VOID + SCOPE + DARK REV + MEGABYTE + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -45,7 +46,7 @@ REMIX = Remix(
         "SPATIALIZER",
         "COMPRESSOR",
         "LO-FI",
-        "DELAY",
+        "MEGABYTE",
         "DARK REV",
     ),
     fx1=(
