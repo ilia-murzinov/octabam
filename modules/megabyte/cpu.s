@@ -6,828 +6,760 @@
 	.globl	mb_process
 	.type	mb_process, @function
 mb_process:
-	lea (-104,%sp),%sp
+	lea (-96,%sp),%sp
 	moveq #127,%d0
+	move.l 104(%sp),%a1
 	movem.l #31996,(%sp)
-	move.l 112(%sp),%a3
-	move.l 108(%sp),%a0
-	move.l (%a3),%d7
-	cmp.l %d7,%d0
+	move.l 100(%sp),%a0
+	move.l (%a1),%d6
+	move.l 112(%sp),%a6
+	cmp.l %d6,%d0
 	jcc .L2
-	moveq #127,%d7
+	moveq #127,%d6
 .L2:
-	move.w %d7,%d0
+	move.w %d6,%d0
+	move.w %d6,%d1
+	move.l 20(%a1),%d2
 	moveq #127,%d3
-	move.l 20(%a3),%d1
-	mulu.w #50715,%d0
-	divu.l %d3,%d0
-	add.l #2205,%d0
-	lsl.l #8,%d0
-	move.l %d0,%a5
-	cmp.l %d1,%d3
+	mulu.w #72,%d0
+	mulu.w #399,%d1
+	lsr.l #7,%d0
+	add.l #2205,%d1
+	add.l %d0,%d1
+	lsl.l #8,%d1
+	cmp.l %d2,%d3
 	jcc .L3
-	moveq #127,%d1
+	moveq #127,%d2
 .L3:
 	move.l #16909320,%d4
-	moveq #127,%d5
-	muls.l %d1,%d4
-	move.l 4(%a3),%d2
-	move.l %d4,100(%sp)
-	move.l %d4,%d0
-	cmp.l %d2,%d5
+	moveq #127,%d0
+	muls.l %d2,%d4
+	move.l 4(%a1),%d7
+	move.l %d4,92(%sp)
+	cmp.l %d7,%d0
 	jcc .L4
-	moveq #127,%d2
+	moveq #127,%d7
 .L4:
-	move.l #14372922,%d6
-	muls.l %d2,%d6
-	move.l 8(%a3),%d1
-	moveq #127,%d2
-	move.l %d6,%a2
-	cmp.l %d1,%d2
-	jcc .L5
-	moveq #127,%d1
-.L5:
-	mulu.w #2560,%d1
+	move.l 8(%a1),%d3
+	move.l #14294411,%d2
+	muls.l %d2,%d7
 	moveq #127,%d4
-	move.l 12(%a3),%d2
-	divu.l %d4,%d1
-	move.l %d1,%a1
-	lea (256,%a1),%a1
+	cmp.l %d3,%d4
+	jcc .L5
+	moveq #127,%d3
+.L5:
+	move.l #8454660,%d0
+	moveq #127,%d4
+	muls.l %d0,%d3
+	move.l 12(%a1),%d2
+	add.l #1073741824,%d3
 	cmp.l %d2,%d4
 	jcc .L6
 	moveq #127,%d2
 .L6:
-	move.l #135680,%d5
-	moveq #127,%d3
-	muls.l %d5,%d2
-	move.l 16(%a3),%d1
-	move.l %d2,%d6
-	divu.l %d3,%d6
-	move.l %d6,96(%sp)
-	cmp.l %d1,%d3
+	mulu.w #1068,%d2
+	move.l 16(%a1),%d0
+	move.l %d2,88(%sp)
+	moveq #127,%d2
+	cmp.l %d0,%d2
 	jcc .L7
-	moveq #127,%d1
+	moveq #127,%d0
 .L7:
-	move.l #6763728,%d5
-	muls.l %d1,%d5
-	move.l %d5,%a3
+	move.l #422427,%d4
+	muls.l %d0,%d4
+	move.l %d4,%a2
 	tst.l (%a0)
 	jeq .L8
-	move.l 16(%a0),%d0
-	move.l %a5,%a4
-	move.l 100(%sp),%d3
-	sub.l %d0,%d3
-	move.l 32(%a0),%d1
-	sub.l %d1,%a4
+	move.l %d3,%a4
+	moveq #9,%d3
+	move.l 16(%a0),%a1
+	move.l %d1,%d2
+	move.l 92(%sp),%d4
+	sub.l %a1,%d4
+	asr.l %d3,%d4
+	move.l 32(%a0),%d0
+	sub.l %d0,%d2
+	asr.l #6,%d2
 	move.l 20(%a0),%d5
-	move.l 24(%a0),%d6
+	sub.l %d5,%d7
+	asr.l %d3,%d7
+	move.l 24(%a0),%a3
+	sub.l %a3,%a4
+	move.l %d4,80(%sp)
+	move.l %a4,%d4
+	asr.l %d3,%d4
+	move.l %d2,52(%sp)
 	move.l 40(%a0),%d2
-	tst.l %d3
-	jlt .L98
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,%a6
-	move.l %a2,%d3
-	sub.l %d5,%d3
-	jmi .L99
-.L10:
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,84(%sp)
-	move.l %a1,%d3
-	sub.l %d6,%d3
-	jmi .L100
-.L11:
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,80(%sp)
-	move.l %a3,%d3
-	sub.l %d2,%d3
-	jmi .L101
-.L12:
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,76(%sp)
-	move.l %a4,%d3
-	tst.l %a4
-	jlt .L102
-.L13:
-	asr.l #6,%d3
-	move.l 12(%a0),%d4
-	move.l %d3,64(%sp)
+	sub.l %d2,%a2
+	move.l %d7,76(%sp)
+	move.l %d4,72(%sp)
+	move.l %a2,%d7
+	asr.l %d3,%d7
 	move.l 28(%a0),%d3
-	move.l %d4,60(%sp)
+	move.l 12(%a0),%d4
+	move.l %d7,68(%sp)
 	move.l %d3,56(%sp)
-	moveq #1,%d3
-	move.l %d3,(%a0)
-	tst.l 64(%sp)
-	jeq .L103
-	cmp.l #32831,%a4
-	jle .L60
-	move.l #512,%d4
-	move.l 8(%a0),%a1
-	add.l #1440000,%a1
-	move.l %d4,64(%sp)
-	move.l #603979776,%d3
-	move.l %a1,%d4
-	add.l %d4,%d4
-	subx.l %d4,%d4
-	muls.l %d7,%d3
-	move.l %a1,%d7
-	lsr.l #1,%d7
-	move.l %a1,8(%a0)
-	move.l %d7,%a4
-	move.l %d4,%a3
-	moveq #127,%d4
-	divu.l %d4,%d3
-	move.l #751619276,%d4
-	move.l %a4,%d7
-	move.l %d3,%a2
-	move.l %a3,%d3
-	eor.l %d3,%d7
-	sub.l %a2,%d4
-	move.l %d4,68(%sp)
-	tst.l %d7
-	jlt .L104
-.L20:
-	add.l %d7,%d7
-	move.l #2147483647,%a1
-	sub.l %d7,%a1
-	move.l #1779033704,%d7
-	move.l %a1,%d3
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d3,%d7,%acc0
-	movclr.l %acc0,%d3
-| 0 "" 2
-#NO_APP
-	move.l 124(%sp),%a2
-	move.l %a6,92(%sp)
-	move.l #176400,%a6
-	move.l 120(%sp),%a4
-	add.l %a4,%a6
-	move.l %d3,72(%sp)
-	move.l 128(%sp),%a3
-	lea (128,%a2),%a1
-	move.l 56(%sp),%d3
-	move.l %a1,88(%sp)
-	move.l 116(%sp),%a4
-	move.l 60(%sp),44(%sp)
-.L56:
-	add.l 92(%sp),%d0
-	add.l 84(%sp),%d5
-	add.l 80(%sp),%d6
-	add.l 76(%sp),%d2
-	add.l 64(%sp),%d1
-	move.l %d0,16(%a0)
-	move.l %d5,20(%a0)
-	move.l %d6,24(%a0)
-	move.l %d2,40(%a0)
-	move.l %d1,32(%a0)
-	move.l 4(%a2),%d0
-	move.l (%a2),56(%sp)
-	move.l 56(%sp),%d7
-	asr.l #1,%d7
-	move.l %d0,52(%sp)
-	asr.l #1,%d0
-	add.l %d7,%d0
-	tst.l %d3
-	jne .L21
-	move.l 96(%sp),%d3
-.L21:
-	move.l 72(%sp),%d4
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d3,%d4,%acc0
-	movclr.l %acc0,%d3
-| 0 "" 2
-#NO_APP
-	move.l 4(%a0),%a1
-	moveq #1,%d7
-	cmp.l %a1,%d7
-	jcc .L63
-	add.l %d3,%d1
-	cmp.l #256,%d1
-	jge .L23
-	move.l #256,%d1
-.L23:
-	move.l %d1,%d3
-	asr.l #8,%d3
-	cmp.l %a1,%d3
-	jcs .L24
-	move.l %a1,%d3
-	subq.l #1,%d3
-.L24:
-	move.l %a6,%a1
-	sub.l %d3,%a1
-	move.l #176400,%d7
-	move.l %a1,%d4
-	remu.l %d7,%d3:%d4
-	mvz.b %d1,%d1
-	move.l %d3,%a5
-	add.l #176399,%a5
-	lsl.l #3,%d3
-	move.l %d3,48(%sp)
-	move.l %a5,%d3
-	remu.l %d7,%d4:%d3
-	move.l 48(%sp),%d3
-	lsl.l #3,%d4
-	move.l (%a4,%d4.l),%d7
-	move.l (%a4,%d3.l),%a1
+	move.l %d4,44(%sp)
+	tst.l 52(%sp)
+	jeq .L84
+	move.l 52(%sp),%d4
+	cmp.l #-512,%d4
+	jlt .L85
+	move.l 52(%sp),%d1
+	cmp.l #512,%d1
+	jgt .L86
+.L12:
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
 	move.l %d7,%d3
-	sub.l %a1,%d3
-	move.l %d3,%d4
-	asr.l #8,%d4
-	muls.l %d1,%d4
-	move.l %d4,%a5
-	tst.l %d3
-	jlt .L25
-	mvz.b %d3,%d3
-	muls.w %d1,%d3
-	move.l %a1,%d1
-	add.l %a5,%d1
-	asr.l #8,%d3
-	add.l %d3,%d1
-.L22:
-	move.l 36(%a0),%d3
-	sub.l %d3,%d1
-	move.l 68(%sp),%d7
+	move.l %d7,%d1
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	lsr.l #1,%d1
+	move.l #5760228,%d4
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	move.l #751619276,%d7
+	moveq #1,%d4
+	move.l %d4,(%a0)
+	sub.l %d6,%d7
+	eor.l %d3,%d1
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jlt .L87
+.L15:
+	add.l %d1,%d1
+	move.l #2147483647,%d3
+	sub.l %d1,%d3
+	move.l #1779033704,%d1
 #APP
-| 22 "modules/megabyte/cpu.c" 1
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d3,%d1,%acc0
+	movclr.l %acc0,%d4
+| 0 "" 2
+#NO_APP
+	move.l %d4,64(%sp)
+	tst.l 56(%sp)
+	jne .L16
+	move.l 88(%sp),56(%sp)
+.L16:
+	add.l 80(%sp),%a1
+	add.l 76(%sp),%d5
+	add.l 72(%sp),%a3
+	add.l 68(%sp),%d2
+	add.l 52(%sp),%d0
+	move.l 116(%sp),%a2
+	move.l %a1,16(%a0)
+	move.l %d5,20(%a0)
+	move.l %a3,24(%a0)
+	move.l %d2,40(%a0)
+	move.l %d0,32(%a0)
+	lea (128,%a2),%a5
+	move.l %a5,84(%sp)
+	move.l 4(%a2),%d1
+	move.l 44(%sp),%d4
+	move.l (%a2),44(%sp)
+	move.l %d1,48(%sp)
+	asr.l #1,%d1
+	move.l 44(%sp),%d6
+	asr.l #1,%d6
+	move.l 120(%sp),%a4
+	add.l %d1,%d6
+	move.l 108(%sp),%a5
+	move.l 56(%sp),%d7
+	move.l 64(%sp),%d1
+#APP
+| 17 "modules/megabyte/cpu.c" 1
 	mac.l %d7,%d1,%acc0
+	movclr.l %acc0,%d3
+| 0 "" 2
+#NO_APP
+	move.l 4(%a0),%d1
+	moveq #1,%d7
+	cmp.l %d1,%d7
+	jcc .L47
+.L94:
+	add.l %d3,%d0
+	cmp.l #256,%d0
+	jge .L18
+	move.l #256,%d0
+.L18:
+	move.l %d0,%d3
+	asr.l #8,%d3
+	cmp.l %d1,%d3
+	jcs .L19
+	move.l %d1,%d3
+	subq.l #1,%d3
+.L19:
+	move.l %a6,%d1
+	sub.l %d3,%d1
+	mvz.b %d0,%d0
+	cmp.l #-176401,%d1
+	jls .L20
+	add.l #176400,%d1
+.L20:
+	tst.l %d1
+	jeq .L48
+	move.l %d1,%d3
+	subq.l #1,%d3
+	lsl.l #3,%d3
+	lsl.l #3,%d1
+	move.l (%a5,%d3.l),%d3
+	move.l (%a5,%d1.l),%d1
+	sub.l %d1,%d3
+	move.l %d3,%d7
+	tst.l %d3
+	jlt .L88
+.L22:
+	mvz.b %d7,%d7
+	mulu.w %d0,%d7
+	lsr.l #8,%d7
+	tst.l %d3
+	jlt .L89
+.L23:
+	asr.l #8,%d3
+	muls.l %d0,%d3
+	add.l %d3,%d1
+	add.l %d7,%d1
+.L17:
+	move.l 36(%a0),%d0
+	sub.l %d0,%d1
+	move.l 60(%sp),%d3
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d3,%d1,%acc0
+	movclr.l %acc0,%d1
+| 0 "" 2
+#NO_APP
+	move.l #1664525,%d7
+	add.l %d1,%d0
+	muls.l %d7,%d4
+	moveq #24,%d3
+	move.l %d0,36(%a0)
+	add.l #1013904223,%d4
+	move.l %d4,%d1
+	asr.l %d3,%d1
+	move.l %d0,%d3
+	move.l %d4,12(%a0)
+	lsl.l #8,%d1
+	add.l %d1,%d3
+	tst.l %d1
+	jle .L24
+.L95:
+	cmp.l %d0,%d3
+	jlt .L90
+.L25:
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d5,%d2,%acc0
+	movclr.l %acc0,%d2
+| 0 "" 2
+#NO_APP
+	move.l %d5,%d0
+	add.l %d2,%d0
+	tst.l %d2
+	jle .L26
+.L96:
+	cmp.l %d5,%d0
+	jlt .L51
+.L28:
+	cmp.l #2093796556,%d0
+	jgt .L51
+.L27:
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d3,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l %a3,%d4
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d6,%d4,%acc0
+	movclr.l %acc0,%d6
+| 0 "" 2
+#NO_APP
+	move.l %d6,%d1
+	add.l %d0,%d1
+	tst.l %d0
+	jle .L30
+.L97:
+	cmp.l %d1,%d6
+	jgt .L91
+.L32:
+	move.l %d1,%d0
+	tst.l %d1
+	jlt .L92
+	cmp.l #536870911,%d0
+	jle .L33
+.L31:
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d1,%d1,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d1,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l #715827882,%d7
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d7,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l %d1,%d2
+	sub.l %d0,%d2
+	tst.l %d0
+	jlt .L93
+.L35:
+	tst.l %d0
+	jeq .L56
+	cmp.l %d1,%d2
+	jgt .L57
+.L56:
+	move.l %d2,%d1
+.L33:
+	move.l %d1,(%a4)
+	move.l %d1,4(%a4)
+	tst.l %a1
+	jeq .L36
+	cmp.l #2147483134,%a1
+	jle .L37
+	move.l %d3,(%a2)
+	move.l %d3,4(%a2)
+.L36:
+	addq.l #8,%a2
+	cmp.l 84(%sp),%a2
+	jeq .L42
+.L100:
+	addq.l #8,%a4
+	addq.l #1,%a6
+	move.l 16(%a0),%a1
+	move.l 20(%a0),%d5
+	move.l 24(%a0),%a3
+	move.l 40(%a0),%d2
+	move.l 32(%a0),%d0
+	add.l 80(%sp),%a1
+	add.l 76(%sp),%d5
+	add.l 72(%sp),%a3
+	add.l 68(%sp),%d2
+	add.l 52(%sp),%d0
+	move.l %a1,16(%a0)
+	move.l %d5,20(%a0)
+	move.l %a3,24(%a0)
+	move.l %d2,40(%a0)
+	move.l %d0,32(%a0)
+	move.l 4(%a2),%d1
+	move.l (%a2),44(%sp)
+	move.l 44(%sp),%d6
+	asr.l #1,%d6
+	move.l %d1,48(%sp)
+	asr.l #1,%d1
+	move.l 12(%a0),%d4
+	add.l %d1,%d6
+	move.l 56(%sp),%d7
+	move.l 64(%sp),%d1
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d7,%d1,%acc0
+	movclr.l %acc0,%d3
+| 0 "" 2
+#NO_APP
+	move.l 4(%a0),%d1
+	moveq #1,%d7
+	cmp.l %d1,%d7
+	jcs .L94
+.L47:
+	clr.l %d1
+	move.l 36(%a0),%d0
+	sub.l %d0,%d1
+	move.l 60(%sp),%d3
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d3,%d1,%acc0
+	movclr.l %acc0,%d1
+| 0 "" 2
+#NO_APP
+	move.l #1664525,%d7
+	add.l %d1,%d0
+	muls.l %d7,%d4
+	moveq #24,%d3
+	move.l %d0,36(%a0)
+	add.l #1013904223,%d4
+	move.l %d4,%d1
+	asr.l %d3,%d1
+	move.l %d0,%d3
+	move.l %d4,12(%a0)
+	lsl.l #8,%d1
+	add.l %d1,%d3
+	tst.l %d1
+	jgt .L95
+.L24:
+	tst.l %d1
+	jeq .L25
+	cmp.l %d0,%d3
+	jle .L25
+	move.l #-2147483648,%d3
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d5,%d2,%acc0
+	movclr.l %acc0,%d2
+| 0 "" 2
+#NO_APP
+	move.l %d5,%d0
+	add.l %d2,%d0
+	tst.l %d2
+	jgt .L96
+.L26:
+	tst.l %d2
+	jeq .L28
+	cmp.l %d5,%d0
+	jle .L28
+	move.l #-2147483648,%d0
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d3,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l %a3,%d4
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d6,%d4,%acc0
+	movclr.l %acc0,%d6
+| 0 "" 2
+#NO_APP
+	move.l %d6,%d1
+	add.l %d0,%d1
+	tst.l %d0
+	jgt .L97
+.L30:
+	tst.l %d0
+	jeq .L32
+	cmp.l %d1,%d6
+	jge .L32
+.L57:
+	move.l #-2147483648,%d1
+	jra .L33
+.L51:
+	move.l #2093796556,%d0
+	jra .L27
+.L92:
+	neg.l %d0
+	cmp.l #536870911,%d0
+	jgt .L31
+	jra .L33
+.L89:
+	asr.l #8,%d3
+	neg.l %d7
+	muls.l %d0,%d3
+	add.l %d3,%d1
+	add.l %d7,%d1
+	jra .L17
+.L88:
+	neg.l %d7
+	mvz.b %d7,%d7
+	mulu.w %d0,%d7
+	lsr.l #8,%d7
+	tst.l %d3
+	jge .L23
+	jra .L89
+.L90:
+	move.l #2147483647,%d3
+	jra .L25
+.L91:
+	move.l #2147483647,%d1
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d1,%d1,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d1,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l #715827882,%d7
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d7,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l %d1,%d2
+	sub.l %d0,%d2
+	tst.l %d0
+	jge .L35
+.L93:
+	cmp.l %d1,%d2
+	jge .L56
+	move.l #2147483647,%d1
+	jra .L33
+.L48:
+	lsl.l #3,%d1
+	move.l #1411192,%d3
+	move.l (%a5,%d3.l),%d3
+	move.l (%a5,%d1.l),%d1
+	sub.l %d1,%d3
+	move.l %d3,%d7
+	tst.l %d3
+	jge .L22
+	jra .L88
+.L37:
+	move.l #2147483647,%d2
+	sub.l %a1,%d2
+	move.l %a1,%d0
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d3,%d0,%acc0
 	movclr.l %acc0,%d1
 | 0 "" 2
 #NO_APP
 	move.l 44(%sp),%d4
-	move.l #1664525,%d7
-	add.l %d1,%d3
-	move.l %d3,36(%a0)
-	muls.l %d7,%d4
-	moveq #24,%d7
-	add.l #1013904223,%d4
-	move.l %d4,%d1
-	asr.l %d7,%d1
-	move.l %d4,12(%a0)
-	move.l %d3,%d4
-	lsl.l #8,%d1
+#APP
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d4,%d2,%acc0
+	movclr.l %acc0,%d0
+| 0 "" 2
+#NO_APP
+	move.l %d0,%d4
 	add.l %d1,%d4
 	tst.l %d1
-	jle .L27
-	cmp.l %d3,%d4
-	jlt .L105
-.L28:
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d5,%d2,%acc0
-	movclr.l %acc0,%d2
-| 0 "" 2
-#NO_APP
-	move.l %d5,%d1
-	add.l %d2,%d1
-	tst.l %d2
-	jle .L29
-.L112:
-	cmp.l %d5,%d1
-	jlt .L66
-.L31:
-	cmp.l #2093796556,%d1
-	jgt .L66
-.L30:
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d1,%d4,%acc0
-	movclr.l %acc0,%d1
-| 0 "" 2
-#NO_APP
-	move.l %d0,%d2
-	asr.l #8,%d2
-	tst.l %d0
-	jlt .L33
-.L111:
-	mvz.b %d0,%d0
-	muls.l %d6,%d2
-	muls.l %d6,%d0
-	asr.l #8,%d0
-	add.l %d2,%d0
-	move.l %d0,%d2
-	tst.l %d0
-	jlt .L106
-.L36:
-	cmp.l #536870911,%d2
-	jle .L35
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d0,%d0,%acc0
-	movclr.l %acc0,%d2
-| 0 "" 2
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d2,%d0,%acc0
-	movclr.l %acc0,%d2
-| 0 "" 2
-#NO_APP
-	moveq #3,%d6
-	moveq #-2,%d7
-	move.l %d2,%d3
-	move.l %d0,%a1
-	divs.l %d6,%d3
-	sub.l %d3,%a1
-	cmp.l %d2,%d7
-	jgt .L107
-	moveq #2,%d3
-	cmp.l %d2,%d3
-	jge .L39
-	cmp.l %d0,%a1
-	jgt .L108
+	jle .L38
+	cmp.l %d4,%d0
+	jgt .L98
 .L39:
-	move.l %a1,%d0
-.L35:
-	move.l %d1,%d2
-	add.l %d0,%d2
-	tst.l %d1
-	jle .L43
-	cmp.l %d2,%d0
-	jgt .L42
-.L41:
-	move.l %d2,%d0
-	tst.l %d2
-	jlt .L109
-.L47:
-	cmp.l #536870911,%d0
-	jle .L68
-.L45:
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d2,%d2,%acc0
-	movclr.l %acc0,%d0
-| 0 "" 2
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d0,%d2,%acc0
-	movclr.l %acc0,%d0
-| 0 "" 2
-#NO_APP
-	moveq #3,%d5
-	moveq #-2,%d6
-	move.l %d0,%d3
-	divs.l %d5,%d3
-	move.l %d2,%d1
-	sub.l %d3,%d1
-	cmp.l %d0,%d6
-	jgt .L110
-.L48:
-	moveq #2,%d7
-	cmp.l %d0,%d7
-	jge .L46
-	cmp.l %d2,%d1
-	jgt .L70
-.L46:
-	move.l %d1,(%a3)
-	move.l %d1,4(%a3)
-	move.l 16(%a0),%d0
-	tst.l %d0
-	jeq .L49
-	cmp.l #2147483134,%d0
-	jle .L50
 	move.l %d4,(%a2)
-	move.l %d4,4(%a2)
-.L49:
-	addq.l #8,%a2
-	cmp.l 88(%sp),%a2
-	jeq .L55
-.L116:
-	addq.l #8,%a3
-	addq.l #1,%a6
-	move.l 12(%a0),%d7
-	move.l 16(%a0),%d0
-	move.l 20(%a0),%d5
-	move.l 24(%a0),%d6
-	move.l 40(%a0),%d2
-	move.l 32(%a0),%d1
-	move.l 28(%a0),%d3
-	move.l %d7,44(%sp)
-	jra .L56
-.L8:
-	move.l %a0,%d1
-	move.l %a0,%a4
-	add.l #44,%d1
-.L16:
-	clr.l (%a4)+
-	cmp.l %d1,%a4
-	jne .L16
-	move.l 96(%sp),%d5
-	move.l #1831565813,%d6
-	moveq #1,%d1
-	sub.l %a6,%a6
-	move.l %d6,60(%sp)
-	move.l %d5,28(%a0)
-	move.l %d6,12(%a0)
-	move.l %d1,(%a0)
-	move.l %d5,56(%sp)
-	clr.l 84(%sp)
-	clr.l 80(%sp)
-	clr.l 76(%sp)
-	clr.l 64(%sp)
-.L19:
-	move.l %a5,%d1
-	move.l %a3,%d2
-	move.l %a1,%d6
-	move.l %a2,%d5
-.L113:
-	move.l #603979776,%d3
-	muls.l %d7,%d3
-	move.l 8(%a0),%a1
-	add.l #1440000,%a1
-	move.l %a1,%d4
 	move.l %a1,%d7
-	add.l %d4,%d4
-	subx.l %d4,%d4
-	lsr.l #1,%d7
-	move.l %a1,8(%a0)
-	move.l %d7,%a4
-	move.l %d4,%a3
-	moveq #127,%d4
-	divu.l %d4,%d3
-	move.l #751619276,%d4
-	move.l %a4,%d7
-	move.l %d3,%a2
-	move.l %a3,%d3
-	eor.l %d3,%d7
-	sub.l %a2,%d4
-	move.l %d4,68(%sp)
-	tst.l %d7
-	jge .L20
-	jra .L104
-.L66:
-	move.l #2093796556,%d1
 #APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d1,%d4,%acc0
-	movclr.l %acc0,%d1
-| 0 "" 2
-#NO_APP
-	move.l %d0,%d2
-	asr.l #8,%d2
-	tst.l %d0
-	jge .L111
-.L33:
-	neg.l %d0
-	mvz.b %d0,%d0
-	muls.l %d6,%d2
-	neg.l %d0
-	muls.l %d6,%d0
-	asr.l #8,%d0
-	add.l %d2,%d0
-	move.l %d0,%d2
-	tst.l %d0
-	jge .L36
-.L106:
-	neg.l %d2
-	jra .L36
-.L109:
-	neg.l %d0
-	cmp.l #536870911,%d0
-	jgt .L45
-.L68:
-	move.l %d2,%d1
-	jra .L46
-.L105:
-	move.l #2147483647,%d4
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d5,%d2,%acc0
-	movclr.l %acc0,%d2
-| 0 "" 2
-#NO_APP
-	move.l %d5,%d1
-	add.l %d2,%d1
-	tst.l %d2
-	jgt .L112
-.L29:
-	tst.l %d2
-	jeq .L31
-	cmp.l %d5,%d1
-	jle .L31
-	move.l #-2147483648,%d1
-	jra .L30
-.L42:
-	move.l #2147483647,%d2
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d2,%d2,%acc0
-	movclr.l %acc0,%d0
-| 0 "" 2
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d0,%d2,%acc0
-	movclr.l %acc0,%d0
-| 0 "" 2
-#NO_APP
-	moveq #3,%d5
-	moveq #-2,%d6
-	move.l %d0,%d3
-	divs.l %d5,%d3
-	move.l %d2,%d1
-	sub.l %d3,%d1
-	cmp.l %d0,%d6
-	jle .L48
-.L110:
-	cmp.l %d2,%d1
-	jge .L46
-	move.l #2147483647,%d1
-	jra .L46
-.L104:
-	neg.l %d7
-	add.l %d7,%d7
-	move.l #2147483647,%a1
-	sub.l %d7,%a1
-	move.l #1779033704,%d7
-	move.l %a1,%d3
-#APP
-| 22 "modules/megabyte/cpu.c" 1
+| 17 "modules/megabyte/cpu.c" 1
 	mac.l %d3,%d7,%acc0
 	movclr.l %acc0,%d3
 | 0 "" 2
 #NO_APP
-	move.l 124(%sp),%a2
-	move.l %a6,92(%sp)
-	move.l #176400,%a6
-	move.l 120(%sp),%a4
-	add.l %a4,%a6
-	move.l %d3,72(%sp)
-	lea (128,%a2),%a1
-	move.l %a1,88(%sp)
-	move.l 128(%sp),%a3
-	move.l 56(%sp),%d3
-	move.l 116(%sp),%a4
-	move.l 60(%sp),44(%sp)
-	jra .L56
-.L102:
-	add.l #63,%d3
-	jra .L13
-.L101:
-	add.l #511,%d3
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,76(%sp)
-	move.l %a4,%d3
-	tst.l %a4
-	jge .L13
-	jra .L102
-.L100:
-	add.l #511,%d3
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,80(%sp)
-	move.l %a3,%d3
-	sub.l %d2,%d3
-	jpl .L12
-	jra .L101
-.L99:
-	add.l #511,%d3
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,84(%sp)
-	move.l %a1,%d3
-	sub.l %d6,%d3
-	jpl .L11
-	jra .L100
-.L98:
-	add.l #511,%d3
-	moveq #9,%d4
-	asr.l %d4,%d3
-	move.l %d3,%a6
-	move.l %a2,%d3
-	sub.l %d5,%d3
-	jpl .L10
-	jra .L99
-.L60:
-	move.l 64(%sp),%d4
-	move.l %d2,%a3
-	move.l %d1,%a5
-	move.l %d6,%a1
-	move.l %d5,%a2
-	cmp.l #-512,%d4
-	jge .L19
-	move.l #-512,%d5
-	move.l %d5,64(%sp)
-	move.l %a5,%d1
-	move.l %a3,%d2
-	move.l %a1,%d6
-	move.l %a2,%d5
-	jra .L113
-.L27:
-	tst.l %d1
-	jeq .L28
-	cmp.l %d3,%d4
-	jle .L28
-	move.l #-2147483648,%d4
-	jra .L28
-.L43:
-	tst.l %d1
-	jeq .L41
-	cmp.l %d2,%d0
-	jge .L41
-.L70:
-	move.l #-2147483648,%d1
-	jra .L46
-.L25:
-	move.l %a1,%d3
-	sub.l %d7,%d3
-	mvz.b %d3,%d3
-	muls.w %d1,%d3
-	move.l %a1,%d1
-	add.l %a5,%d1
-	neg.l %d3
-	asr.l #8,%d3
-	add.l %d3,%d1
-	jra .L22
-.L107:
-	cmp.l %d0,%a1
-	jge .L39
-	tst.l %d1
-	jgt .L42
-	move.l %d1,%d2
-	add.l #2147483647,%d2
-	move.l %d2,%d0
-	tst.l %d2
-	jge .L47
-	jra .L109
-.L63:
-	clr.l %d1
-	jra .L22
-.L50:
-	move.l #2147483647,%d3
-	sub.l %d0,%d3
+	move.l 48(%sp),%d0
 #APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d4,%d0,%acc0
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d2,%acc0
 	movclr.l %acc0,%d2
 | 0 "" 2
 #NO_APP
-	move.l 56(%sp),%d5
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d5,%d3,%acc0
-	movclr.l %acc0,%d1
-| 0 "" 2
-#NO_APP
-	move.l %d1,%a1
-	add.l %d2,%a1
-	tst.l %d2
-	jle .L51
-	cmp.l %a1,%d1
-	jgt .L114
-.L52:
-	move.l %a1,(%a2)
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d4,%d0,%acc0
-	movclr.l %acc0,%d0
-| 0 "" 2
-#NO_APP
-	move.l 52(%sp),%d6
-#APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d6,%d3,%acc0
-	movclr.l %acc0,%d7
-| 0 "" 2
-#NO_APP
-	move.l %d7,%d1
-	add.l %d0,%d1
-	tst.l %d0
-	jle .L53
-.L118:
-	cmp.l %d1,%d7
-	jgt .L115
-.L54:
+	move.l %d2,%d1
+	add.l %d3,%d1
+	tst.l %d3
+	jle .L40
+.L103:
+	cmp.l %d1,%d2
+	jgt .L99
+.L41:
 	move.l %d1,4(%a2)
-.L117:
+.L102:
 	addq.l #8,%a2
-	cmp.l 88(%sp),%a2
-	jne .L116
-.L55:
-	tst.l 100(%sp)
-	jne .L57
-	move.w #511,%a1
-	cmp.l 16(%a0),%a1
-	jlt .L57
-	clr.l 16(%a0)
-.L57:
-	moveq #16,%d0
-	add.l %d0,4(%a0)
+	cmp.l 84(%sp),%a2
+	jne .L100
+.L42:
+	tst.l 92(%sp)
+	jne .L44
+	move.l #511,%d1
+	cmp.l 16(%a0),%d1
+	jge .L101
+.L44:
+	moveq #16,%d2
+	add.l %d2,4(%a0)
 	move.l 4(%a0),%d0
-	move.l 96(%sp),28(%a0)
+	move.l 88(%sp),28(%a0)
 	cmp.l #176399,%d0
-	jls .L58
+	jls .L45
 	move.l #176399,%d0
-.L58:
-	move.l %d0,4(%a0)
+.L45:
 	movem.l (%sp),#31996
-	lea (104,%sp),%sp
+	move.l %d0,4(%a0)
+	lea (96,%sp),%sp
 	rts
-.L115:
+.L99:
 	move.l #2147483647,%d1
 	move.l %d1,4(%a2)
-	jra .L117
-.L114:
-	move.l #2147483647,%a1
-	move.l %a1,(%a2)
+	jra .L102
+.L98:
+	move.l #2147483647,%d4
+	move.l %d4,(%a2)
+	move.l %a1,%d7
 #APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d4,%d0,%acc0
-	movclr.l %acc0,%d0
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d3,%d7,%acc0
+	movclr.l %acc0,%d3
 | 0 "" 2
 #NO_APP
-	move.l 52(%sp),%d6
+	move.l 48(%sp),%d0
 #APP
-| 22 "modules/megabyte/cpu.c" 1
-	mac.l %d6,%d3,%acc0
-	movclr.l %acc0,%d7
+| 17 "modules/megabyte/cpu.c" 1
+	mac.l %d0,%d2,%acc0
+	movclr.l %acc0,%d2
 | 0 "" 2
 #NO_APP
-	move.l %d7,%d1
-	add.l %d0,%d1
-	tst.l %d0
-	jgt .L118
-.L53:
-	tst.l %d0
-	jeq .L54
-	cmp.l %d1,%d7
-	jge .L54
+	move.l %d2,%d1
+	add.l %d3,%d1
+	tst.l %d3
+	jgt .L103
+.L40:
+	tst.l %d3
+	jeq .L41
+	cmp.l %d1,%d2
+	jge .L41
 	move.l #-2147483648,%d1
 	move.l %d1,4(%a2)
-	jra .L117
-.L51:
-	tst.l %d2
-	jeq .L52
-	cmp.l %a1,%d1
-	jge .L52
-	move.l #-2147483648,%a1
-	jra .L52
-.L108:
+	jra .L102
+.L38:
 	tst.l %d1
-	jle .L70
-	move.l %d1,%d2
-	add.l #-2147483648,%d2
-	move.l %d2,%d0
-	tst.l %d2
-	jge .L47
-	jra .L109
-.L103:
-	cmp.l %a5,%d1
-	jeq .L60
-	jge .L61
-	move.l 8(%a0),%a1
-	add.l #1440000,%a1
-	move.l %a1,%d4
+	jeq .L39
+	cmp.l %d4,%d0
+	jge .L39
+	move.l #-2147483648,%d4
+	jra .L39
+.L8:
+	move.l 108(%sp),%a5
+	move.l %a0,%d0
+	move.l %a0,%a1
+	add.l #44,%d0
+.L11:
+	clr.l (%a1)+
+	cmp.l %d0,%a1
+	jne .L11
+	move.l %d7,%d5
+	move.l %d3,%a3
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
+	move.l %d7,%d3
+	move.l #5760228,%d4
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	move.l 88(%sp),%d0
+	move.l #1831565813,%d2
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	moveq #1,%d4
+	move.l %d0,28(%a0)
+	move.l %d0,56(%sp)
+	move.l %d1,%d0
+	move.l %d7,%d1
+	lsr.l #1,%d1
+	move.l #751619276,%d7
+	move.l %d2,44(%sp)
+	move.l %d2,12(%a0)
+	eor.l %d3,%d1
+	sub.l %d6,%d7
+	move.l %a5,108(%sp)
+	move.l %a2,%d2
+	move.l 92(%sp),%a1
+	clr.l 68(%sp)
+	clr.l 72(%sp)
+	clr.l 76(%sp)
+	clr.l 80(%sp)
+	clr.l 52(%sp)
+	move.l %d4,(%a0)
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jge .L15
+.L87:
+	neg.l %d1
+	jra .L15
+.L86:
+	move.l #512,%d3
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
+	move.l %d3,52(%sp)
+	move.l #5760228,%d4
+	move.l %d7,%d3
+	move.l %d7,%d1
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	lsr.l #1,%d1
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	move.l #751619276,%d7
+	moveq #1,%d4
+	move.l %d4,(%a0)
+	sub.l %d6,%d7
+	eor.l %d3,%d1
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jge .L15
+	jra .L87
+.L85:
+	move.l #-512,%d7
+	move.l %d7,52(%sp)
+	move.l #5760228,%d4
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
+	move.l %d7,%d3
+	move.l %d7,%d1
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	lsr.l #1,%d1
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	move.l #751619276,%d7
+	moveq #1,%d4
+	move.l %d4,(%a0)
+	sub.l %d6,%d7
+	eor.l %d3,%d1
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jge .L15
+	jra .L87
+.L101:
+	clr.l 16(%a0)
+	jra .L44
+.L84:
+	cmp.l %d1,%d0
+	jeq .L12
+	jge .L46
 	moveq #1,%d3
-	add.l %d4,%d4
-	subx.l %d4,%d4
-	move.l %d3,64(%sp)
-	move.l #603979776,%d3
-	muls.l %d7,%d3
-	move.l %a1,%d7
-	lsr.l #1,%d7
-	move.l %a1,8(%a0)
-	move.l %d7,%a4
-	move.l %d4,%a3
-	moveq #127,%d4
-	divu.l %d4,%d3
-	move.l #751619276,%d4
-	move.l %a4,%d7
-	move.l %d3,%a2
-	move.l %a3,%d3
-	eor.l %d3,%d7
-	sub.l %a2,%d4
-	move.l %d4,68(%sp)
-	tst.l %d7
-	jge .L20
-	jra .L104
-.L61:
-	move.l 8(%a0),%a1
-	add.l #1440000,%a1
-	move.l %a1,%d4
-	moveq #-1,%d3
-	add.l %d4,%d4
-	subx.l %d4,%d4
-	move.l %d3,64(%sp)
-	move.l #603979776,%d3
-	muls.l %d7,%d3
-	move.l %a1,%d7
-	lsr.l #1,%d7
-	move.l %a1,8(%a0)
-	move.l %d7,%a4
-	move.l %d4,%a3
-	moveq #127,%d4
-	divu.l %d4,%d3
-	move.l #751619276,%d4
-	move.l %a4,%d7
-	move.l %d3,%a2
-	move.l %a3,%d3
-	eor.l %d3,%d7
-	sub.l %a2,%d4
-	move.l %d4,68(%sp)
-	tst.l %d7
-	jge .L20
-	jra .L104
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
+	move.l %d3,52(%sp)
+	move.l #5760228,%d4
+	move.l %d7,%d3
+	move.l %d7,%d1
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	lsr.l #1,%d1
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	move.l #751619276,%d7
+	moveq #1,%d4
+	move.l %d4,(%a0)
+	sub.l %d6,%d7
+	eor.l %d3,%d1
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jge .L15
+	jra .L87
+.L46:
+	move.l 8(%a0),%d7
+	add.l #1440000,%d7
+	move.l %d7,%d3
+	move.l %d7,%d1
+	add.l %d3,%d3
+	subx.l %d3,%d3
+	lsr.l #1,%d1
+	moveq #-1,%d4
+	move.l %d4,52(%sp)
+	move.l #5760228,%d4
+	muls.l %d4,%d6
+	move.l %d7,8(%a0)
+	move.l #751619276,%d7
+	moveq #1,%d4
+	move.l %d4,(%a0)
+	eor.l %d3,%d1
+	sub.l %d6,%d7
+	move.l %d7,60(%sp)
+	tst.l %d1
+	jge .L15
+	jra .L87
 	.size	mb_process, .-mb_process
 	.align	2
 	.globl	mb_cpu_frame
@@ -839,17 +771,17 @@ mb_cpu_frame:
 	move.l %d2,-(%sp)
 	move.l 112(%a1),%d0
 	cmp.l %d0,%d1
-	jcs .L124
+	jcs .L109
 	move.l 76(%a1),%a0
 	mvz.b 7(%a0),%d1
 	subq.l #8,%d1
 	tst.l %d1
-	jne .L126
+	jne .L111
 	move.l 108(%a1),%a0
 	mvz.b (%a0),%d1
 	subq.l #7,%d1
 	tst.l %d1
-	jeq .L126
+	jeq .L111
 	move.l 72(%a1),%a0
 	mvz.b (%a0),%d1
 	move.l %d1,-24(%fp)
@@ -874,23 +806,23 @@ mb_cpu_frame:
 	move.l %d2,-4(%fp)
 	move.l -36(%fp),%d2
 	cmp.l #1411079,%d2
-	jls .L125
-.L126:
+	jls .L110
+.L111:
 	moveq #44,%d1
 	muls.l %d1,%d0
 	lea mb_states,%a0
 	clr.l (%a0,%d0.l)
-.L124:
+.L109:
 	move.l -40(%fp),%d2
 	clr.l %d0
 	unlk %fp
 	rts
-.L125:
+.L110:
 	move.l 1073755686,%d2
 	move.l #-2147483416,%a0
 	eor.l %d2,(%a0)
 #APP
-| 220 "modules/megabyte/cpu.c" 1
+| 213 "modules/megabyte/cpu.c" 1
 	move.l #0,%acc0
 	move.l #0,%acc1
 	move.l #0,%acc2

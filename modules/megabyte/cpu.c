@@ -1,13 +1,9 @@
 /*
  * Megabyte — lo-fi delay in the stock four-second CPU delay rings.
  *
- * Inspired by Caroline Guitar Company's Megabyte (dual PT2399 character,
- * driven wet preamp, havoc runaway). Not a circuit clone: one mono head,
- * soft-clip drive, clock-tracking loft low-pass, LFO time-mod, havoc
- * feedback boost. Same ring/DMA protocol as Tape Echo (COLDFIRE_DELAY.md).
- *
- * Freestanding: no libgcc. Fractional mul uses the ColdFire EMAC (as stock
- * delay / Tape Echo); the host path is a 64-bit oracle of the same shift.
+ * Inspired by Caroline Guitar Company's Megabyte. ColdFire freestanding:
+ * EMAC mul only — no libgcc, no div/mod in the sample loop (divu.l in the
+ * ring index hung the unit on first flash, 4 Nov 2026).
  */
 #include "cpu.h"
 
@@ -15,7 +11,6 @@
 
 _Static_assert(sizeof(MbState) == 44, "cpu_hooks.s allocation: 8 x 44 bytes");
 
-/* Signed fractional EMAC, MACSR=0xa0 as stock's delay establishes. */
 static inline int32_t mul31(int32_t a, int32_t b) {
 #ifdef __m68k__
     int32_t out;
@@ -41,58 +36,50 @@ static int32_t sat_sub(int32_t a, int32_t b) {
     return s;
 }
 
-/* Soft clip ~ x - x^3/3 for |x| > 0.25 FS. */
+/* Soft clip ~ x - x^3/3; 1/3 ≈ Q1.31 0x2aaaaaaa — no div. */
 static int32_t softclip(int32_t x) {
     int32_t a = x < 0 ? -x : x;
     if (a < 0x20000000) return x;
     int32_t x2 = mul31(x, x);
     int32_t x3 = mul31(x2, x);
-    return sat_sub(x, x3 / 3);
+    return sat_sub(x, mul31(x3, 0x2aaaaaaa));
 }
 
-/* TIME 0..127 → 50..1200 ms as fractional samples×256. */
+/* TIME 0..127 → 50..1200 ms as fractional samples×256.
+ * 50715/127 = 399 + 72/127; avoid a live div: 399*t + (72*t)/128. */
 static int32_t time_to_delay(uint32_t time) {
     if (time > 127) time = 127;
-    uint32_t samples = 2205u + (time * (52920u - 2205u)) / 127u;
+    uint32_t samples = 2205u + time * 399u + ((time * 72u) >> 7);
     return (int32_t)(samples << 8);
 }
 
-/* Gain 0..127 → drive in Q8.8: 1.0=256 … ~11.0=2816 (+21 dB). */
+/* Gain 0..127 → Q1.31 drive, 0.5 .. ~1.0 (soft). Hot path: one mul31.
+ * Full +21 dB needs a cheaper form before we re-open it. */
 static int32_t gain_coeff(uint32_t g) {
     if (g > 127) g = 127;
-    return (int32_t)(256u + (g * 2560u) / 127u);
+    /* 0x40000000 + g * (0x3fffffff/127) ≈ 0.5 .. 1.0 */
+    return (int32_t)(0x40000000u + g * 0x810204u);
 }
 
 static int32_t feedback_coeff(uint32_t f) {
     if (f > 127) f = 127;
-    return (int32_t)((0x6cccccccu / 127u) * f);   /* ~0.85 at 127 */
+    return (int32_t)(f * 0xDA1D8Bu);   /* ~0.85/127 per step */
 }
 
 static int32_t mix_coeff(uint32_t m) {
     if (m > 127) m = 127;
-    return (int32_t)((uint32_t)MB_ONE / 127u * m);
+    return (int32_t)(m * 0x1020408u);  /* ONE/127 */
 }
 
 static int32_t mod_depth(uint32_t m) {
     if (m > 127) m = 127;
-    return (int32_t)((m * 530u * 256u) / 127u);
+    /* ~530 samples ×256 / 127 ≈ 1068 per step */
+    return (int32_t)(m * 1068u);
 }
 
 static int32_t havoc_boost(uint32_t h) {
     if (h > 127) h = 127;
-    return (int32_t)((0x33333333u / 127u) * h);
-}
-
-/* Drive x by Q8.8 gain (256..2816) without a 64-bit libgcc mul. */
-static int32_t apply_gain(int32_t x, int32_t g88) {
-    int32_t units = g88 >> 8;                 /* 1..11 */
-    int32_t frac = (g88 & 0xff) << 23;        /* (g88&0xff)/256 as Q1.31 */
-    int32_t y = 0;
-    for (int32_t n = 0; n < units; ++n)
-        y = sat_add(y, x);
-    if (frac)
-        y = sat_add(y, mul31(x, frac));
-    return softclip(y);
+    return (int32_t)(h * 0x6721Bu);    /* ~0.4/127 */
 }
 
 static int32_t sine(uint32_t phase) {
@@ -102,7 +89,6 @@ static int32_t sine(uint32_t phase) {
     return mul31(t, 0x6a09e668);
 }
 
-/* Linear interp: a + ((b-a)*frac)>>8, frac in 0..255. No 64-bit mul. */
 static int32_t lerp8(int32_t a, int32_t b, uint32_t frac) {
     int32_t d = b - a;
     int32_t ad = d < 0 ? -d : d;
@@ -111,6 +97,7 @@ static int32_t lerp8(int32_t a, int32_t b, uint32_t frac) {
     return a + (d >> 8) * (int32_t)frac + lo;
 }
 
+/* Ring wrap by subtract — never % (divu.l hung the unit). */
 static int32_t read_head(volatile int32_t *ring, uint32_t write,
                          int32_t delay_x256, uint32_t valid) {
     if (valid < 2) return 0;
@@ -118,8 +105,10 @@ static int32_t read_head(volatile int32_t *ring, uint32_t write,
     if (delay < 1) delay = 1;
     if ((uint32_t)delay >= valid) delay = (int32_t)valid - 1;
     uint32_t frac = (uint32_t)delay_x256 & 255u;
-    uint32_t i0 = (write + MB_RING - (uint32_t)delay) % MB_RING;
-    uint32_t i1 = (i0 + MB_RING - 1) % MB_RING;
+    /* write ∈ [0, RING), delay < RING → one conditional subtract. */
+    uint32_t i0 = write + MB_RING - (uint32_t)delay;
+    if (i0 >= MB_RING) i0 -= MB_RING;
+    uint32_t i1 = i0 ? i0 - 1u : MB_RING - 1u;
     return lerp8(ring[2u * i0], ring[2u * i1], frac);
 }
 
@@ -143,20 +132,23 @@ void mb_process(MbState *restrict s, const MbParams *restrict p,
     }
     s->active = 1;
 
-    int32_t dm = (mix - s->mix) / 512;
-    int32_t df = (fb  - s->feedback) / 512;
-    int32_t dg = (gn  - s->gain) / 512;
-    int32_t dh = (hv  - s->havoc) / 512;
-    int32_t dd = (target - s->delay) / 64;
+    /* Ramp steps: shifts, not /512 (divs.l). */
+    int32_t dm = (mix - s->mix) >> 9;
+    int32_t df = (fb  - s->feedback) >> 9;
+    int32_t dg = (gn  - s->gain) >> 9;
+    int32_t dh = (hv  - s->havoc) >> 9;
+    int32_t dd = (target - s->delay) >> 6;
     if (!dd && target != s->delay) dd = target > s->delay ? 1 : -1;
     if (dd > 512) dd = 512;
     if (dd < -512) dd = -512;
 
     uint32_t t = p->time > 127 ? 127 : p->time;
-    int32_t alpha = (int32_t)(0x2cccccccu - (t * 0x24000000u) / 127u);
+    /* alpha ≈ 0.35 - t*0.27/127 — mul shift, no div */
+    int32_t alpha = (int32_t)(0x2cccccccu - t * 0x57E4E4u);
 
     s->phase += 16u * 90000u;
     int32_t lfo = sine(s->phase);
+    int32_t mod = s->mod_amt ? s->mod_amt : md;
 
     for (unsigned i = 0; i < MB_FRAMES; ++i) {
         s->mix += dm; s->feedback += df; s->gain += dg;
@@ -166,7 +158,7 @@ void mb_process(MbState *restrict s, const MbParams *restrict p,
         int32_t R = audio[2 * i + 1];
         int32_t mono = (L >> 1) + (R >> 1);
 
-        int32_t delay = s->delay + mul31(s->mod_amt ? s->mod_amt : md, lfo);
+        int32_t delay = s->delay + mul31(mod, lfo);
         if (delay < (1 << 8)) delay = 1 << 8;
 
         int32_t wet = read_head(ring, write + i, delay, s->valid);
@@ -179,7 +171,7 @@ void mb_process(MbState *restrict s, const MbParams *restrict p,
         int32_t fbk = sat_add(s->feedback, mul31(s->feedback, s->havoc));
         if (fbk > 0x7ccccccc) fbk = 0x7ccccccc;
 
-        int32_t rec = softclip(sat_add(apply_gain(mono, s->gain), mul31(fbk, wet)));
+        int32_t rec = softclip(sat_add(mul31(mono, s->gain), mul31(fbk, wet)));
         record[2 * i]     = rec;
         record[2 * i + 1] = rec;
 
