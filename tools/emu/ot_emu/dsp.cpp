@@ -531,7 +531,7 @@ namespace ot
 			c.px->getEsaiClock().setCyclesPerSample(c.esaiCyclesPerSlot);
 
 			// The inter-core mailbox (see dsp.h), on the Y-side peripherals.
-			c.py->setIoExtension(
+			c.py->setUnmappedHooks(
 				[this, i](dsp56k::TWord _a, dsp56k::TWord& _v)
 				{
 					// O17: `full` is the flag of a one-word SPSC channel between the
