@@ -13,12 +13,15 @@ Code: `poly.s` (`sy_epmix`, `sy_dpw`, `sy_loop`), `machine.s` (`fm_e6_morph`),
 
 LFO SETUP PMTR **30 = CMOR**, **31 = MMOR**.
 
-**As of CX 15:**
+**As of CX 15 (MMOR) / CX 29 (CMOR):**
 
-- **CMOR** — linear mix of table sine ↔ **phase-aligned naive saw** (hard ramp).
+- **CMOR** — linear mix of table sine ↔ **DPW bandlimited saw** (continuous).
+  Naive carrier saw leaked a hard edge through any mix amount — even **0→1**
+  jumped (Ilia, 7 Nov 2026). `S_DPWC` was reserved; wired in CX 29.
 - **MMOR** — linear mix of table sine ↔ **DPW bandlimited saw** (continuous).
 - Feedback (`S_LASTM` / `m_prev`) is always the **unmorphed modulator sine** so a saw edge never re-enters the fb loop.
 - Mix is exact `/127` with a hard replace at amount **127** (no `/128` residual).
+- Trade-off: 127 is a bright bandlimited saw (fund-heavy), not a hard digital ramp.
 
 ## Control path (solved earlier in the same pass)
 
@@ -55,6 +58,8 @@ Same linear mix on paper is **not** the same in the instrument:
 **CX 14 bug (extra):** MMOR mixed sine(`φm+fb`) against saw from **raw `φm`** (and threw away the matching naive saw already in `a4`). CMOR used one phase for both.
 
 **CX 15:** MMOR → DPW from **`φm_eff`**, fb = sine only; CMOR → aligned naive.
+**CX 29:** CMOR → DPW from **`φc`** + `S_INC` via **`S_DPWC`** (same discontinuity
+leak as early naive mixes; 0→1 no longer jumps).
 
 ## Perception traps (still true on a correct 127)
 
@@ -67,17 +72,18 @@ Same linear mix on paper is **not** the same in the instrument:
 | Symbol | Role |
 |--------|------|
 | `sy_epmix` | `d4=sine, d1=saw, d2=amt` → linear `/127`; 0 keeps sine; 127 = saw |
-| `sy_dpw` | Välimäki DPW, 2× scale + invert; `d6=φ, d1=Δφ, a4=&z1` → `d2` Q14 (**MMOR only**) |
+| `sy_dpw` | Välimäki DPW, 2× scale + invert; `d6=φ, d1=Δφ, a4=&z1` → `d2` Q14 (**CMOR + MMOR**) |
 | `S_DPWM` (+44) | DPW `z1` for modulator |
+| `S_DPWC` (+48) | DPW `z1` for carrier |
 | `S_LASTM` | Feedback sample = unmorphed mod sine |
-| Carrier morph | Inline `16384 − (φc>>17)` then `sy_epmix` |
+| Carrier morph | `sy_dpw` on `φc` / `S_INC` → `sy_epmix` |
 
 ColdFire gas notes burned here: `lsr.l #imm` only 1..8; `divs.l #imm` rejected — use a register.
 
 ## On-unit check
 
 1. BRAIN → current CX tip. CX OSC track. **FOLD/RATE = 1**, **SYMM = 64**, **DEC = 127**.
-2. **CMOR** 0→127, INDX 0: smooth brightening to a hard saw at 127; no hollow spot mid-high.
+2. **CMOR** 0→127, INDX 0: smooth brightening; **0→1 must not jump**; 127 = bright DPW saw (not a hard digital edge).
 3. **MMOR** 0→127, INDX ~40, CMOR 0: smooth FM-colour change; **no jump at 46–48**.
 4. One morph at a time when comparing.
 
