@@ -39,7 +39,7 @@ Signal path: **mod FM → carrier → MIX → FOLD → out**.
 | B | MMOR | Modulator morph 0..127 (sine → saw) |
 | C | DEC | Index envelope; **127 = HOLD** |
 | D | SYMM | Fold half-wave skew (**64** = even) |
-| E | FDBK | Modulator feedback (default mid ~40) |
+| E | FDBK | Modulator feedback (default **0** = off) |
 
 LFO PMTR **30 = CMOR**, **31 = MMOR**, **32 = SYMM**, **33 = FDBK**.
 DEC is not an LFO destination. Mono only.
