@@ -31,10 +31,18 @@ jobs:
           python-version: '3.12'
       - run: pip install -r docs/site/requirements.txt
       # Tim v2.22+ manifests call stock_guard() at import (needs MAIN OS).
-      # Pages used to load the registry with no firmware; that broke on the
-      # v2.22 pin (direct-jump / synth / quantizer / tuner).
+      # make recon alone is not enough on a bare runner: analyze.sh skips
+      # extraction when elektron-firmware-tool is missing and still exits 0.
       - name: Fetch and extract stock MAIN OS
-        run: make os && make recon
+        run: |
+          set -euo pipefail
+          make os
+          scripts/vendor.sh eft
+          make -C vendor/elektron-firmware-tool
+          mkdir -p out/raw
+          vendor/elektron-firmware-tool/elektron-firmware-tool \
+            -i downloads/extracted/OCTATRACK_OS1.40C.syx -d 3 -o out/raw
+          test -f out/raw/section_3_MAIN_OS.bin
       - run: python3 tools/site/gen_pages.py
       - run: mkdocs build --strict --config-file docs/site/mkdocs.yml
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
