@@ -43,8 +43,8 @@ DSP-record snapshot (not the live lane alone).
 
 | Slot | Name | Role |
 |------|------|------|
-| A | CMOR | Carrier morph 0..127: sine → saw |
-| B | MMOR | Modulator morph 0..127: sine → saw |
+| A | CMOR | Carrier morph knob 0..127 (sine → saw). Plain dial; SETUP edit stores full range (stock LOOP path only wrote 0/1). |
+| B | MMOR | Modulator morph knob 0..127 (sine → saw). Same. |
 | C–F | — | Blank (no leftover FLEX boxes) |
 
 LFO SETUP PMTR **30 = CMOR**, **31 = MMOR** (private depth words). Mono only.

@@ -94,8 +94,10 @@
         .set    CHOOSER_MISS, 0x400786fc | ... and its other one
         .set    SETUP_OPEN_RET, 0x400585e6
         .set    CHOOSER_OPEN_RET, 0x40078890
-        .set    EDIT6_RET, 0x4003a536
-        .set    DRAW6_RET, 0x4003cda0
+        .set    EDIT6_RET, 0x4003a536    | after row*6: lea a3@(d0),a4 (Part SETUP store)
+        .set    DRAW6_RET, 0x4003cda0    | after row*6 in the SETUP drawer
+        .set    EDIT6_EXIT, 0x4003a624   | that editor's movem epilogue
+        .set    EDIT6_CLAMP, 0x4003a56c  | after SETUP_STEP (must keep its 8 B stack)
         .set    SRC_COMMIT_RET, 0x4005a61c
         .set    SRC_COMMIT2_RET, 0x4005a856
         .set    TICK_A, 0x4005213c       | the UI tick's two calls fm_tick replays (the first is PC-relative
@@ -1144,10 +1146,16 @@ fm_chooser_open:
         pea     (0x460e7386).l           | displaced
         jmp     CHOOSER_OPEN_RET
 
-| ---- 0x4003a52e / 0x4003cd98 (jmp, 8 B each): SRC SETUP's editor and drawer address the
-| row's Part bytes at row * 6: displaced `movel %dN,%d0; lsll #3,%d0; addl %dN,%dN; subl
-| %dN,%d0` (d2 / d6, the row; d0 / d7 := row * 6). Rows 5.. address FLEX's.
+| ---- 0x4003a52e / 0x4003cd98 (jmp, 8 B each): SRC SETUP editor/drawer row*6.
+| a5 already = PB_TABLE[row] (CX clone: count 128). Remap row 5.. -> FLEX for
+| Part addressing; stock clamp uses a5. CMOR/MMOR: raw delta + stock store
+| (pad 8 B -- stock addql #8 still runs after SETUP_STEP's pushes).
 fm_setup_edit6:
+        jsr     po_setup_edit:l
+        cmpi.l  #2,%d0
+        beq     fm_e6_morph
+        tst.l   %d0
+        bne     fm_e6_handled            | C-F blanked on the CX page
         cmpi.l  #FM_ROW,%d2
         blt     fm_e6
         moveq   #FLEX,%d2
@@ -1157,9 +1165,35 @@ fm_e6:
         add.l   %d2,%d2
         sub.l   %d2,%d0
         jmp     EDIT6_RET
+fm_e6_morph:
+        moveq   #FLEX*6,%d0
+        lea     (%a3,%d0.l),%a4
+        move.l  %d4,%d2
+        jsr     po_setup_cur:l           | d0 = current Part SETUP byte
+        move.l  %d0,%d2
+        move.l  %a3,%d0
+        mulu.w  #24,%d0
+        lea     0x46c7de2e,%a0           | encoder-pressed flag a control
+        tst.l   (%a0,%d0.l)
+        beq     fm_e6_plain
+        move.l  %d3,%d0
+        moveq   #7,%d1
+        divs.l  %d1,%d0
+        bra     fm_e6_delta
+fm_e6_plain:
+        move.l  %d3,%d0
+fm_e6_delta:
+        clr.l   -(%sp)                   | stand in for SETUP_STEP's two pushes
+        clr.l   -(%sp)                   | (stock addql #8,sp still runs)
+        jmp     EDIT6_CLAMP
+fm_e6_handled:
+        jmp     EDIT6_EXIT
 fm_setup_draw6:
         cmpi.l  #FM_ROW,%d6
         blt     fm_d6
+        bne     fm_d6_flex
+        bsr     fm_d6_frame              | CX OSC SETUP: only A/B keep a frame
+fm_d6_flex:
         moveq   #FLEX,%d6
 fm_d6:
         move.l  %d6,%d7
@@ -1167,6 +1201,36 @@ fm_d6:
         add.l   %d6,%d6
         sub.l   %d6,%d7
         jmp     DRAW6_RET
+| Clear stock SETUP divider segments that only frame blank C-F boxes (Tim).
+        .set    FILL_RECT, 0x40012254    | stock rect fill (window, x0, y0, x1, y1, mode)
+fm_d6_frame:
+        lea     fm_d6_rects(%pc),%a0
+fm_d6_rect:
+        mvs.w   (%a0)+,%d0
+        bmi     fm_d6_done
+        move.l  %a0,-(%sp)
+        clr.l   -(%sp)
+        mvs.w   4(%a0),%d1
+        move.l  %d1,-(%sp)
+        mvs.w   2(%a0),%d1
+        move.l  %d1,-(%sp)
+        mvs.w   (%a0),%d1
+        move.l  %d1,-(%sp)
+        move.l  %d0,-(%sp)
+        move.l  %d4,-(%sp)
+        jsr     FILL_RECT
+        lea     24(%sp),%sp
+        movea.l (%sp)+,%a0
+        addq.l  #6,%a0
+        bra     fm_d6_rect
+fm_d6_done:
+        rts
+fm_d6_rects:
+        .short  72, 2, 72, 27
+        .short  92, 2, 92, 27
+        .short  93, 28, 111, 28
+        .short  -1
+        .balign 2
 
 | ---- 0x4005221e (jmp, 10 B): the UI tick: displaced `jsr 0x4005213c; jsr 0x4007e940`,
 | replayed; then SRC SETUP's name table is filled from the stock one and the rows' names,
