@@ -47,14 +47,15 @@ FUNC on most knobs jumps in bigger steps.
 **FUNC + PLAYBACK** (header reads **SRC SETUP**; machine list on the left).
 Slot F is blank.
 
-- **CMOR** — carrier waveshape morph **0..127**: table sine → **bandlimited**
-  (DPW) saw. Audible even with INDX at 0. A hard (naive) saw used to leak
-  through the mix — even **0→1** jumped; DPW keeps the travel continuous.
-  127 is bright and fund-heavy, not a digital edge.
+- **CMOR** — carrier waveshape morph **0..127**: table sine → hard
+  (phase-aligned) saw. Audible even with INDX at 0. At 127 you get a bright
+  edge; mid values are a continuous blend, not a switch. (A soft DPW
+  carrier was tried and withdrawn — crackle under FM, and the hard edge
+  is the point.)
 - **MMOR** — modulator waveshape morph **0..127**: sine → **bandlimited**
-  (DPW) saw. Heard *through* FM, so needs **INDX**. Same continuous target
-  as CMOR; a hard saw in the modulator also made the FM path explode
-  mid-travel (~46–48).
+  (DPW) saw. Heard *through* FM, so needs **INDX**. Same idea as CMOR on
+  paper, different target on purpose: a hard saw in the modulator makes the
+  FM path explode mid-travel; DPW keeps it continuous.
 - **DEC** — index envelope after a trig. Low = the FM depth falls away
   quickly; **127 = HOLD** (index stays at the INDX knob). The HOLD icon is
   a single hollow line at the top of the box.
@@ -89,7 +90,7 @@ knob (and locks / scenes).
 | PLAYBACK | FINE | −64..+63 ¢ | 0c (raw 64) | fine tune |
 | PLAYBACK | FOLD | 0..127 | 0 | sine folder dry/wet after MIX |
 | PLAYBACK | MIX | 0..127 | 0 | carrier↔mod into the folder |
-| SETUP | CMOR | 0..127 | 0 | carrier sine→DPW saw |
+| SETUP | CMOR | 0..127 | 0 | carrier sine→hard saw |
 | SETUP | MMOR | 0..127 | 0 | mod sine→DPW saw (needs INDX) |
 | SETUP | DEC | 0..127 | 127 | index env; 127 = HOLD |
 | SETUP | SYMM | 0..127 | 64 | fold skew; 64 = even |
