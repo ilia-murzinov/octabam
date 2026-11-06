@@ -462,6 +462,10 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Tim v2.22+ manifests call stock_guard() at import (needs MAIN OS).
+      - name: ⬇️ Fetch Stock OS
+        run: make os && make recon
+
       # the manual site's pages include the generated reference files, so
       # they must exist before the doclinks scan of the tracked pages
       - name: 📝 Generate Pages

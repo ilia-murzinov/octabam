@@ -19,7 +19,7 @@ jobs:
   build:
     name: build the site
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -30,6 +30,11 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r docs/site/requirements.txt
+      # Tim v2.22+ manifests call stock_guard() at import (needs MAIN OS).
+      # Pages used to load the registry with no firmware; that broke on the
+      # v2.22 pin (direct-jump / synth / quantizer / tuner).
+      - name: Fetch and extract stock MAIN OS
+        run: make os && make recon
       - run: python3 tools/site/gen_pages.py
       - run: mkdocs build --strict --config-file docs/site/mkdocs.yml
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
