@@ -1,6 +1,6 @@
 """base-vres -- base with RESONATOR instead of SHATTER (VOID kept).
 
-Tim v2.15 synth + VOID + RESONATOR + SCOPE + DARK + COPY. Stock COMPRESSOR.
+Tim v2.22 synth + VOID + RESONATOR + SCOPE + DARK + COPY. Stock COMPRESSOR.
 No SHATTER / STUTTR / SIDECHAIN / TAPE. PLATE / SPRING harvested.
 """
 
@@ -26,8 +26,8 @@ REMIX = Remix(
     name="base-vres",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="v2.15 synth + VOID + RESONATOR + SCOPE + DARK + COPY; stock COMP; no SHATTER / STUTTR / SC.",
-    doc="CORE + STEM REC + SYNTH v2.15 + VOID + RESONATOR + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
+    proof_note="v2.22 synth + VOID + RESONATOR + SCOPE + DARK + COPY; stock COMP; no SHATTER / STUTTR / SC.",
+    doc="CORE + STEM REC + SYNTH v2.22 + VOID + RESONATOR + SCOPE + DARK REV + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -67,6 +67,5 @@ REMIX = Remix(
         ("octabam.usb", "MASTER"): 0,
         ("octabam.usb", "IN"): "OFF",
         ("kyoti.mute-modes", "PLACE"): Pin("DRAM"),
-        ("timhastie.synth", "PLACE"): "DRAM",
     },
 )

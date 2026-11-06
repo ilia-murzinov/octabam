@@ -1,9 +1,7 @@
-"""SCALE QUANTIZER -- SCALE / ROOT / GLIDE.
+"""SCALE QUANTIZER -- SCALE / ROOT / GLIDE + TRACK/FOLLOW (v2.22).
 
-Source: `upstream/` is Tim Hastie's repository (timhastie/octatrick-modules,
-submodule, pinned to v2.15). Since 2.13 `qz_octnum` lives at 0x400449be
-(Modwerk #264), so octabam's 2.9-era Keep/pad at that site (#741) is not
-applied. Nothing inside `upstream/` is edited here.
+Source: `upstream/` pinned to v2.22 with SYNTH MACHINE. Nothing inside
+`upstream/` is edited here.
 """
 
 import dataclasses
@@ -31,5 +29,5 @@ MODULE = dataclasses.replace(
     category=Category.MACHINES, author="timhastie/octatrick-modules",
     author_url="https://github.com/timhastie/octatrick-modules",
     proof=Proof.HARDWARE,
-    proof_note="v2.15 with SYNTH MACHINE on Tim's MKI, 18 Oct 2026",
+    proof_note="v2.22 with SYNTH MACHINE on Tim's MKI, 1 Nov 2026",
 )

@@ -20,8 +20,8 @@
 | THE STORAGE. Chosen track = FLEX (machine byte 1) with signature
 | "C", "X", 1 in NEIGHBOR PLAYBACK: bank + part * 6322 + 0x8edbc + 30 *
 | track (and the battery-RAM shadow). Seed PLAYBACK: PTCH 0, RATO 1,
-| INDX 32, FOLD 40, SYMM 64 (even), DEC HOLD; SETUP 0 (LOOP, SLIC,
-| LEN, RATE, TSTR, TSNS: OFF); choosing it again keeps the patch; choosing any other
+| INDX 32, FOLD 40, SYMM 64 (even), DEC HOLD; SETUP 0 (CMOR, MMOR,
+| blank×4); choosing it again keeps the patch; choosing any other
 | row clears the signature.
 |
 | THE MACHINE CHANGE (2.12). A change of the machine a track plays, where the old or the
@@ -310,8 +310,8 @@ ml_flexslot:
 | DRUM), d1 = the stock machine (d0 = 0), d2 = the track of the current Part. Writes the
 | machine's INIT into the Part, its battery-RAM shadow and the track's live lane, so the
 | page shows it at once, the next frame plays it and SAVE keeps it:
-|   * PLAYBACK and PLAYBACK SETUP: a row's machine -- its twelve seeds in the FLEX column (FM
-|     SYNTH: PTCH 0, RATO 1, INDX 32, FOLD 40, SYMM 64, DEC HOLD, SETUP 0; SY DRUM: PTCH 0, MODE
+|   * PLAYBACK and PLAYBACK SETUP: a row's machine -- its twelve seeds in the FLEX column (CX
+|     OSC: PTCH 0, RATO 1, INDX 32, FOLD 40, SYMM 64, DEC HOLD, SETUP CMOR/MMOR 0; SY DRUM: PTCH 0, MODE
 |     A, WDTH 64, SWEP 0, SPED 64, DEC 64, LSPD 64, LDEP 0, WAVE OFF, S&H OFF); a stock
 |     machine -- its column at the defaults of its stock PLAYBACK descriptor, and the FLEX
 |     column at FLEX's (the FLEX bytes a row's machine had used: they are no sample settings);

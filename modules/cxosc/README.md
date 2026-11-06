@@ -23,7 +23,8 @@ refusal under Unicorn.
 
 CX-specific: marker-less list row, FOLD + SYMM waveshape, free/snap RATO,
 DEC on the index (HOLD at **127**, Tim 5 Oct polarity), fixed mid FDBK in the
-engine, mono + stock LFOs (no VOIC/CHRD). AMP ATK / HOLD / REL are the
+engine, mono, PLAYBACK SETUP **CMOR/MMOR** (sine→saw on carrier/modulator;
+LFO PMTR **30/31**). No Tim VOIC/CHRD. AMP ATK / HOLD / REL are the
 engine's (plan B); scenes and LFOs on those knobs apply via the **v2.22**
 DSP-record snapshot (not the live lane alone).
 
@@ -31,16 +32,24 @@ DSP-record snapshot (not the live lane alone).
 
 | Slot | Name | Role |
 |------|------|------|
-| A | PTCH | Semitones (−64..+63) |
+| A | PTCH | Semitones (−32..+32; raw 32..96, 64 = 0). FUNC snaps −32/0/+32; pressed ×3 |
 | B | RATO | Mod:carrier ratio (free 0.25..4; FUNC snaps classic table ≤4.01) |
 | C | INDX | FM index |
 | D | FOLD | Sine waveshape fold (dry/wet; moderate drive) |
 | E | SYMM | Bipolar half-wave skew into the folder (64 = even; extremes mute one polarity) |
 | F | DEC | Index envelope; **127 = HOLD**, 0 = shortest (not the old min=HOLD) |
 
-Mono only. Stock LFO page (all three LFOs). No VOIC/CHRD. AMP page ATK / HOLD /
-REL shape the note in the engine (locks, scenes, LFOs). Modulator feedback is
-a fixed mid (no FDBK knob).
+### PLAYBACK SETUP (FUNC + PLAYBACK)
+
+| Slot | Name | Role |
+|------|------|------|
+| A | CMOR | Carrier morph 0..127: sine → saw |
+| B | MMOR | Modulator morph 0..127: sine → saw |
+| C–F | — | Blank (no leftover FLEX boxes) |
+
+LFO SETUP PMTR **30 = CMOR**, **31 = MMOR** (private depth words). Mono only.
+No VOIC/CHRD. AMP page ATK / HOLD / REL shape the note in the engine. Modulator
+feedback is a fixed mid (no FDBK knob).
 
 **Saved Parts.** Slot F was FDBK; SYMM's even centre was 0. Seeds FOLD 40 /
 SYMM 64 / DEC 127 are written only when CX OSC is chosen. A Part saved under
@@ -51,8 +60,8 @@ set DEC 127 and SYMM 64 by hand.
 ## Cost
 
 Unicorn executed instructions for one mono CX OSC track (`tools/verify/verify_cxosc.py`,
-`sy_render`, base knobs; pitch curve stubbed — EMAC): **~1352 instructions/frame**
-(~85/sample; was ~1290 before the v2.22 AMP snap), peak ~1391. Not hardware
+`sy_render`, base knobs; pitch curve stubbed — EMAC): **~1697 instructions/frame**
+(~106/sample; was ~1352 before dual-op morph), peak ~1736. Not hardware
 cycles. One track per Part by the selection guard; ColdFire headroom on a
 loaded Part on the unit is still **open** ([#852](https://github.com/sambanks/octabam/issues/852)).
 

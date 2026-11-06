@@ -1,7 +1,7 @@
-"""base -- Ilia FM flash stack: Tim v2.15 synth + VOID + SHATTER + SCOPE + DARK.
+"""base -- Ilia FM flash stack: Tim v2.22 synth + VOID + SHATTER + SCOPE + DARK.
 
 CORE + STEM REC + PERSISTENT BUFFERS + EUCLID FILL / RND NAME + synth/FX +
-VOID + SHATTER + SCOPE + DARK REV + COPY. SYNTH / QUANTIZER at v2.15;
+VOID + SHATTER + SCOPE + DARK REV + COPY. SYNTH / QUANTIZER at v2.22;
 ML_FM_MAX=4. Stock COMPRESSOR kept (no SIDECHAIN). No TAPE / STUTTR /
 RESONATOR. PLATE / SPRING harvested; DARK REV kept.
 """
@@ -28,8 +28,8 @@ REMIX = Remix(
     name="base",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="v2.15 synth ML_FM_MAX=4 + VOID + SHATTER + SCOPE + DARK + COPY; stock COMP; no SC / RESONATOR / TAPE / STUTTR.",
-    doc="CORE + STEM REC + SYNTH v2.15 + VOID + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP + USB TRACKS MAIN CUE.",
+    proof_note="v2.22 synth ML_FM_MAX=4 + VOID + SHATTER + SCOPE + DARK + COPY; stock COMP; no SC / RESONATOR / TAPE / STUTTR.",
+    doc="CORE + STEM REC + SYNTH v2.22 + VOID + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP + USB TRACKS MAIN CUE.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -68,6 +68,5 @@ REMIX = Remix(
         ("octabam.usb", "MASTER"): 0,
         ("octabam.usb", "IN"): "OFF",
         ("kyoti.mute-modes", "PLACE"): Pin("DRAM"),
-        ("timhastie.synth", "PLACE"): "DRAM",
     },
 )
