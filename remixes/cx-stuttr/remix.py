@@ -1,7 +1,7 @@
 """cx-stuttr -- cx with STUTTR instead of SHATTER.
 
 CX OSC + VOID + STUTTR + SCOPE + DARK + COPY. Stock COMPRESSOR.
-No SHATTER / SIDECHAIN / RESONATOR / SYNTH / TAPE. MEGABYTE replaces stock DELAY. PLATE / SPRING harvested.
+No SHATTER / SIDECHAIN / RESONATOR / SYNTH / TAPE. Stock DELAY kept. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -26,8 +26,8 @@ REMIX = Remix(
     name="cx-stuttr",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="CX OSC + VOID + STUTTR + SCOPE + DARK + COPY; MEGABYTE for DELAY; stock COMP; no SHATTER / SC / RESONATOR / SYNTH.",
-    doc="CORE + STEM REC + CX OSC + VOID + STUTTR + SCOPE + DARK REV + MEGABYTE + COPY PROJECT + stock COMP.",
+    proof_note="CX OSC + VOID + STUTTR + SCOPE + DARK + COPY; stock DELAY; stock COMP; no SHATTER / SC / RESONATOR / SYNTH.",
+    doc="CORE + STEM REC + CX OSC + VOID + STUTTR + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -44,7 +44,7 @@ REMIX = Remix(
         "SPATIALIZER",
         "COMPRESSOR",
         "LO-FI",
-        "MEGABYTE",
+        "DELAY",
         "DARK REV",
     ),
     fx1=(

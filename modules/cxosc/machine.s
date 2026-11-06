@@ -20,7 +20,7 @@
 | THE STORAGE. Chosen track = FLEX (machine byte 1) with signature
 | "C", "X", 1 in NEIGHBOR PLAYBACK: bank + part * 6322 + 0x8edbc + 30 *
 | track (and the battery-RAM shadow). Seed PLAYBACK: PTCH 0, RATO 1,
-| INDX 32, FOLD 40, SYMM 64 (even), DEC HOLD; SETUP 0 (CMOR, MMOR,
+| INDX 0, FOLD 0, FDBK 40, MIX 0; SETUP CMOR/MMOR/DEC/SYMM/FDBK (
 | blank×4); choosing it again keeps the patch; choosing any other
 | row clears the signature.
 |
@@ -1155,7 +1155,7 @@ fm_setup_edit6:
         cmpi.l  #2,%d0
         beq     fm_e6_morph
         tst.l   %d0
-        bne     fm_e6_handled            | C-F blanked on the CX page
+        bne     fm_e6_handled            | E-F blanked on the CX page
         cmpi.l  #FM_ROW,%d2
         blt     fm_e6
         moveq   #FLEX,%d2
@@ -1192,7 +1192,7 @@ fm_setup_draw6:
         cmpi.l  #FM_ROW,%d6
         blt     fm_d6
         bne     fm_d6_flex
-        bsr     fm_d6_frame              | CX OSC SETUP: only A/B keep a frame
+        bsr     fm_d6_frame              | CX OSC SETUP: blank F frame only (A-E live)
 fm_d6_flex:
         moveq   #FLEX,%d6
 fm_d6:
@@ -1201,7 +1201,7 @@ fm_d6:
         add.l   %d6,%d6
         sub.l   %d6,%d7
         jmp     DRAW6_RET
-| Clear stock SETUP divider segments that only frame blank C-F boxes (Tim).
+| Clear stock SETUP divider segments that only frame blank F.
         .set    FILL_RECT, 0x40012254    | stock rect fill (window, x0, y0, x1, y1, mode)
 fm_d6_frame:
         lea     fm_d6_rects(%pc),%a0
@@ -1226,9 +1226,8 @@ fm_d6_rect:
 fm_d6_done:
         rts
 fm_d6_rects:
-        .short  72, 2, 72, 27
-        .short  92, 2, 92, 27
-        .short  93, 28, 111, 28
+        .short  112, 2, 112, 27          | F-only vertical + bottom stub
+        .short  113, 28, 127, 28
         .short  -1
         .balign 2
 
@@ -1480,8 +1479,8 @@ ml_msg_both:
         .asciz  "FM+SY DRUM: LIMIT"
         .balign 2
 fm_defaults:
-        .byte   64, 25, 32, 40, 64, 127 | PLAYBACK: PTCH 0, RATO ~1, INDX 32, FOLD 40, SYMM even, DEC HOLD
-        .byte   0, 0, 0, 0, 0, 0         | SETUP: LOOP SLIC LEN RATE TSTR TSNS all 0 (OFF)
+        .byte   64, 25, 0, 64, 0, 0      | PLAYBACK: PTCH 0, RATO ~1, INDX 0, FINE 0c, FOLD 0, MIX 0
+        .byte   0, 0, 127, 64, 40, 0     | SETUP: CMOR MMOR DEC HOLD SYMM even FDBK mid
 fm_name:
         .asciz  "CX OSC"
         .balign 4

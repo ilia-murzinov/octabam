@@ -1,8 +1,8 @@
 """CX OSC -- Buchla-flavoured complex oscillator (marker-less machine list).
 
 Choose CX OSC in FUNC+SRC / SELECT MACHINE TYPE (FLEX + Part signature "CX",1).
-Mono. PLAYBACK: PTCH (−32..+32) RATO INDX FOLD SYMM DEC (HOLD@127). SETUP:
-CMOR/MMOR sine→saw; LFO PMTR 30/31. No Tim VOIC/CHRD.
+Mono. PLAYBACK: PTCH (−32..+32) RATO INDX FINE FOLD MIX. SETUP:
+CMOR/MMOR/DEC/SYMM/FDBK (F blank); LFO PMTR 30..33 (no DEC). No Tim VOIC/CHRD.
 
 Machine list adapted from timhastie/octatrick-modules v2.15 SYNTH MACHINE
 (MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE and
@@ -288,7 +288,7 @@ def _variant(values):
         "cf_patches": (),
         "detours": MODULE.detours + (Detour(
             RESOLVER_HOOK, RESOLVER_STOCK, "page", "pg_resolve",
-            "PLAYBACK page resolver: CX OSC track reads PTCH/RATO/INDX/FOLD/SYMM/DEC "
+            "PLAYBACK page resolver: CX OSC track reads PTCH/RATO/INDX/FINE/FOLD/MIX "
             "(DRAM form; leaves the stock DELAY table tail alone)", kind="jmp"),),
     }
 
@@ -303,12 +303,12 @@ MODULE = Module(
     proof=Proof.HARDWARE,
     proof_note=(
         "MKII VRCS-CX VS @ 32316200 (author): Tim v2.22 AMP snap; DEC HOLD@127; "
-        "bipolar SYMM half-wave skew (64=even) + icons; FOLD default 40; PLAYBACK "
+        "FOLD+MIX on PLAYBACK, DEC/SYMM/FDBK on SETUP; INDX/FOLD default 0; PLAYBACK "
         "knobs; FUNC RATO snaps. Prior MKII BUILD CS @ 052bb14d (cxosc-core) smoked "
         "machine select / PLAYBACK then FDBK / MIDI / STOP / Part. verify_cxosc + "
         "make check REMIX=cxosc"
     ),
-    doc="CX OSC in the machine list (no marker file): PTCH RATO INDX FOLD SYMM DEC (HOLD@127; SYMM half-wave skew 64=even), PLAYBACK SETUP CMOR/MMOR (sine→saw), LFO PMTR 30/31, mono. Local fork of FM SYNTH.",
+    doc="CX OSC in the machine list (no marker file): PTCH RATO INDX FINE FOLD MIX, SETUP CMOR/MMOR/DEC/SYMM/FDBK, LFO PMTR 30..33 (no DEC), mono. Local fork of FM SYNTH.",
     conflicts=(
         ("SYNTH MACHINE", "both own the FLEX/STATIC kind-table renderers, page cave 0x400d24d0, and machine-list sites"),
         ("BLACKPYRAMIDS_303", "shares ColdFire ROM hooks (e.g. MIDI note-on 0x4000e746) — build refuses the pair"),
@@ -330,13 +330,13 @@ MODULE = Module(
     ),
     detours=(
         Detour(LFO_DEPTH_HOOK, LFO_DEPTH_STOCK, "poly", "cx_lfo_standalone",
-               "PMTR 30/31 (CMOR/MMOR) private LFO words; stock depth otherwise",
+               "PMTR 30..33 (CMOR/MMOR/SYMM/FDBK) private LFO words; stock depth otherwise",
                kind="jmp", pad_to=8),
         Detour(LFO_DEPTH_HOOK2, LFO_DEPTH_STOCK, "poly", "cx_lfo_frame",
-               "frame-builder LFO depth: CMOR/MMOR private words",
+               "frame-builder LFO depth: CMOR/MMOR/SYMM/FDBK private words",
                kind="jmp", pad_to=8),
         Detour(LFO_PAGE_HOOK, LFO_PAGE_STOCK, "poly", "cx_lfo_page",
-               "LFO page: PMTR count 32 on CX OSC (CMOR/MMOR)",
+               "LFO page: PMTR count 34 on CX OSC (CMOR/MMOR/SYMM/FDBK)",
                kind="jmp", pad_to=8),
         Detour(LFD_EDIT_HOOK, LFD_EDIT_STOCK, "poly", "cx_lfo_pmtr_edit",
                "LFO SETUP PMTR walk includes 30/31 on CX OSC",
@@ -346,7 +346,7 @@ MODULE = Module(
         Detour(LFD_MOVE_HOOK, LFD_PEA_STOCK, "poly", "cx_lfo_move",
                "LFO SETUP row move stages CX PMTR count", kind="jmp"),
         Detour(LFD_DRAW_HOOK, LFD_LEA_STOCK, "poly", "cx_lfo_draw",
-               "LFO SETUP draws CMOR/MMOR PMTR labels", kind="jmp"),
+               "LFO SETUP draws CMOR/MMOR/SYMM/FDBK PMTR labels", kind="jmp"),
         Detour(LFD_EDITUI_HOOK, LFD_LEA3_STOCK, "poly", "cx_lfo_edit",
                "LFO SETUP edits CX PMTR destination count", kind="jmp"),
         Detour(MIDI_MAP_HOOK, MIDI_MAP_STOCK, "poly", "po_mon",
