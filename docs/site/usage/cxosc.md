@@ -43,7 +43,7 @@ Slot F is blank.
 | B | **MMOR** | Modulator morph **0..127**: sine → saw. |
 | C | **DEC** | Index envelope after a trig. Low = quick fall; **127 = HOLD** (index stays up). |
 | D | **SYMM** | Fold half-wave skew. **64** = even; below/above tips the fold. |
-| E | **FDBK** | Modulator feedback — the mod listens to itself. Mid (~40) is a useful start; 0 is off. |
+| E | **FDBK** | Modulator feedback — the mod listens to itself. Default **0** = off; turn up to hear it. |
 
 ## LFO
 

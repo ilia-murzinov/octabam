@@ -20,7 +20,7 @@
 | THE STORAGE. Chosen track = FLEX (machine byte 1) with signature
 | "C", "X", 1 in NEIGHBOR PLAYBACK: bank + part * 6322 + 0x8edbc + 30 *
 | track (and the battery-RAM shadow). Seed PLAYBACK: PTCH 0, RATO 1,
-| INDX 0, FOLD 0, FDBK 40, MIX 0; SETUP CMOR/MMOR/DEC/SYMM/FDBK (
+| INDX 0, FOLD 0, FDBK 0, MIX 0; SETUP CMOR/MMOR/DEC/SYMM/FDBK (
 | blank×4); choosing it again keeps the patch; choosing any other
 | row clears the signature.
 |
@@ -1480,7 +1480,7 @@ ml_msg_both:
         .balign 2
 fm_defaults:
         .byte   64, 25, 0, 64, 0, 0      | PLAYBACK: PTCH 0, RATO ~1, INDX 0, FINE 0c, FOLD 0, MIX 0
-        .byte   0, 0, 127, 64, 40, 0     | SETUP: CMOR MMOR DEC HOLD SYMM even FDBK mid
+        .byte   0, 0, 127, 64, 0, 0      | SETUP: CMOR MMOR DEC HOLD SYMM even FDBK off
 fm_name:
         .asciz  "CX OSC"
         .balign 4

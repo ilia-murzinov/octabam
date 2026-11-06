@@ -3195,7 +3195,7 @@ po_setup_cx:
         clr.b   0x5e+7(%a1)
         move.b  #127,0x5e+8(%a1)         | DEC HOLD
         move.b  #64,0x5e+9(%a1)          | SYMM even
-        move.b  #40,0x5e+10(%a1)         | FDBK mid (old CX fixed amount)
+        move.b  #0,0x5e+10(%a1)          | FDBK off (raise to hear mod feedback)
         clr.l   0xfa+24(%a1)             | CMOR/MMOR plain
         clr.l   0xfa+28(%a1)
         lea     pg_wid_decay:l,%a0       | DEC decay icon
