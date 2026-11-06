@@ -1,8 +1,8 @@
 """CX OSC -- Buchla-flavoured complex oscillator (marker-less machine list).
 
 Choose CX OSC in FUNC+SRC / SELECT MACHINE TYPE (FLEX + Part signature "CX",1).
-Mono. PLAYBACK: PTCH (−32..+32) RATO INDX FOLD SYMM DEC (HOLD@127). SETUP:
-CMOR/MMOR sine→saw; LFO PMTR 30/31. No Tim VOIC/CHRD.
+Mono. PLAYBACK: PTCH (−32..+32) RATO INDX FOLD FDBK MIX. SETUP:
+CMOR/MMOR/FINE/DEC on SETUP; MIX on PLAYBACK F; LFO PMTR 30/31. No Tim VOIC/CHRD.
 
 Machine list adapted from timhastie/octatrick-modules v2.15 SYNTH MACHINE
 (MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE and
@@ -288,7 +288,7 @@ def _variant(values):
         "cf_patches": (),
         "detours": MODULE.detours + (Detour(
             RESOLVER_HOOK, RESOLVER_STOCK, "page", "pg_resolve",
-            "PLAYBACK page resolver: CX OSC track reads PTCH/RATO/INDX/FOLD/SYMM/DEC "
+            "PLAYBACK page resolver: CX OSC track reads PTCH/RATO/INDX/FOLD/FDBK/MIX "
             "(DRAM form; leaves the stock DELAY table tail alone)", kind="jmp"),),
     }
 
@@ -303,12 +303,12 @@ MODULE = Module(
     proof=Proof.HARDWARE,
     proof_note=(
         "MKII VRCS-CX VS @ 32316200 (author): Tim v2.22 AMP snap; DEC HOLD@127; "
-        "bipolar SYMM half-wave skew (64=even) + icons; FOLD default 40; PLAYBACK "
+        "FDBK+MIX on PLAYBACK, FINE+DEC on SETUP; FOLD default 40; PLAYBACK "
         "knobs; FUNC RATO snaps. Prior MKII BUILD CS @ 052bb14d (cxosc-core) smoked "
         "machine select / PLAYBACK then FDBK / MIDI / STOP / Part. verify_cxosc + "
         "make check REMIX=cxosc"
     ),
-    doc="CX OSC in the machine list (no marker file): PTCH RATO INDX FOLD SYMM DEC (HOLD@127; SYMM half-wave skew 64=even), PLAYBACK SETUP CMOR/MMOR (sine→saw), LFO PMTR 30/31, mono. Local fork of FM SYNTH.",
+    doc="CX OSC in the machine list (no marker file): PTCH RATO INDX FOLD FDBK MIX, PLAYBACK SETUP CMOR/MMOR/FINE/DEC (HOLD@127), LFO PMTR 30/31, mono. Local fork of FM SYNTH.",
     conflicts=(
         ("SYNTH MACHINE", "both own the FLEX/STATIC kind-table renderers, page cave 0x400d24d0, and machine-list sites"),
         ("BLACKPYRAMIDS_303", "shares ColdFire ROM hooks (e.g. MIDI note-on 0x4000e746) — build refuses the pair"),

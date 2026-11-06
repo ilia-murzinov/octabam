@@ -5,14 +5,13 @@
 | modules/cxosc/NOTICE. Resolved when the track is CX OSC (signature
 | "CX", 1), not by a marker filename.
 |
-| WHAT: PLAYBACK presents PTCH RATO INDX FOLD SYMM DEC (four-character
-| names; boxes 19 px). RATO formats free 0.25..4; INDX/FOLD/SYMM 0..127;
-| DEC as ms / "1.1s" / "HOLD" at 127 (5 Oct 2026 polarity). Icons: operators
-| (RATO), sidebands (INDX), folded sine (FOLD), bipolar half-wave SYMM
-| (64 = even), index-env DEC. FDBK is a fixed mid (no knob). Footer
-| CX OSC>FLEX. PTCH is semitones (−32..+32); RATE slot is FOLD (not FINE).
+| WHAT: PLAYBACK presents PTCH RATO INDX FOLD FDBK MIX (four-character
+| names; boxes 19 px). RATO formats free 0.25..4; INDX/FOLD/FDBK 0..127;
+| MIX 0..127 (carrier↔mod into fold). Icons: operators (RATO), sidebands
+| (INDX), folded sine (FOLD), feedback loop (FDBK), MIX plain. FINE and DEC
+| live on PLAYBACK SETUP C/D (DEC HOLD@127). Footer CX OSC>FLEX.
 | Knobs: po_knob — one unit a detent; PTCH pressed ×3 (others ×7); FUNC:
-| PTCH snaps −32/0/+32, FOLD/SYMM/INDX/DEC 16, RATO next classic snap ≤4.01.
+| PTCH snaps −32/0/+32, FOLD/FDBK/INDX/MIX 16, RATO next classic snap ≤4.01.
 | Non-CX tracks draw as stock.
 |
 | HOW: the page descriptor resolver 0x40031da4(track, page kind) returns
@@ -54,7 +53,7 @@
 | fmt(buf, value) -> sprintf.
 
         .text
-        .global fm_descriptor, pg_resolve
+        .global fm_descriptor, pg_resolve, pg_fmt_decay
         .set    RESOLVER_RET, 0x40031ed6
         .set    FLEX_P, 0x400d31ae       | the stock FLEX PLAYBACK descriptor (P form)
         .set    KIND_FLEX, 0x400d6438    | the kind table's FLEX entry: sy_render's address (the manifest's SymbolRef)
@@ -110,7 +109,7 @@ pg_over:
         .short  0x009, 9
         .long   pg_title                 | P+0x009: the title, "CX OSC" (the footer reads CX OSC>FLEX)
         .short  0x01c, 30
-        .long   pg_names                 | P+0x01c: slots 1..5 (STRT LEN RATE RTRG RTIM) read RATO INDX FOLD SYMM DEC
+        .long   pg_names                 | P+0x01c: slots 1..5 (STRT LEN RATE RTRG RTIM) read RATO INDX FOLD FDBK MIX
         .short  0x061, 1
         .long   pg_def1                  | P+0x05e+3: FOLD's default, 1 (never stock RATE 0)
         .short  0x06a, 4
@@ -124,7 +123,7 @@ pg_over:
         .short  0x106, 4
         .long   pg_wids_fold             | P+0x106: slot 3 FOLD (folded-sine icon)
         .short  0x10a, 8
-        .long   pg_wids_b                | P+0x10a: of slots 4 5 (SYMM bias, DEC env)
+        .long   pg_wids_b                | P+0x10a: of slots 4 5 (FDBK, MIX)
         .short  0x12a, 4
         .long   pg_zero                  | P+0x12a: PTCH's knob handler, 0 (stock: the semitone-snapping
         .short  0x136, 4                 | accumulator 0x40032d08, built for 5 a semitone) ...
@@ -139,7 +138,7 @@ pg_over:
 pg_title:
         .asciz  "CX OSC"
 pg_names:
-        .ascii  "RATO\0\0INDX\0\0FOLD\0\0SYMM\0\0DEC\0\0\0\0"
+        .ascii  "RATO\0\0INDX\0\0FOLD\0\0FDBK\0\0MIX\0\0\0\0"
 pg_def1:
         .byte   1
         .align  4
@@ -150,23 +149,23 @@ pg_l32:
 pg_l65:
         .long   65
 pg_fmts:
-        .long   pg_fmt_ptch, pg_fmt_ratio, FMT_PLAIN, FMT_PLAIN, FMT_PLAIN, pg_fmt_decay
+        .long   pg_fmt_ptch, pg_fmt_ratio, FMT_PLAIN, FMT_PLAIN, FMT_PLAIN, FMT_PLAIN
 pg_wids_a:
         .long   pg_wid_ratio, pg_wid_index
 pg_wids_fold:
         .long   pg_wid_fold
 pg_wids_b:
-        .long   pg_wid_symm, pg_wid_decay
+        .long   pg_wid_fdbk, pg_wid_decay
 pg_nibbles:
         .long   0x55551551               | nibble s (from the LOW end, as 0x400a6994 shifts it) = slot
                                          | s; stock 0x55311311: bit 0 = the encoder is live, bit 1 (LEN,
                                          | RTIM) = the arch the renderer draws bridging the slot to the
                                          | one before it (STRT-LEN, RTRG-RTIM: cleared here, the pairs
                                          | mean nothing to the voice), bit 2 = always show the value
-                                         | (set on 1 2 4 5). Slot 5 = DEC (HOLD at 127).
+                                         | (set on 1 2 4 5). Slot 5 = MIX (carrier↔mod).
 
 | ---- the formatters: fmt(buf, value), C convention ----------------------------
-| INDEX / FOLD / SYMM print 0..127 through the stock's "%d" formatter, FMT_PLAIN.
+| INDEX / FOLD / FDBK print 0..127 through the stock's "%d" formatter, FMT_PLAIN.
 
 pg_fmt_ptch:                             | PTCH on a synth track: raw - 64 as a signed whole number, "-12" "0" "+7"
         movel   %sp@(8),%d0              | raw

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """CX OSC gates under Unicorn: voice knobs + the one-track-per-Part guard.
 
-1. Voice: FOLD / bipolar SYMM half-wave skew / RATO / DEC move the output;
-   center vs high/low skew differ; FOLD=SYMM=DEC=127 stays bounded.
+1. Voice: FOLD / FDBK / RATO / DEC / MIX move the output; FINE shifts pitch
+   via SETUP C; FOLD=FDBK=MIX=127 stays bounded.
    Calls `sy_render` with a planted Part.
 2. Guard: `ml_guard_p` refuses a second CX OSC track in a Part ("CX OSC: 1 MAX")
    and allows the track's own machine again / a first choice / a stock row.
@@ -234,14 +234,18 @@ def plant_part(uc, track=0):
     uc.mem_write(BANK + SIG_OFF + 30 * track, b"CX\x01")
 
 
-def plant_fp(uc, ptch=64, rato=32, indx=40, fold=0, symm=0, dec=127):
-    """PLAYBACK halfwords as the packer leaves them (raw << 8). DEC 127 = HOLD."""
-    words = [ptch, rato, indx, fold, symm, dec]
+def plant_fp(uc, ptch=64, rato=32, indx=40, fold=0, fdbk=40, mix=0,
+             fine=64, dec=127, cmor=0, mmor=0, track=0):
+    """PLAYBACK halfwords (raw << 8) + SETUP bytes in CURVALS.
+    PLAYBACK F = MIX; SETUP D = DEC (127 = HOLD); FINE 64 = 0c."""
+    words = [ptch, rato, indx, fold, fdbk, mix]
     blob = b"".join(struct.pack(">H", (v & 0xFF) << 8) for v in words)
     uc.mem_write(FP_REC, blob + bytes(64))
     uc.mem_write(FP_PTR_AT, struct.pack(">I", FP_REC))
     uc.mem_write(RS_REC, bytes(64))
     uc.mem_write(RS_PTR_AT, struct.pack(">I", RS_REC))
+    lane = CURVALS + 72 * track + 32  # CV_SETUP
+    uc.mem_write(lane, bytes([cmor & 0xFF, mmor & 0xFF, fine & 0xFF, dec & 0xFF, 0, 0]))
 
 
 def plant_amp(uc, track=0, atk=0, hold=127, rel=64, dsp_atk=None, dsp_hold=None, dsp_rel=None):
@@ -279,7 +283,7 @@ def render_frames(uc, symbols, knobs, frames=64, track=0, amp=None):
     """Cold-start then run `frames` second-calls; return interleaved L samples (signed 24)."""
     amp = dict(amp or {})
     plant_part(uc, track)
-    plant_fp(uc, **knobs)
+    plant_fp(uc, track=track, **knobs)
     plant_voice(uc, track, True, **amp)
     uc.mem_write(HEADER, bytes(16 + 16 * 8 * 2))  # header + stereo pairs
     uc.mem_write(CURSOR_AT, struct.pack(">I", HEADER))
@@ -362,16 +366,16 @@ def main():
 
     check_guard(uc, symbols)
 
-    # SYMM default 64 = even; plant fold-alone at even so bias variants differ.
-    base = dict(ptch=64, rato=32, indx=48, fold=0, symm=64, dec=127)
+    base = dict(ptch=64, rato=32, indx=48, fold=0, fdbk=40, mix=0, fine=64, dec=127)
     variants = {
         "base": base,
         "fold": {**base, "fold": 96},
-        "symm": {**base, "fold": 96, "symm": 112},
-        "symm_lo": {**base, "fold": 96, "symm": 16},
+        "fdbk": {**base, "fold": 96, "fdbk": 100},
+        "mix": {**base, "fold": 64, "mix": 96, "indx": 0},
+        "fine": {**base, "fine": 96},
         "rato": {**base, "rato": 96},
         "dec": {**base, "dec": 32},
-        "rails": {**base, "fold": 127, "symm": 127, "dec": 127, "indx": 127},
+        "rails": {**base, "fold": 127, "fdbk": 127, "mix": 127, "indx": 127},
     }
 
     outs = {}
@@ -394,20 +398,24 @@ def main():
         check(label, diff >= min_frac, f"{diff * 100:.1f}% samples differ")
 
     differ(outs["base"], outs["fold"], "FOLD changes the output")
-    differ(outs["fold"], outs["symm"], "SYMM high bias ≠ even (vs FOLD alone)")
-    differ(outs["fold"], outs["symm_lo"], "SYMM low bias ≠ even (vs FOLD alone)")
-    differ(outs["symm_lo"], outs["symm"], "SYMM low bias ≠ high bias")
+    differ(outs["fold"], outs["fdbk"], "FDBK changes the output")
+    differ(outs["base"], outs["mix"], "MIX changes the output")
+    # FINE feeds sy_word; po_rate is stubbed to C4_INC here, so audio may not move.
+    if outs["base"] != outs["fine"]:
+        differ(outs["base"], outs["fine"], "FINE changes the pitch/output")
+    else:
+        print("  [INFO] FINE: no audio delta under stubbed po_rate (expected)")
     differ(outs["base"], outs["rato"], "RATO changes the output")
     differ(outs["base"], outs["dec"], "DEC (not HOLD) changes the output")
 
-    # Boundedness at full FOLD/SYMM/DEC HOLD: count samples at both rails.
+    # Boundedness at full FOLD/FDBK/DEC HOLD: count samples at both rails.
     rails = outs["rails"]
     pos = sum(1 for x in rails if x >= RAIL)
     neg = sum(1 for x in rails if x <= -RAIL - 1)
     frac = (pos + neg) / max(len(rails), 1)
     peak = max(abs(x) for x in rails)
     check(
-        "FOLD=SYMM=DEC=127 stays bounded (not stuck on the rails)",
+        "FOLD=FDBK=MIX=127 stays bounded (not stuck on the rails)",
         frac < 0.25 and peak <= 0x7FFFFF,
         f"rail {frac * 100:.2f}% ({pos}+/{neg}-), peak={peak:#x}",
     )

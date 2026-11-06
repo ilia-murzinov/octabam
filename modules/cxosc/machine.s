@@ -20,7 +20,7 @@
 | THE STORAGE. Chosen track = FLEX (machine byte 1) with signature
 | "C", "X", 1 in NEIGHBOR PLAYBACK: bank + part * 6322 + 0x8edbc + 30 *
 | track (and the battery-RAM shadow). Seed PLAYBACK: PTCH 0, RATO 1,
-| INDX 32, FOLD 40, SYMM 64 (even), DEC HOLD; SETUP 0 (CMOR, MMOR,
+| INDX 32, FOLD 40, FDBK 40, MIX 0; SETUP CMOR/MMOR/FINE/DEC (
 | blank×4); choosing it again keeps the patch; choosing any other
 | row clears the signature.
 |
@@ -1480,8 +1480,8 @@ ml_msg_both:
         .asciz  "FM+SY DRUM: LIMIT"
         .balign 2
 fm_defaults:
-        .byte   64, 25, 32, 40, 64, 127 | PLAYBACK: PTCH 0, RATO ~1, INDX 32, FOLD 40, SYMM even, DEC HOLD
-        .byte   0, 0, 0, 0, 0, 0         | SETUP: LOOP SLIC LEN RATE TSTR TSNS all 0 (OFF)
+        .byte   64, 25, 32, 40, 40, 0   | PLAYBACK: PTCH 0, RATO ~1, INDX 32, FOLD 40, FDBK mid, MIX 0
+        .byte   0, 0, 64, 127, 0, 0      | SETUP: CMOR MMOR FINE0c DEC HOLD
 fm_name:
         .asciz  "CX OSC"
         .balign 4
