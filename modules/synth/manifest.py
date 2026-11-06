@@ -48,10 +48,16 @@ def _keep_detour(d):
     return not any(d.symbol.startswith(p) for p in _DROP_PREFIXES)
 
 
+# Tim still ships an empty DELAY-tail Keep + boundary CavePatch at
+# 0x400d24d0+16 (overflow cursor). After #1023 stock DELAY keeps
+# 0x400d24d0..0x400d2ca8, so those claims collide with DELAY in base*.
+# Page is already DRAM (fmpage); drop the markers.
 MODULE = dataclasses.replace(
     MODULE,
     linked=tuple(_adapt_unit(_u) for _u in MODULE.linked),
     detours=tuple(d for d in MODULE.detours if _keep_detour(d)),
+    keeps=(),
+    cf_patches=(),
     store=Store("timhastie.synth"),
     category=Category.MACHINES,
     author="timhastie/octatrick-modules",

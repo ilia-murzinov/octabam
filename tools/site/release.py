@@ -5,7 +5,7 @@ web builder. SITE_MODULES are Ilia's own modules (with usage docs) — the only
 module pages this Pages site generates.
 """
 
-VERSION = "v0.3"
+VERSION = "v0.4"
 REMIXES = ()
 
 BUILDER_REMIXES = (
