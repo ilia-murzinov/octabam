@@ -981,8 +981,8 @@ sy_loop:
         asr.l   #8,%d2
         add.l   %d2,%d4                  | m sine, Q14
         | Stack: 0=MIX, 4=fold/symm, 8=morph 00 00 CMOR MMOR, 12=header.
-        | Naive saw discontinuity leaks through any linear mix (MORPH.md:
-        | "low amounts already foldy") — both CMOR and MMOR use DPW.
+        | MMOR: DPW (naive into FM jumps ~46..48). CMOR: aligned naive —
+        | DPW(φc_mod, S_INC) crackled under INDX (dt ≠ Δφ_mod); soft CMOR TBD.
         | fb always unmorphed sine (saw must not re-enter the fb loop).
         move.l  %d4,S_LASTM(%a3)         | fb source = sine
         mvz.b   11(%sp),%d2              | MMOR
@@ -1023,17 +1023,15 @@ sy_mod_ok:
         add.l   %d2,%d1                  | c sine, Q14
         mvz.b   14(%sp),%d2              | CMOR (morph at 8+4 park)
         beq     sy_car_ok
-        move.l  %d1,-(%sp)               | park sine
-        move.l  %d2,-(%sp)               | park amt
-        move.l  %d5,%d1                  | Δφ carrier (S_INC)
-        lea     S_DPWC(%a3),%a4
-        bsr     sy_dpw                   | d6=φc → d2 continuous saw
-        move.l  %d2,%d1
-        move.l  (%sp)+,%d2               | amt
-        move.l  (%sp)+,%d4               | sine
+        move.l  %d1,%d4                  | sine
+        move.l  %d6,%d1
+        lsr.l   #8,%d1
+        lsr.l   #8,%d1
+        lsr.l   #1,%d1                   | φc>>17
+        neg.l   %d1
+        addi.l  #16384,%d1              | aligned naive saw
         bsr     sy_epmix
         move.l  %d4,%d1
-        move.l  S_LASTM(%a3),%a4         | restore m_prev (sy_dpw borrowed a4)
 sy_car_ok:
         move.l  (%sp)+,%d6               | restore mod phase
         | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX / 128; 0 = carrier ----
@@ -1130,8 +1128,8 @@ sy_done:
         lea     48(%sp),%sp
         rts
 
-| ---- DPW saw (CMOR + MMOR): d6=φ, d1=Δφ, a4=&z1 → d2 Q14. Parks d3/d7. ---
-| Continuous — naive edge leaks at any mix amount. 2× + invert = fund-aligned.
+| ---- DPW saw (MMOR): d6=φ, d1=Δφ, a4=&z1 → d2 Q14. Parks d3/d7. ----------
+| Continuous — required for FM. 2× + invert = sine-aligned fundamental.
 sy_dpw:
         move.l  %d3,-(%sp)
         move.l  %d7,-(%sp)
