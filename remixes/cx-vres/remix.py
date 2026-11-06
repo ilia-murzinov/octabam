@@ -1,7 +1,7 @@
 """cx-vres -- cx with RESONATOR instead of SHATTER (VOID kept).
 
 CX OSC + VOID + RESONATOR + SCOPE + DARK + COPY. Stock COMPRESSOR.
-No SHATTER / STUTTR / SIDECHAIN / SYNTH / TAPE. MEGABYTE replaces stock DELAY. PLATE / SPRING harvested.
+No SHATTER / STUTTR / SIDECHAIN / SYNTH / TAPE. Stock DELAY kept. PLATE / SPRING harvested.
 """
 
 from remix.schema import Pin, Proof, Remix
@@ -26,8 +26,8 @@ REMIX = Remix(
     name="cx-vres",
     family="mods",
     proof=Proof.RENDER,
-    proof_note="CX OSC + VOID + RESONATOR + SCOPE + DARK + COPY; MEGABYTE for DELAY; stock COMP; no SHATTER / STUTTR / SC / SYNTH.",
-    doc="CORE + STEM REC + CX OSC + VOID + RESONATOR + SCOPE + DARK REV + MEGABYTE + COPY PROJECT + stock COMP.",
+    proof_note="CX OSC + VOID + RESONATOR + SCOPE + DARK + COPY; stock DELAY; stock COMP; no SHATTER / STUTTR / SC / SYNTH.",
+    doc="CORE + STEM REC + CX OSC + VOID + RESONATOR + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP.",
     modules=CORE + (
         "MEMORY",
         "STEM REC",
@@ -44,7 +44,7 @@ REMIX = Remix(
         "SPATIALIZER",
         "COMPRESSOR",
         "LO-FI",
-        "MEGABYTE",
+        "DELAY",
         "DARK REV",
     ),
     fx1=(

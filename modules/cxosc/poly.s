@@ -7,11 +7,11 @@
 |
 | WHAT: a FLEX track with CX OSC chosen generates a two-operator FM voice
 | every frame (16 samples, rate 1.0): carrier = sin(phi_c + I *
-| sin(phi_m + fb * m_prev)), optional MIX, then a sine fold.
-| PLAYBACK: PTCH RATO INDX FOLD FDBK MIX. RATO free 0.25..4 (FUNC snaps).
-| FDBK = modulator feedback. MIX = carrier↔mod into fold (0 = carrier).
-| SETUP A/B = CMOR/MMOR (sine→saw; CMOR naive, MMOR DPW). C/D = FINE
-| (cents, 64=0c) / DEC (index env, 127=HOLD). Part LOOP/SLIC/LEN/RATE.
+| sin(phi_m + fb * m_prev)), optional MIX, then a sine fold with SYMM.
+| PLAYBACK: PTCH RATO INDX FINE FOLD MIX. RATO free 0.25..4 (FUNC snaps).
+| FINE = cents (RATE slot, 64=0c). FOLD = sine fold. MIX = carrier↔mod
+| into fold (0 = carrier). SETUP: CMOR MMOR DEC SYMM FDBK (F blank).
+| DEC index env HOLD@127; SYMM fold skew (64=even); FDBK mod feedback.
 | PTCH −32..+32.
 
 | Mono only -- T_POLY
@@ -179,7 +179,10 @@
         .set    SCALE_AT, 0x400d2ca8     | modules/quantizer/scale.s: `jmp qz_scale_mask` -- d0 := the scale's pitch-class mask, 0 = OFF
         .set    CURVALS, 0x80000810      | the frame builder's per-track current values, 72 B a track, locks applied
         .set    CV_STRIDE, 72
-        .set    CV_SETUP, 32             | PLAYBACK SETUP: +0 CMOR (stock LOOP), +1 MMOR (stock SLIC)
+        .set    CV_SETUP, 32             | SETUP: +0 CMOR +1 MMOR +2 DEC +3 SYMM +4 FDBK
+        .set    CV_MIX, 5                | flat slot 5 = PLAYBACK F (RTIM) = MIX
+        .set    PLAY_SETUP, 0x8ef60      | Part + track*30: CMOR/MMOR/DEC/SYMM/FDBK
+        .set    PLAY_SLOTS, 0x8edaa      | Part PLAYBACK columns (+ machine*6 + track*30)
         .set    CV_CHRD, 11              | flat slot 11 = LFO page slot 5 (DEP3): the chord shape
         .set    CV_VOIC, 8               | flat slot 8 = LFO page slot 2 (SPD3): the voice count, 1..4
         .set    CV_REL, 14               | flat slot 14 = AMP page slot 2 (REL)
@@ -216,7 +219,8 @@
         .set    S_INCM, 16               | modulator increment
         .set    S_IEFF, 20               | index * envelope, the per-sample multiplier -- the RUNNING value: sy_loop steps it by S_ISTEP a sample (BUILD 38)
         .set    S_GAIN, 24               | start ramp, Q15
-        .set    S_FB, 28                 | feedback multiplier
+        .set    S_FB, 28                 | feedback multiplier (SETUP E)
+        .set    S_MIX, 86                | byte: PLAYBACK F MIX 0..127 — aliases T_GMAX+2; prefer sy_cxmix[t]
         .set    S_LASTM, 32              | the modulator's last sample, Q14
         .set    S_ON, 36                 | bit 0: the playing voice is a synth; bit 1: a release (the AMP release, mailbox 0x40)
                                          | reached the frame builder since that START (po_rel; BUILD 27) -- tst.b still
@@ -249,7 +253,7 @@
         .set    T_RAWP, 112              | the record's PTCH raw (halfword >> 8) at this frame's second call, before the neutralising (MIDI IN, 30 Sep 2026: po_start's per-note pitch)
         .set    T_SMASK, 116             | paraphonic: the held keys that got their voice (or were dropped by the cap) since their press (the same-scan sweep, 26 Sep 2026)
         .set    T_LASTK, 120             | paraphonic: the frame of the last live panel-key start (a key within KR_WIN of it is a chord press)
-                                         | FOLD/MIX/CMOR/MMOR in sy_cxparm[t] (4 B) -- NOT here: +124/+126 are T_LEGKEY/T_LEGN and S_ISTEP
+                                         | FOLD/SYMM/CMOR/MMOR in sy_cxparm[t] (4 B) -- NOT here: +124/+126 are T_LEGKEY/T_LEGN and S_ISTEP
         .set    T_POS, 92                | the marker's sample positions (voice +64..+83) before the stock call, restored after it: a synth voice never reaches the marker's end
         .set    V_POS, 64                | the voice struct's sample position fields: +64 window base, +68 position, +72/+76 the stream's, +80 frames left in the fetched chunk
         .set    PART_PTR, 0x46c82456     | the bank blob; the Part = blob + part index * 6322
@@ -399,6 +403,8 @@ sy_cold1:
         clr.l   S_PHC(%a3)               | silent: phase 0, the gain from 0
         clr.l   S_PHM(%a3)
         clr.l   S_LASTM(%a3)
+        lea     sy_cxmix(%pc),%a0        | MIX lives off the 128 B record (S_MIX@86 aliases T_GMAX)
+        clr.b   (%a0,%d2.l)
         clr.l   S_DPWM(%a3)
         clr.l   S_DPWC(%a3)
         clr.l   S_GAIN(%a3)
@@ -583,6 +589,7 @@ sy_mono_inc:
         move.l  %d0,S_INC(%a3)           | carrier increment: the true pitch
 
 | ---- the parameters ---------------------------------------------------------
+| PLAYBACK: PTCH RATO INDX FINE FOLD MIX. SETUP: CMOR MMOR DEC SYMM FDBK.
         move.l  %d0,-(%sp)               | park carrier inc (sy_rato_q8 clobbers d0)
         mvz.w   2(%a4),%d1               | STRT -> ratio (free: raw 0..127 -> Q8 0.25..16)
         lsr.l   #8,%d1
@@ -591,26 +598,34 @@ sy_mono_inc:
         asr.l   #8,%d0
         muls.l  %d1,%d0
         move.l  %d0,S_INCM(%a3)          | modulator increment = ratio * pitch
-        mvz.w   6(%a4),%d1               | RATE -> FOLD raw (sy_cxparm: not S_ISTEP / T_LEG*)
+        mvz.w   8(%a4),%d1               | RTRG -> FOLD
         lsr.l   #8,%d1
         move.l  %d2,%d0                  | track (still in d2 here)
         lea     sy_cxparm(%pc),%a0
-        lsl.l   #2,%d0                   | 4 B a track: FOLD MIX CMOR MMOR
+        lsl.l   #2,%d0                   | 4 B a track: FOLD SYMM CMOR MMOR
         move.b  %d1,(%a0,%d0.l)          | FOLD
         move.l  %d2,%d1
         move.l  #CV_STRIDE,%d3
         mulu.l  %d3,%d1
-        lea     CURVALS+CV_SETUP,%a1     | PLAYBACK SETUP: CMOR MMOR FINE DEC
-        mvz.w   10(%a4),%d3              | RTIM -> MIX
-        lsr.l   #8,%d3
+        lea     CURVALS+CV_SETUP,%a1     | SETUP: CMOR MMOR DEC SYMM FDBK
+        mvz.b   3(%a1,%d1.l),%d3         | SETUP D -> SYMM
+        bne     sy_symm_nz               | 0 = pre-migrate / unset Part -> even
+        moveq   #64,%d3
+        move.b  %d3,3(%a1,%d1.l)         | heal CURVALS so SETUP shows 64
+sy_symm_nz:
         move.b  %d3,1(%a0,%d0.l)
         mvz.b   (%a1,%d1.l),%d3
         move.b  %d3,2(%a0,%d0.l)         | CMOR
         mvz.b   1(%a1,%d1.l),%d3
         move.b  %d3,3(%a0,%d0.l)         | MMOR
-        bsr     cx_lfo_morph             | PMTR 30/31 private words -> CMOR/MMOR (d2 = track)
-        mvz.w   8(%a4),%d1               | RTRG -> FDBK raw
-        lsr.l   #8,%d1
+        bsr     cx_lfo_morph             | PMTR 30..33 -> CMOR/MMOR/SYMM + sy_cxfb (d2 = track)
+        mvz.w   10(%a4),%d0              | RTIM -> MIX
+        lsr.l   #8,%d0
+        lea     sy_cxmix(%pc),%a0
+        move.b  %d0,(%a0,%d2.l)
+        lea     sy_cxfb(%pc),%a0         | FDBK (SETUP E + LFO PMTR 33)
+        mvz.b   (%a0,%d2.l),%d1
+        lsl.l   #8,%d1                   | word form (Tim RTRG path): raw<<8 * SCALE >> 8
         move.l  #FB_SCALE,%d0
         mulu.l  %d0,%d1
         lsr.l   #8,%d1
@@ -629,8 +644,8 @@ sy_env_k:                                | (2.10 / 5 Oct 2026: HOLD at 127, not 
         move.l  #CV_STRIDE,%d0
         mulu.l  %d0,%d1
         lea     CURVALS+CV_SETUP,%a1
-        mvz.b   3(%a1,%d1.l),%d1         | SETUP D -> DEC
-        moveq   #127,%d0                 | RTIM 127: the index holds;
+        mvz.b   2(%a1,%d1.l),%d1         | SETUP C -> DEC
+        moveq   #127,%d0                 | DEC 127: the index holds;
         cmp.l   %d0,%d1                  | 0 = the shortest -- read as 1, whose k is the cap
         bcc     sy_nodecay               | K_MAX
         tst.l   %d1
@@ -915,13 +930,17 @@ sy_alive:
         bra     po_fill                  | ... sum the voices (ends at sy_done)
 sy_mono:
         move.l  %a2,-(%sp)               | the header: sy_gend's pass over the fading voices reads it (popped there)
-        move.l  56(%sp),%d1              | track -> sy_cxparm (4 B: FOLD MIX CMOR MMOR)
+        move.l  56(%sp),%d1              | track -> sy_cxparm (4 B: FOLD SYMM CMOR MMOR)
         lea     sy_cxparm(%pc),%a6
         lsl.l   #2,%d1
         mvz.w   2(%a6,%d1.l),%d2         | CMOR<<8|MMOR
-        move.l  %d2,-(%sp)               | 4(sp) after fold push
-        mvz.w   (%a6,%d1.l),%d1          | FOLD<<8|MIX
-        move.l  %d1,-(%sp)               | 0(sp) = fold/mix, 4(sp) = morph, 8(sp) = header
+        move.l  %d2,-(%sp)               | morph (under fold)
+        mvz.w   (%a6,%d1.l),%d1          | FOLD<<8|SYMM
+        move.l  %d1,-(%sp)               | fold/symm
+        move.l  64(%sp),%d1              | track (52+12 after header/morph/fold): MIX
+        lea     sy_cxmix(%pc),%a6
+        mvz.b   (%a6,%d1.l),%d1
+        move.l  %d1,-(%sp)               | 0=MIX, 4=fold/symm, 8=morph, 12=header
         move.l  S_PHC(%a3),%d0
         move.l  S_PHM(%a3),%d6
         move.l  S_INC(%a3),%d5
@@ -961,11 +980,11 @@ sy_loop:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d4                  | m sine, Q14
-        | Stack: 0=fold, 4=morph 00 00 CMOR MMOR, 8=header.
+        | Stack: 0=MIX, 4=fold/symm, 8=morph 00 00 CMOR MMOR, 12=header.
         | MMOR into FM cannot use a naive saw edge (jumps ~46..48). DPW target
         | + fb always sine. CMOR (carrier) still hard naive — audible saw OK.
         move.l  %d4,S_LASTM(%a3)         | fb source = sine
-        mvz.b   7(%sp),%d2               | MMOR
+        mvz.b   11(%sp),%d2              | MMOR
         beq     sy_mod_ok
         move.l  %d6,%d1                  | raw φm
         move.l  %a4,%d6                  | DPW phase = φm_eff
@@ -1001,7 +1020,7 @@ sy_mod_ok:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d1                  | c sine, Q14
-        mvz.b   10(%sp),%d2              | CMOR
+        mvz.b   14(%sp),%d2              | CMOR (morph at 8+4 park)
         beq     sy_car_ok
         move.l  %d1,%d4                  | sine
         move.l  %d6,%d1
@@ -1015,28 +1034,41 @@ sy_mod_ok:
 sy_car_ok:
         move.l  (%sp)+,%d6               | restore mod phase
         | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX / 128; 0 = carrier ----
-        | Stack long is 00 00 FOLD MIX (be); MIX at +3.
-        mvz.b   3(%sp),%d2
+        move.l  (%sp),%d2                | MIX 0..127
         beq     sy_mix_done
-        move.l  %a4,%d4                  | morphed modulator
+        move.l  %a4,%d4                  | modulator (sine / last m)
         sub.l   %d1,%d4
         muls.l  %d2,%d4
         asr.l   #7,%d4
         add.l   %d4,%d1
 sy_mix_done:
-        | ---- FOLD: sine fold, even (no SYMM). drive_q8 = 256 + FOLD*24.
-        move.l  (%sp),%d2                | FOLD<<8|MIX
+        | ---- FOLD (RTRG) + SYMM (SETUP D): half-wave skew into the folder ----
+        | c_fold = c * gain/64; gain = SYMM (c>=0) or (128-SYMM) (c<0).
+        | 64 = even. drive_q8 = 256 + FOLD*24. out = c + (folded-c)*FOLD/128.
+        move.l  4(%sp),%d2               | FOLD<<8|SYMM
         lsr.l   #8,%d2
         beq     sy_nofold
-        move.l  %d1,-(%sp)               | park c
-        move.l  %d2,-(%sp)               | park FOLD
-        move.l  %d2,%d4
+        move.l  %d1,-(%sp)               | park c (unbiased dry)
+        move.l  %d2,-(%sp)               | park FOLD amount
+        move.l  %d2,%d4                  | fold*24 = fold*16 + fold*8
         lsl.l   #4,%d4
         lsl.l   #3,%d2
         add.l   %d2,%d4
-        addi.l  #256,%d4
-        move.l  4(%sp),%d1
-        muls.l  %d4,%d1
+        addi.l  #256,%d4                 | drive_q8
+        move.l  4(%sp),%d1               | c
+        move.l  12(%sp),%d2              | FOLD<<8|SYMM (under the two parks; was at 4)
+        mvz.b   %d2,%d2                  | SYMM 0..127
+        tstl    %d1
+        bmi     sy_skew_lo
+        muls.l  %d2,%d1                  | +half: c * SYMM
+        bra     sy_skew_div
+sy_skew_lo:
+        negl    %d2
+        addil   #128,%d2                 | 128 − SYMM
+        muls.l  %d2,%d1                  | −half: c * (128−SYMM)
+sy_skew_div:
+        asr.l   #6,%d1                   | / 64 -> c_fold
+        muls.l  %d4,%d1                  | c_fold * drive_q8
         asl.l   #8,%d1
         move.l  %d1,%d2
         lsr.l   %d3,%d2
@@ -1049,9 +1081,9 @@ sy_mix_done:
         muls.l  %d1,%d2
         asr.l   #8,%d2
         asr.l   #8,%d2
-        add.l   %d2,%d4
-        move.l  (%sp)+,%d2
-        move.l  (%sp)+,%d1
+        add.l   %d2,%d4                  | folded, Q14
+        move.l  (%sp)+,%d2               | FOLD
+        move.l  (%sp)+,%d1               | c
         sub.l   %d1,%d4
         muls.l  %d2,%d4
         asr.l   #7,%d4
@@ -1079,7 +1111,8 @@ sy_nofold:
         moveq   #0,%d1
 sy_gend:
         move.w  %d1,S_GPREV(%a3)
-        move.l  (%sp)+,%d1               | drop fold/mix
+        move.l  (%sp)+,%d1               | drop MIX
+        move.l  (%sp)+,%d1               | drop fold/symm
         move.l  (%sp)+,%d1               | drop morph
         move.l  (%sp)+,%a2               | the header
         move.l  52(%sp),%d2              | track
@@ -1262,20 +1295,13 @@ sy_word:
         move.l  %d6,%d0
         lsl.l   #2,%d6
         add.l   %d0,%d6                  | (ptch - 0x4000) * 5
-        | FINE = SETUP C (CURVALS+CV_SETUP+2); raw 64 = 0c. d2 = track.
-        move.l  %a0,-(%sp)
-        move.l  %d2,%d0
-        move.l  #CV_STRIDE,%d1
-        mulu.l  %d1,%d0
-        lea     CURVALS+CV_SETUP,%a0
-        mvz.b   2(%a0,%d0.l),%d0
-        lsl.l   #8,%d0
+        | FINE = PLAYBACK RATE (Tim): (rate - 0x4000) / 20 cents into the word
+        mvz.w   6(%a4),%d0
         subi.l  #0x4000,%d0
         move.l  %d0,%d1
         moveq   #20,%d0
         divs.l  %d0,%d1
         add.l   %d1,%d6
-        movea.l (%sp)+,%a0
         addi.l  #0x4000,%d6
         rts
 
@@ -1506,17 +1532,22 @@ po_fr_params:
         lsr.l   #8,%d1
         bsr     sy_rato_q8               | d1 := Q8
         move.l  %d1,T_RATIO(%a5)
-        mvz.w   8(%a4),%d1               | RTRG -> FDBK
-        lsr.l   #8,%d1
+        lea     sy_cxfb(%pc),%a1         | FDBK (SETUP E + LFO PMTR 33; morph ran this frame)
+        mvz.b   (%a1,%d2.l),%d1
+        lsl.l   #8,%d1                   | word form (Tim RTRG path)
         move.l  #FB_SCALE,%d0
         mulu.l  %d0,%d1
         lsr.l   #8,%d1
         move.l  %d1,S_FB(%a5)
-        move.l  %d2,%d1                  | track -> SETUP D = DEC
+        mvz.w   10(%a4),%d1              | RTIM -> MIX
+        lsr.l   #8,%d1
+        lea     sy_cxmix(%pc),%a1
+        move.b  %d1,(%a1,%d2.l)
+        move.l  %d2,%d1                  | track -> SETUP C = DEC
         move.l  #CV_STRIDE,%d0
         mulu.l  %d0,%d1
         lea     CURVALS+CV_SETUP,%a1
-        mvz.b   3(%a1,%d1.l),%d1         | index decay k (127 = hold)
+        mvz.b   2(%a1,%d1.l),%d1         | index decay k (127 = hold)
         moveq   #127,%d0
         cmp.l   %d0,%d1
         bcc     po_fr_hold
@@ -3109,12 +3140,13 @@ po_pg_have:
         lea     8(%sp),%sp
         rts
 
-| a0 = PLAYBACK descriptor clone: SETUP A/B = CMOR/MMOR, C/D = FINE/DEC
-| (0..127), E-F blanked. min/count 0/128 + plain dials.
+| a0 = PLAYBACK descriptor clone: SETUP A..E = CMOR MMOR DEC SYMM FDBK,
+| F blanked. min/count 0/128. DEC uses decay icon; SYMM/FDBK their icons.
+| Nibbles: 0x18e high = A/B; 0x18a low 16 = C..F (C=0..3 … F=12..15).
 | Edit: po_setup_edit + fm_e6_morph (stock SETUP_STEP bypassed; stack padded).
 | Clobbers d0/a0/a1; a2 (clone) preserved by caller frame.
         .set    FMT_PLAIN, 0x4003c178
-        .set    PLAY_SETUP, 0x8ef60      | Part + track*30: LOOP/SLIC/LEN/RATE = CMOR/MMOR/FINE/DEC
+        .set    PLAY_SETUP, 0x8ef60      | Part + track*30: CMOR/MMOR/DEC/SYMM/FDBK
         .global po_setup_edit, po_setup_cur
 po_setup_cx:
         lea     -8(%sp),%sp
@@ -3126,60 +3158,74 @@ po_setup_cx:
         lea     po_mmor(%pc),%a0
         move.l  (%a0),0x40(%a1)
         move.w  4(%a0),0x44(%a1)
-        lea     po_fine(%pc),%a0
+        lea     po_dec(%pc),%a0
         move.l  (%a0),0x46(%a1)
         move.w  4(%a0),0x4a(%a1)
-        lea     po_dec(%pc),%a0
+        lea     po_symm(%pc),%a0
         move.l  (%a0),0x4c(%a1)
         move.w  4(%a0),0x50(%a1)
+        lea     po_fdbk(%pc),%a0
+        move.l  (%a0),0x52(%a1)
+        move.w  4(%a0),0x56(%a1)
+        lea     po_blank6(%pc),%a0       | F: kill stock TSNS name
+        move.l  (%a0),0x58(%a1)
+        move.w  4(%a0),0x5c(%a1)
         move.l  #FMT_PLAIN,%d0
-        move.l  %d0,0xca+24(%a1)
-        move.l  %d0,0xca+28(%a1)
-        lea     po_fmt_fine(%pc),%a0
-        move.l  %a0,0xca+32(%a1)
+        move.l  %d0,0xca+24(%a1)         | CMOR
+        move.l  %d0,0xca+28(%a1)         | MMOR
         lea     pg_fmt_decay:l,%a0
-        move.l  %a0,0xca+36(%a1)
+        move.l  %a0,0xca+32(%a1)         | DEC
+        move.l  #FMT_PLAIN,%d0
+        move.l  %d0,0xca+36(%a1)         | SYMM
+        move.l  %d0,0xca+40(%a1)         | FDBK
         lea     po_fmt_blank(%pc),%a0
-        move.l  %a0,0xca+40(%a1)
-        move.l  %a0,0xca+44(%a1)
+        move.l  %a0,0xca+44(%a1)         | F blank
         clr.l   0x6a+24(%a1)
         clr.l   0x6a+28(%a1)
         clr.l   0x6a+32(%a1)
         clr.l   0x6a+36(%a1)
+        clr.l   0x6a+40(%a1)
         move.l  #128,%d0
         move.l  %d0,0x9a+24(%a1)
         move.l  %d0,0x9a+28(%a1)
         move.l  %d0,0x9a+32(%a1)
         move.l  %d0,0x9a+36(%a1)
-        clr.b   0x5e+6(%a1)
+        move.l  %d0,0x9a+40(%a1)
+        clr.b   0x5e+6(%a1)              | CMOR/MMOR default 0
         clr.b   0x5e+7(%a1)
-        move.b  #64,0x5e+8(%a1)
-        move.b  #127,0x5e+9(%a1)
-        clr.l   0xfa+24(%a1)
+        move.b  #127,0x5e+8(%a1)         | DEC HOLD
+        move.b  #64,0x5e+9(%a1)          | SYMM even
+        move.b  #40,0x5e+10(%a1)         | FDBK mid (old CX fixed amount)
+        clr.l   0xfa+24(%a1)             | CMOR/MMOR plain
         clr.l   0xfa+28(%a1)
-        clr.l   0xfa+32(%a1)
-        clr.l   0xfa+36(%a1)
+        lea     pg_wid_decay:l,%a0       | DEC decay icon
+        move.l  %a0,0xfa+32(%a1)
+        lea     pg_wid_symm:l,%a0
+        move.l  %a0,0xfa+36(%a1)
+        lea     pg_wid_fdbk:l,%a0
+        move.l  %a0,0xfa+40(%a1)
+        clr.l   0xfa+44(%a1)             | F no widget
         move.l  0x18e(%a1),%d0
         andi.l  #0x00ffffff,%d0
-        ori.l   #0x11000000,%d0
+        ori.l   #0x11000000,%d0          | SETUP A/B live
         move.l  %d0,0x18e(%a1)
         move.l  0x18a(%a1),%d0
         andi.l  #0xffff0000,%d0
-        ori.l   #0x00001100,%d0
+        ori.l   #0x00000111,%d0          | C/D/E = 1; F = 0
         move.l  %d0,0x18a(%a1)
         movem.l (%sp),%d0/%a1
         lea     8(%sp),%sp
         rts
 
 | SRC SETUP edit site (a5=descriptor, a3=control, d2=row).
-| d0: 0 stock row*6, 1 inert (E-F), 2 A-D continuous (caller stores).
+| d0: 0 stock row*6, 1 inert (F), 2 A-E continuous (caller stores).
 po_setup_edit:
         move.l  %a0,-(%sp)
         lea     po_pgdesc_buf(%pc),%a0
         cmpa.l  %a0,%a5
         movea.l (%sp)+,%a0
         bne     po_se_no
-        cmpa.l  #4,%a3
+        cmpa.l  #5,%a3
         bcc     po_se_inert
         moveq   #2,%d0
         rts
@@ -3190,7 +3236,7 @@ po_se_no:
         moveq   #0,%d0
         rts
 
-| d2=track, a3=control 0..3 -> d0 = Part SETUP byte. Other regs kept.
+| d2=track, a3=control 0..4 -> d0 = Part SETUP byte. Other regs kept.
 po_setup_cur:
         lea     -8(%sp),%sp
         movem.l %d1/%a0,(%sp)
@@ -3251,8 +3297,8 @@ po_f_dc:
 | Stock caller 0x40055008 clamps to the slot's [min, min+count-1]. CX:
 |   plain           one unit
 |   knob pressed    PTCH ×3; other slots ×7
-|   FUNC held       PTCH snaps −32 / 0 / +32 (raw 32 / 64 / 96); INDX FOLD
-|                   FDBK MIX ×16; RATO next classic snap ≤4.01
+|   FUNC held       PTCH snaps −32 / 0 / +32 (raw 32 / 64 / 96); INDX FINE
+|                   FOLD MIX ×16; RATO next classic snap ≤4.01
 | SCALE ON: qz_knob still recomputes PTCH by scale degree (existing path).
 | Clobbers d0/d1/a0 (C scratch); d2-d5 saved.
 po_knob:
@@ -3387,7 +3433,7 @@ po_kn_out:
         movem.l (%sp),%d2-%d5
         lea     16(%sp),%sp
         rts
-po_kn_jump:                              | FUNC's jump a detent, by slot: PTCH RATO INDX FOLD FDBK MIX
+po_kn_jump:                              | FUNC's jump a detent, by slot: PTCH RATO INDX FINE FOLD MIX
         .byte   0, 0, 16, 16, 16, 16     | PTCH uses po_kn_ptch (cardinals); RATO its own path
         .align  4
 
@@ -5495,7 +5541,7 @@ po_flex_slot:
         move.l  %d3,%d4
         rts
 
-| ---- po_fine_reset: RATE := 1 (FOLD ~off; never 0 -- stock RATE 0 can stall) for track d2.
+| ---- po_fine_reset: RATE := 64 (FINE 0c) for track d2.
 | Part FLEX PLAYBACK byte, shadow, live lane. Preserves every register.
 po_fine_reset:
         lea     -16(%sp),%sp
@@ -5509,15 +5555,15 @@ po_fine_reset:
         sub.l   %d2,%d1
         sub.l   %d2,%d1                  | track * 30
         add.l   %d0,%d1
-        addi.l  #PLAY_SLOTS+6+CV_RATE,%d1 | + FLEX (machine 1) * 6 + slot D
-        moveq   #1,%d0
-        move.b  %d0,(%a0,%d1.l)          | the Part (FOLD ~off; not 0)
+        addi.l  #PLAY_SLOTS+6+CV_RATE,%d1 | + FLEX (machine 1) * 6 + slot D = FINE
+        moveq   #64,%d0                  | 0 cents
+        move.b  %d0,(%a0,%d1.l)
         lea     PART_SHADOW,%a1
-        move.b  %d0,(%a1,%d1.l)          | its shadow
+        move.b  %d0,(%a1,%d1.l)
         move.l  #CV_STRIDE,%d1
         muls.l  %d2,%d1
         lea     CURVALS,%a0
-        move.b  %d0,CV_RATE(%a0,%d1.l)   | the live lane
+        move.b  %d0,CV_RATE(%a0,%d1.l)
         movem.l (%sp),%d0-%d1/%a0-%a1
         lea     16(%sp),%sp
         rts
@@ -5602,10 +5648,14 @@ po_cmor:
         .ascii  "CMOR\0\0"
 po_mmor:
         .ascii  "MMOR\0\0"
-po_fine:
-        .ascii  "FINE\0\0"
 po_dec:
         .ascii  "DEC\0\0\0"
+po_symm:
+        .ascii  "SYMM\0\0"
+po_fdbk:
+        .ascii  "FDBK\0\0"
+po_blank6:
+        .ascii  "\0\0\0\0\0\0"
 po_chrd:
         .ascii  "CHRD\0\0"
 po_voic:
@@ -5855,15 +5905,20 @@ sy_tab:
         .short  -3196, -2801, -2404, -2006, -1606, -1205, -804, -402
         .short  0
 
-| ---- CMOR/MMOR LFO destinations (PMTR 30/31; remix.inc second pass) ------------
+| ---- SETUP LFO destinations (PMTR 30..33; remix.inc second pass) ---------------
         .include "remix.inc"
 
 | ---- state (RAM) ---------------------------------------------------------------
         .align  4
 sy_state:                                | 8 tracks x 128 bytes
         .fill   8 * ST_STRIDE, 1, 0
-sy_cxparm:                               | 8 tracks x (FOLD, MIX, CMOR, MMOR) -- off the 128 B record
+sy_cxparm:                               | 8 tracks x (FOLD, SYMM, CMOR, MMOR) -- off the 128 B record
         .fill   32, 1, 0
+sy_cxmix:                                | 8 tracks: PLAYBACK F MIX (S_MIX@86 aliases T_GMAX)
+        .fill   8, 1, 0
+sy_cxfb:                                 | 8 tracks: effective FDBK (SETUP E + LFO PMTR 33)
+        .fill   8, 1, 0
+        .align  4
 po_amp:                                  | (2.20) 8 tracks x 4 bytes: ATK, HOLD, REL as the frame builder wrote them,
         .fill   8 * 4, 1, 0              | 1 once kept (po_amp_snap)
 po_voices:                               | 8 tracks x 4 voices x 64 bytes
