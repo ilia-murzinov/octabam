@@ -13,8 +13,6 @@ Choosing a second CX OSC in the same Part hits the mono cap (`CX OSC: 1 MAX`).
 After a layout change (or an old Part), **re-select CX OSC** on the track
 so the SETUP bytes match the current defaults.
 
-![CX OSC PLAYBACK: PTCH RATO INDX FINE FOLD MIX.](../../img/cxosc/source.png)
-
 ## PLAYBACK — the voice
 
 Six knobs on the PLAYBACK page. Think **carrier + modulator → mix → fold**.
@@ -29,8 +27,6 @@ Six knobs on the PLAYBACK page. Think **carrier + modulator → mix → fold**.
 | F | **MIX** | What goes into the folder: **0** = carrier only, up = more modulator into the fold. Plain dial. |
 
 FUNC on most knobs jumps in bigger steps (PTCH snaps −32 / 0 / +32).
-
-![SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK.](../../img/cxosc/setup.png)
 
 ## SETUP — shape and motion
 
