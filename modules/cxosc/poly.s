@@ -226,6 +226,9 @@
                                          | reached the frame builder since that START (po_rel; BUILD 27) -- tst.b still
                                          | means "a synth plays": bits 1 / 2 are set only while bit 0 is;
                                          | bit 2: STOPPED (po_stop, BUILD 32): a release under REL INF takes the 1 ms floor
+                                         | bit 3: LIVE — START was a key/MIDI (not a sequencer trig). HOLD INF +
+                                         | REL 0: stock still posts a step-end 0x40; po_rel must ignore that for
+                                         | sequencer HOLD INF (otherwise INF sounds like HOLD 0), but honor key-up.
         .set    S_GPREV, 38              | word: the gain the last rendered call ended at (sy_loop ramps S_GPREV -> S_GAIN across the call; every start clears it with the phases -- BUILD 26)
         .set    S_CUR, 40                | the slewed PTCH word, Q12 (GLIDE)
         .set    S_DPWM, 44               | DPW z1 (φ²) modulator — was T_REF (CX mono)
@@ -383,6 +386,14 @@ sy_cold:                                 | a synth starts -- THE START RULE (pla
                                          | the 16-frame ramp its floor), the index envelope restarts at once (from
                                          | silence: inaudible). BUILD 27/28's four-condition rule (S_HOLD, S_KEYED,
                                          | the released flag) is gone: the DSP no longer restarts or
+        tst.l   %d1                      | DSP snap can still be 0 on the START frame; prefer the lane
+        bne     sy_cold_holdv
+        move.l  %d2,%d0
+        move.l  #CV_STRIDE,%d3
+        mulu.l  %d3,%d0
+        lea     CURVALS+CV_HOLD,%a0
+        mvz.b   (%a0,%d0.l),%d1
+sy_cold_holdv:
         cmpi.l  #127,%d1                 | releases anything. The track's effective HOLD now (2.20, po_amp_at: the
         beq     sy_cold_nohold           | lock or the Part's, a scene, an LFO) arms the mono HOLD timer: 127 = INF (none), else po_hold128 steps
         lea     po_hold128(%pc),%a0      | in 1/128 x frames a step (the DSP's own timer runs from the START at that
@@ -397,6 +408,18 @@ sy_cold_nohold:
         moveq   #0,%d1
 sy_cold_hold:
         move.l  %d1,S_HTIM(%a3)
+        bclr    #3,S_ON(%a3)             | LIVE bit: set if this START is a key/MIDI
+        lea     KEYS_AT,%a0
+        tst.b   (%a0,%d2.l)
+        bne     sy_cold_live
+        lea     0x460d171d,%a0           | stock HELD[t]
+        tst.b   (%a0,%d2.l)
+        bne     sy_cold_live
+        bsr     po_mheld_of              | MIDI held list
+        beq     sy_cold_seq
+sy_cold_live:
+        bset    #3,S_ON(%a3)
+sy_cold_seq:
         tst.w   S_GPREV(%a3)
         bne     sy_warm_env              | sounding: continuous
 sy_cold1:
@@ -4620,12 +4643,25 @@ po_rel:
         btst    #2,%d0                   | a START in the same word (a panel key pressed while one is held,
         bne     po_rel_out               | LEG OFF: 0x4004fbfe posts the note-off and the START together): the
         move.l  %a3,%d2                  | DSP restarts at full this frame, the release never fades -- no flag
+        move.l  %d2,-(%sp)               | park track (po_amp_at / LIVE test)
         lsl.l   #7,%d2                   | * ST_STRIDE
         lea     sy_state(%pc),%a0
         adda.l  %d2,%a0
         btst    #0,S_ON(%a0)             | a synth plays: it has been released
-        beq     po_rel_out
+        beq     po_rel_drop
+        btst    #3,S_ON(%a0)             | LIVE key/MIDI: always honor note-off
+        bne     po_rel_do
+        move.l  %a0,-(%sp)               | sequencer: HOLD INF must ignore step-end 0x40
+        move.l  4(%sp),%d2               | track
+        bsr     po_amp_at
+        mvz.b   1(%a0),%d0
+        move.l  (%sp)+,%a0
+        cmpi.l  #127,%d0
+        beq     po_rel_drop              | HOLD INF + sequencer = sustain (HTIM already 0)
+po_rel_do:
         bset    #1,S_ON(%a0)
+po_rel_drop:
+        move.l  (%sp)+,%d2
 po_rel_out:
         jmp     0x4000b522
 
