@@ -480,9 +480,9 @@ sy_no:
 sy_set:
         tst.l   %d3                      | sample: clear; synth: keep LIVE (bit 3) across the write
         beq     sy_set_off
-        move.b  S_ON(%a3),%d0
-        andi.b  #0x08,%d0
-        ori.b   #1,%d0
+        mvz.b   S_ON(%a3),%d0
+        andi.l  #0x08,%d0
+        ori.l   #1,%d0
         move.b  %d0,S_ON(%a3)
         bra     sy_ison
 sy_set_off:
