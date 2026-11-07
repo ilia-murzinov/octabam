@@ -478,7 +478,15 @@ sy_no:
         move.l  %d1,S_CUR(%a3)
         moveq   #0,%d3
 sy_set:
-        move.b  %d3,S_ON(%a3)
+        tst.l   %d3                      | sample: clear; synth: keep LIVE (bit 3) across the write
+        beq     sy_set_off
+        move.b  S_ON(%a3),%d0
+        andi.b  #0x08,%d0
+        ori.b   #1,%d0
+        move.b  %d0,S_ON(%a3)
+        bra     sy_ison
+sy_set_off:
+        clr.b   S_ON(%a3)
 sy_ison:
         tst.b   S_ON(%a3)
         beq     sy_sample
