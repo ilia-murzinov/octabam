@@ -1,8 +1,8 @@
 {
  "version": "v0.4",
- "commit": "dc8a8d3e4cef88753726980462e7a7432519cc6b",
+ "commit": "73afa8e0eb44cc7cdf457446de394a6f6522ae26",
  "dev": true,
- "build": "I3",
+ "build": "I4",
  "date": "2026-11-07",
  "featureRows": [
   "SCOPE",
@@ -85,7 +85,7 @@
   {
    "name": "base",
    "title": "base",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "BASE I3",
    "patch": "patches/base.obp",
    "patchBytes": 136496,
@@ -102,7 +102,7 @@
   {
    "name": "base-stuttr",
    "title": "base-stuttr",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "BASE-STUTTR I3",
    "patch": "patches/base-stuttr.obp",
    "patchBytes": 136877,
@@ -119,7 +119,7 @@
   {
    "name": "base-reson",
    "title": "base-reson",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "BASE-RESON I3",
    "patch": "patches/base-reson.obp",
    "patchBytes": 135454,
@@ -136,7 +136,7 @@
   {
    "name": "base-vres",
    "title": "base-vres",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "BASE-VRES I3",
    "patch": "patches/base-vres.obp",
    "patchBytes": 136650,
@@ -153,11 +153,11 @@
   {
    "name": "cx",
    "title": "cx",
-   "version": "OCTABAMI3",
-   "imageName": "CX I3",
+   "version": "OCTABAMI4",
+   "imageName": "CX I4",
    "patch": "patches/cx.obp",
-   "patchBytes": 120065,
-   "sha256": "ab57a116902b2a646879072e911b6f86a442f62d7372dc219960a0840fde2ada",
+   "patchBytes": 119999,
+   "sha256": "d27f2d36b0c84235ce3fa24c4153952d442c3ad099d37c9ea0bc1bffa5e07aaa",
    "features": [
     "COPY PROJECT",
     "CX OSC",
@@ -170,7 +170,7 @@
   {
    "name": "cx-stuttr",
    "title": "cx-stuttr",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "CX-STUTTR I3",
    "patch": "patches/cx-stuttr.obp",
    "patchBytes": 120344,
@@ -187,7 +187,7 @@
   {
    "name": "cx-reson",
    "title": "cx-reson",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "CX-RESON I3",
    "patch": "patches/cx-reson.obp",
    "patchBytes": 118965,
@@ -204,7 +204,7 @@
   {
    "name": "cx-vres",
    "title": "cx-vres",
-   "version": "OCTABAMI3",
+   "version": "OCTABAMI4",
    "imageName": "CX-VRES I3",
    "patch": "patches/cx-vres.obp",
    "patchBytes": 120163,
