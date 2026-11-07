@@ -578,7 +578,7 @@ sy_machine:
 
 | ---- the mono voice's frame: the rate, as the stock renderer computes it -----
 sy_mono_frame:
-        bsr     po_fade_frame            | paraphonic voices fading under the mono voice: their envelope (BUILD 32)
+        bsr     po_free                  | CX: never leave para zombies under the mono voice
         bsr     po_rate_fold             | d0 = the increment for the word d6, any octave (clobbers d0/d1/d3/d4/d7/a0)
         cmpi.l  #INC_MAX,%d0             | safety net: an impossible pitch (a word off the curve's
         bls     sy_mono_inc              | table, a stale record) silences the voice instead of
@@ -1113,12 +1113,7 @@ sy_gend:
         move.l  (%sp)+,%d1               | drop fold/symm
         move.l  (%sp)+,%d1               | drop morph
         move.l  (%sp)+,%a2               | the header
-        move.l  52(%sp),%d2              | track
-        bsr     po_any                   | paraphonic voices still fading under the mono voice (VOIC 2..4 -> 1 across
-        beq     sy_done                  | a note, sy_warm's po_fade): summed onto the mono voice's samples (BUILD 32)
-        mvz.b   3(%a2),%d7
-        lea     16(%a2),%a1
-        bra     po_fill_add
+        | CX mono: never sum fading para voices under the carrier (was two pitches)
 sy_done:
         move.l  44(%sp),%d0
         movem.l (%sp),%d2-%d7/%a2-%a6
@@ -2510,22 +2505,14 @@ po_ho_new1:
 | quantizer reaches it through the pointer block's -24, po_mon directly):
 |   0  stock: the held note ends, the new one starts (LEG OFF)
 |   1  mono legato: the trigless path, the mono voice slews (LEG MONO / POLY)
-| CX OSC has no VOIC/CHRD -- LFO SPD3 is a real LFO rate. Reading it as Tim's
-| VOIC (2..4) made overlapping keys take the paraphonic gate (two pitches).
-| Always the mono gate here. Sample tracks unchanged below.
-| LEG is the Part's AMP page-2 byte 5: 0 OFF, 1 MONO, 2.. POLY. tst.l d0 done;
-| preserves every other register.
+| CX OSC: ALWAYS 1 on a synth track. LEG OFF used to return 0 → stock note-off
+| + START while the previous note was still releasing (~REL, ~0.5 s of two
+| pitches). Last-note priority, no under-release. SPD3 is never Tim VOIC.
+| Sample tracks unchanged below. tst.l d0 done; preserves every other register.
 po_legmode:
         bsr     po_is_synth
         beq     po_lm_sample             | not a synth track: its LEG byte, 0 -> 0 (stock), else 1 (mono legato)
-        lea     -8(%sp),%sp
-        movem.l %d1/%a0,(%sp)
-        bsr     po_legbyte               | LEG only — never SPD3-as-VOIC
-        movem.l (%sp),%d1/%a0
-        lea     8(%sp),%sp
-        tst.l   %d0
-        beq     po_lm_ret                | OFF -> 0
-        moveq   #1,%d0                   | any LEG -> mono legato
+        moveq   #1,%d0                   | CX synth: always mono legato (even LEG OFF)
         rts
 po_lm_sample:
         lea     -8(%sp),%sp              | a sample track (3 Oct 2026): LEG OFF -> 0 (stock), LEG MONO (any
