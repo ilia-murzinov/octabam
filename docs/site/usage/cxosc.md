@@ -36,10 +36,9 @@ carrier, then open one thing at a time.
   bypass. As it rises you get Buchla-style harmonics; the fold is a
   *sine-table* waveshape, so leaving it up while testing **CMOR** can make
   a saw still sound “sine-ish”. Drop FOLD near 0 when auditioning morph.
-  Live turns are slewed (fractional) so a held note does not zipper.
 - **MIX** — what goes into the folder. **0** = carrier only; raise it to
-  blend the modulator into the fold input. Same slew as FOLD under a
-  sustained note. With MIX 0, FOLD only colours the carrier.
+  blend the modulator into the fold input. Plain dial. With MIX 0, FOLD
+  only colours the carrier.
 
 FUNC on most knobs jumps in bigger steps.
 
