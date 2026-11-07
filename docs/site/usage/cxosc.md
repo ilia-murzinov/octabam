@@ -36,9 +36,10 @@ carrier, then open one thing at a time.
   bypass. As it rises you get Buchla-style harmonics; the fold is a
   *sine-table* waveshape, so leaving it up while testing **CMOR** can make
   a saw still sound “sine-ish”. Drop FOLD near 0 when auditioning morph.
+  Live turns are slewed (fractional) so a held note does not zipper.
 - **MIX** — what goes into the folder. **0** = carrier only; raise it to
-  blend the modulator into the fold input. Plain dial. With MIX 0, FOLD
-  only colours the carrier.
+  blend the modulator into the fold input. Same slew as FOLD under a
+  sustained note. With MIX 0, FOLD only colours the carrier.
 
 FUNC on most knobs jumps in bigger steps.
 
@@ -54,9 +55,11 @@ Slot F is blank.
   (DPW) saw. Heard *through* FM, so needs **INDX**. Same idea as CMOR on
   paper, different target on purpose: a hard saw in the modulator makes the
   FM path explode mid-travel; DPW keeps it continuous.
-- **DEC** — index envelope after a trig. Low = the FM depth falls away
-  quickly; **127 = HOLD** (index stays at the INDX knob). The HOLD icon is
-  a single hollow line at the top of the box.
+- **DEC** — index envelope after a trig (**SETUP C**, not PLAYBACK F —
+  PLAYBACK F is MIX). Low = the FM depth falls away quickly; **127 = HOLD**
+  (INDX tracks the knob instantly). The HOLD icon is a single hollow line
+  at the top of the box. After a layout change, re-select CX OSC so DEC
+  lands on SETUP at 127.
 - **SYMM** — fold half-wave skew. **64** = even fold. Below / above tips
   which polarity the folder emphasises (can mute one side). Needs **FOLD**
   up — at FOLD 0 you will not hear it.

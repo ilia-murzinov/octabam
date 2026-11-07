@@ -403,8 +403,20 @@ sy_cold1:
         clr.l   S_PHC(%a3)               | silent: phase 0, the gain from 0
         clr.l   S_PHM(%a3)
         clr.l   S_LASTM(%a3)
-        lea     sy_cxmix(%pc),%a0        | MIX lives off the 128 B record (S_MIX@86 aliases T_GMAX)
-        clr.b   (%a0,%d2.l)
+        move.l  %d2,%d0                  | snap MIX/FOLD Q8 to the panel (was clr → click every START)
+        lsl.l   #2,%d0
+        mvz.w   10(%a4),%d1              | RTIM -> MIX
+        lsr.l   #8,%d1
+        lea     sy_cxmix(%pc),%a0
+        move.b  %d1,(%a0,%d2.l)
+        lsl.l   #8,%d1
+        lea     sy_mixq(%pc),%a0
+        move.l  %d1,(%a0,%d0.l)
+        mvz.w   8(%a4),%d1               | RTRG -> FOLD
+        lsr.l   #8,%d1
+        lsl.l   #8,%d1
+        lea     sy_foldq(%pc),%a0
+        move.l  %d1,(%a0,%d0.l)
         clr.l   S_DPWM(%a3)
         clr.l   S_DPWC(%a3)
         clr.l   S_GAIN(%a3)
@@ -420,7 +432,7 @@ sy_warm:                                 | (sy_env_ramp, 5.8 ms), the carrier an
         move.l  RS_PTR,%a0
         clr.l   4(%a0)                   | the retrig count the packer just latched: no stock retrigs
         clr.b   T_POLY(%a3)              | CX OSC: mono only -- LFO 3 stays SPD3/DEP3 (no VOIC/CHRD)
-        bsr     po_fade
+        bsr     po_free                  | hard-kill para zombies (fade left them under mono = two pitches)
         bsr     po_mring_reset
         lea     KEYS_AT,%a0
         clr.b   (%a0,%d2.l)
@@ -578,7 +590,7 @@ sy_machine:
 
 | ---- the mono voice's frame: the rate, as the stock renderer computes it -----
 sy_mono_frame:
-        bsr     po_fade_frame            | paraphonic voices fading under the mono voice: their envelope (BUILD 32)
+        bsr     po_free                  | CX: never leave para zombies under the mono voice
         bsr     po_rate_fold             | d0 = the increment for the word d6, any octave (clobbers d0/d1/d3/d4/d7/a0)
         cmpi.l  #INC_MAX,%d0             | safety net: an impossible pitch (a word off the curve's
         bls     sy_mono_inc              | table, a stale record) silences the voice instead of
@@ -601,9 +613,16 @@ sy_mono_inc:
         mvz.w   8(%a4),%d1               | RTRG -> FOLD
         lsr.l   #8,%d1
         move.l  %d2,%d0                  | track (still in d2 here)
+        lea     sy_foldq(%pc),%a0        | one-pole slew — knob jumps were zipper clicks
+        lsl.l   #2,%d0
+        adda.l  %d0,%a0
+        move.l  %d1,%d0                  | target raw
+        bsr     sy_knob_slew             | d0 := slewed FOLD
+        move.l  %d2,%d1
         lea     sy_cxparm(%pc),%a0
-        lsl.l   #2,%d0                   | 4 B a track: FOLD SYMM CMOR MMOR
-        move.b  %d1,(%a0,%d0.l)          | FOLD
+        lsl.l   #2,%d1                   | 4 B a track: FOLD SYMM CMOR MMOR
+        move.b  %d0,(%a0,%d1.l)          | FOLD (slewed)
+        move.l  %d1,%d0                  | parm index (track*4)
         move.l  %d2,%d1
         move.l  #CV_STRIDE,%d3
         mulu.l  %d3,%d1
@@ -621,6 +640,11 @@ sy_symm_nz:
         bsr     cx_lfo_morph             | PMTR 30..33 -> CMOR/MMOR/SYMM + sy_cxfb (d2 = track)
         mvz.w   10(%a4),%d0              | RTIM -> MIX
         lsr.l   #8,%d0
+        move.l  %d2,%d1
+        lea     sy_mixq(%pc),%a0
+        lsl.l   #2,%d1
+        adda.l  %d1,%a0
+        bsr     sy_knob_slew             | d0 := slewed MIX
         lea     sy_cxmix(%pc),%a0
         move.b  %d0,(%a0,%d2.l)
         lea     sy_cxfb(%pc),%a0         | FDBK (SETUP E + LFO PMTR 33)
@@ -683,10 +707,8 @@ sy_envdone:
         mulu.l  %d2,%d1
         lsr.l   #8,%d1
         lsr.l   #4,%d1                   | I * E: this call's target
-        sub.l   S_IEFF(%a3),%d1          | ... minus the running value: sy_loop ramps S_IEFF there across the
-        moveq   #16,%d2                  | frame, (target - running) / 16 a sample (BUILD 38: no step at a frame
-        divs.l  %d2,%d1                  | edge when the index moves -- the ramp, the decay, a knob)
-        move.w  %d1,S_ISTEP(%a3)
+        move.l  %d1,S_IEFF(%a3)          | snap — INDX / DEC track this frame (no 16-sample slew;
+        clr.w   S_ISTEP(%a3)             | DEC HOLD must feel instant on the knob)
         move.l  52(%sp),%d2              | track (d2 was RTIM above)
         bsr     po_mono_env              | the mono voice's AMP envelope (plan B): S_GAIN := the level this frame ends at
         bra     sy_check                 | (po_mono_env's body follows: not fall-through)
@@ -802,6 +824,16 @@ po_me_atk:
         move.l  #32768,%d1
         bra     po_me_store
 po_me_rel:
+        lea     KEYS_AT,%a1              | CX last-note: if a key/MIDI note is still held, cancel
+        tst.b   (%a1,%d2.l)              | release — never let the previous pitch die under the new one
+        bne     po_me_unrel
+        lea     0x460d171d,%a1           | stock HELD[t] (key+1; quantizer HELD)
+        tst.b   (%a1,%d2.l)
+        bne     po_me_unrel
+        move.l  %a0,-(%sp)
+        bsr     po_mheld_of              | MIDI held list (Z clear = something held)
+        movea.l (%sp)+,%a0
+        bne     po_me_unrel
         mvz.b   2(%a0),%d0               | REL
         lea     po_relk(%pc),%a0
         mvz.w   (%a0,%d0.l*2),%d0        | k, Q16 (0 = INF)
@@ -823,6 +855,10 @@ po_me_rel1:
         cmpi.l  #64,%d1                  | -54 dB: silent
         bgt     po_me_store
         moveq   #0,%d1
+        bra     po_me_store
+po_me_unrel:
+        bclr    #1,S_ON(%a3)             | still held: stay sounding at the new pitch
+        bra     po_me_atk
 po_me_store:
         move.l  %d1,S_GAIN(%a3)
         rts
@@ -934,13 +970,15 @@ sy_mono:
         lea     sy_cxparm(%pc),%a6
         lsl.l   #2,%d1
         mvz.w   2(%a6,%d1.l),%d2         | CMOR<<8|MMOR
-        move.l  %d2,-(%sp)               | morph (under fold)
-        mvz.w   (%a6,%d1.l),%d1          | FOLD<<8|SYMM
-        move.l  %d1,-(%sp)               | fold/symm
-        move.l  64(%sp),%d1              | track (52+12 after header/morph/fold): MIX
-        lea     sy_cxmix(%pc),%a6
-        mvz.b   (%a6,%d1.l),%d1
-        move.l  %d1,-(%sp)               | 0=MIX, 4=fold/symm, 8=morph, 12=header
+        move.l  %d2,-(%sp)               | morph
+        mvz.b   1(%a6,%d1.l),%d2         | SYMM (FOLD amount comes from Q8 slew, not the byte)
+        move.l  %d2,-(%sp)
+        move.l  64(%sp),%d1              | track (52+12 after header/morph/symm)
+        lsl.l   #2,%d1
+        lea     sy_foldq(%pc),%a6        | Q8 FOLD/MIX — fractional through the loop (sustained knob turns)
+        move.l  (%a6,%d1.l),-(%sp)
+        lea     sy_mixq(%pc),%a6
+        move.l  (%a6,%d1.l),-(%sp)       | 0=MIX_Q8, 4=FOLD_Q8, 8=SYMM, 12=morph, 16=header
         move.l  S_PHC(%a3),%d0
         move.l  S_PHM(%a3),%d6
         move.l  S_INC(%a3),%d5
@@ -980,11 +1018,11 @@ sy_loop:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d4                  | m sine, Q14
-        | Stack: 0=MIX, 4=fold/symm, 8=morph 00 00 CMOR MMOR, 12=header.
+        | Stack: 0=MIX_Q8, 4=FOLD_Q8, 8=SYMM, 12=morph 00 00 CMOR MMOR, 16=header.
         | MMOR into FM cannot use a naive saw edge (jumps ~46..48). DPW target
         | + fb always sine. CMOR (carrier) still hard naive — audible saw OK.
         move.l  %d4,S_LASTM(%a3)         | fb source = sine
-        mvz.b   11(%sp),%d2              | MMOR
+        mvz.b   15(%sp),%d2              | MMOR
         beq     sy_mod_ok
         move.l  %d6,%d1                  | raw φm
         move.l  %a4,%d6                  | DPW phase = φm_eff
@@ -1020,7 +1058,7 @@ sy_mod_ok:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d1                  | c sine, Q14
-        mvz.b   14(%sp),%d2              | CMOR (morph at 8+4 park)
+        mvz.b   18(%sp),%d2              | CMOR (morph at 12+4 park)
         beq     sy_car_ok
         move.l  %d1,%d4                  | sine
         move.l  %d6,%d1
@@ -1033,30 +1071,31 @@ sy_mod_ok:
         move.l  %d4,%d1
 sy_car_ok:
         move.l  (%sp)+,%d6               | restore mod phase
-        | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX / 128; 0 = carrier ----
-        move.l  (%sp),%d2                | MIX 0..127
+        | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX_Q8 / 32768; 0 = carrier ----
+        move.l  (%sp),%d2                | MIX Q8 (slewed)
         beq     sy_mix_done
         move.l  %a4,%d4                  | modulator (sine / last m)
         sub.l   %d1,%d4
         muls.l  %d2,%d4
+        asr.l   #8,%d4                   | /32768 (CF asr #imm is 1..8)
         asr.l   #7,%d4
         add.l   %d4,%d1
 sy_mix_done:
         | ---- FOLD (RTRG) + SYMM (SETUP D): half-wave skew into the folder ----
         | c_fold = c * gain/64; gain = SYMM (c>=0) or (128-SYMM) (c<0).
-        | 64 = even. drive_q8 = 256 + FOLD*24. out = c + (folded-c)*FOLD/128.
-        move.l  4(%sp),%d2               | FOLD<<8|SYMM
-        lsr.l   #8,%d2
+        | 64 = even. drive = 256 + (FOLD_Q8*24)>>8. out = c + (folded-c)*FOLD_Q8/32768.
+        move.l  4(%sp),%d2               | FOLD Q8
         beq     sy_nofold
         move.l  %d1,-(%sp)               | park c (unbiased dry)
-        move.l  %d2,-(%sp)               | park FOLD amount
-        move.l  %d2,%d4                  | fold*24 = fold*16 + fold*8
+        move.l  %d2,-(%sp)               | park FOLD Q8
+        move.l  %d2,%d4                  | (fold_q8*24)>>8 = fold*24
         lsl.l   #4,%d4
         lsl.l   #3,%d2
         add.l   %d2,%d4
+        asr.l   #8,%d4
         addi.l  #256,%d4                 | drive_q8
         move.l  4(%sp),%d1               | c
-        move.l  12(%sp),%d2              | FOLD<<8|SYMM (under the two parks; was at 4)
+        move.l  16(%sp),%d2              | SYMM (under the two parks; was at 8)
         mvz.b   %d2,%d2                  | SYMM 0..127
         tstl    %d1
         bmi     sy_skew_lo
@@ -1082,10 +1121,11 @@ sy_skew_div:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d4                  | folded, Q14
-        move.l  (%sp)+,%d2               | FOLD
+        move.l  (%sp)+,%d2               | FOLD Q8
         move.l  (%sp)+,%d1               | c
         sub.l   %d1,%d4
         muls.l  %d2,%d4
+        asr.l   #8,%d4                   | /32768
         asr.l   #7,%d4
         add.l   %d4,%d1
 sy_nofold:
@@ -1111,16 +1151,12 @@ sy_nofold:
         moveq   #0,%d1
 sy_gend:
         move.w  %d1,S_GPREV(%a3)
-        move.l  (%sp)+,%d1               | drop MIX
-        move.l  (%sp)+,%d1               | drop fold/symm
+        move.l  (%sp)+,%d1               | drop MIX_Q8
+        move.l  (%sp)+,%d1               | drop FOLD_Q8
+        move.l  (%sp)+,%d1               | drop SYMM
         move.l  (%sp)+,%d1               | drop morph
         move.l  (%sp)+,%a2               | the header
-        move.l  52(%sp),%d2              | track
-        bsr     po_any                   | paraphonic voices still fading under the mono voice (VOIC 2..4 -> 1 across
-        beq     sy_done                  | a note, sy_warm's po_fade): summed onto the mono voice's samples (BUILD 32)
-        mvz.b   3(%a2),%d7
-        lea     16(%a2),%a1
-        bra     po_fill_add
+        | CX mono: never sum fading para voices under the carrier (was two pitches)
 sy_done:
         move.l  44(%sp),%d0
         movem.l (%sp),%d2-%d7/%a2-%a6
@@ -1369,6 +1405,20 @@ po_legbyte:
         sub.l   %d2,%d3                  | track * 30
         adda.l  #AMP_P2_OFF,%a0
         mvz.b   LEG_SLOT2(%a0,%d3.l),%d0
+        rts
+
+| ---- sy_knob_slew: d0 := one-pole of target d0 (0..127), a0 -> Q8 long ------
+| cur += (target<<8 - cur) >> 3; d0 = cur >> 8. ~8 frames to settle — kills
+| MIX/FOLD zipper when the encoder jumps. Clobbers d1.
+sy_knob_slew:
+        move.l  %d0,%d1
+        lsl.l   #8,%d1                   | target Q8
+        move.l  (%a0),%d0                | cur
+        sub.l   %d0,%d1                  | diff
+        asr.l   #3,%d1                   | /8
+        add.l   %d1,%d0
+        move.l  %d0,(%a0)
+        lsr.l   #8,%d0                   | published raw
         rts
 
 | ---- sy_slew: d6 := the PTCH word slewed toward d6 (GLIDE) ---------------------
@@ -2121,13 +2171,7 @@ po_st_ns:
         move.l  #CV_STRIDE,%d0
         muls.l  %d2,%d0
         lea     CURVALS,%a0
-        mvz.b   CV_VOIC(%a0,%d0.l),%d6   | VOIC: the track's voice cap, locks applied (2..4 here:
-        subq.l  #1,%d6                   | the note started paraphonic on this byte; a byte outside
-        cmpi.l  #3,%d6                   | 1..4 reads 1)
-        bls     po_st_v1
-        moveq   #0,%d6
-po_st_v1:
-        addq.l  #1,%d6
+        moveq   #1,%d6                   | CX: always VOIC 1 (SPD3 is LFO rate, not Tim's cap)
         mvz.b   CV_CHRD(%a0,%d0.l),%d0   | the chord byte, locks applied: shape << 2 | inversion (26 Sep 2026)
         move.l  %d0,%d3
         lsr.l   #2,%d3                   | the shape, 0..31 (0 = "----")
@@ -2395,13 +2439,7 @@ po_ho_fold1:
         muls.l  %d2,%d0
         lea     CURVALS,%a0
         mvz.b   CV_CHRD(%a0,%d0.l),%d3   | the chord byte, locks applied: shape << 2 | inversion
-        mvz.b   CV_VOIC(%a0,%d0.l),%d6   | VOIC 1..4 (as po_st_v1)
-        subq.l  #1,%d6
-        cmpi.l  #3,%d6
-        bls     po_ho_v1
-        moveq   #0,%d6
-po_ho_v1:
-        addq.l  #1,%d6                   | n
+        moveq   #1,%d6                   | CX: always VOIC 1 (SPD3 ≠ Tim cap)
         move.l  %d3,%d0
         lsr.l   #2,%d0                   | the shape
         beq     po_ho_single
@@ -2522,78 +2560,16 @@ po_ho_new1:
 | ---- po_legmode: d2 = track -> d0 = what a CHROMATIC key (or a MIDI note) pressed
 | while another is held does on the track -- THE LEG GATE (2 Oct 2026; the
 | quantizer reaches it through the pointer block's -24, po_mon directly):
-|   0  stock: the held note ends, the new one starts (a sample track with
-|      GLIDE OFF; a synth track at VOIC 1 with LEG OFF)
-|   1  mono legato: the trigless path, the mono voice slews (VOIC 1, LEG MONO or
-|      POLY); a SAMPLE track with LEG MONO (the 2.6 trigless path: the key
-|      changes the pitch at once, no retrigger; GLIDE is not read there)
-|   2  paraphonic: the key gets a voice of its own, no legato (VOIC 2..4 with
-|      LEG OFF or MONO; and with LEG POLY and CHRD "----" a CHORD PRESS: a key
-|      inside KR_WIN frames -- 150 ms, the recorder's chord window -- of the
-|      track's last live key START (T_LASTK), so a chord fingered on the keys
-|      still gets its voices)
-|   3  paraphonic legato: the trigless path and po_legkey, the chord follows the
-|      key (VOIC 2..4, LEG POLY: with a shape always; with "----" a key later
-|      than the chord window)
-| LEG is the Part's AMP page-2 byte 5 (AMP_P2_OFF + track * 30 + 5: the AMP
-| SETUP page's sixth box, TRIG's byte, po_amp_desc): 0 OFF, 1 MONO, 2 POLY (3
-| and 4, a stock knob's reach on the empty box, read as POLY; on a sample
-| track any nonzero byte is MONO). A stock Part reads OFF. tst.l d0 done;
-| preserves every other register.
+|   0  stock: the held note ends, the new one starts (LEG OFF)
+|   1  mono legato: the trigless path, the mono voice slews (LEG MONO / POLY)
+| CX OSC: ALWAYS 1 on a synth track. LEG OFF used to return 0 → stock note-off
+| + START while the previous note was still releasing (~REL, ~0.5 s of two
+| pitches). Last-note priority, no under-release. SPD3 is never Tim VOIC.
+| Sample tracks unchanged below. tst.l d0 done; preserves every other register.
 po_legmode:
         bsr     po_is_synth
         beq     po_lm_sample             | not a synth track: its LEG byte, 0 -> 0 (stock), else 1 (mono legato)
-        lea     -16(%sp),%sp
-        movem.l %d1/%d3/%d4/%a0,(%sp)
-        movea.l PART_PTR,%a0
-        mvz.b   PART_IDX,%d0
-        move.l  #6322,%d1
-        muls.l  %d1,%d0
-        adda.l  %d0,%a0                  | the Part
-        move.l  %d2,%d1
-        lsl.l   #3,%d1
-        move.l  %d1,%d0
-        add.l   %d1,%d1
-        add.l   %d0,%d1                  | track * 24
-        adda.l  #LFO_PAGE_OFF,%a0
-        mvz.b   2(%a0,%d1.l),%d3         | VOIC
-        mvz.b   5(%a0,%d1.l),%d4         | CHRD (shape << 2 | inversion)
-        suba.l  #LFO_PAGE_OFF,%a0
-        move.l  %d2,%d1
-        lsl.l   #5,%d1
-        sub.l   %d2,%d1
-        sub.l   %d2,%d1                  | track * 30
-        adda.l  #AMP_P2_OFF,%a0
-        mvz.b   LEG_SLOT2(%a0,%d1.l),%d0 | LEG: 0 OFF, 1 MONO, 2.. POLY
-        subq.l  #2,%d3
-        cmpi.l  #2,%d3                   | VOIC 2..4?
-        bls     po_lm_para
-        tst.l   %d0                      | VOIC 1: OFF -> 0 (stock), else 1 (mono legato)
-        beq     po_lm_out
-        moveq   #1,%d0
-        bra     po_lm_out
-po_lm_para:
-        cmpi.l  #2,%d0                   | VOIC 2..4: POLY -> 3 (or a chord press, 2), else 2
-        bcc     po_lm_leg
-po_lm_two:
-        moveq   #2,%d0
-        bra     po_lm_out
-po_lm_leg:
-        lsr.l   #2,%d4                   | a shape: legato
-        bne     po_lm_three
-        lea     sy_state(%pc),%a0        | "----": inside the chord window of the track's last live
-        move.l  %d2,%d1                  | key START (po_st_cpress stamps T_LASTK) the key is a chord
-        lsl.l   #7,%d1                   | press -- a voice of its own
-        move.l  po_clock+CK_FRAMES(%pc),%d0
-        sub.l   T_LASTK(%a0,%d1.l),%d0
-        cmpi.l  #KR_WIN,%d0
-        bls     po_lm_two
-po_lm_three:
-        moveq   #3,%d0
-po_lm_out:
-        movem.l (%sp),%d1/%d3/%d4/%a0
-        lea     16(%sp),%sp
-        tst.l   %d0
+        moveq   #1,%d0                   | CX synth: always mono legato (even LEG OFF)
         rts
 po_lm_sample:
         lea     -8(%sp),%sp              | a sample track (3 Oct 2026): LEG OFF -> 0 (stock), LEG MONO (any
@@ -5919,6 +5895,10 @@ sy_cxmix:                                | 8 tracks: PLAYBACK F MIX (S_MIX@86 al
 sy_cxfb:                                 | 8 tracks: effective FDBK (SETUP E + LFO PMTR 33)
         .fill   8, 1, 0
         .align  4
+sy_mixq:                                 | 8 tracks x Q8 current MIX (sy_knob_slew)
+        .fill   8, 4, 0
+sy_foldq:                                | 8 tracks x Q8 current FOLD
+        .fill   8, 4, 0
 po_amp:                                  | (2.20) 8 tracks x 4 bytes: ATK, HOLD, REL as the frame builder wrote them,
         .fill   8 * 4, 1, 0              | 1 once kept (po_amp_snap)
 po_voices:                               | 8 tracks x 4 voices x 64 bytes
