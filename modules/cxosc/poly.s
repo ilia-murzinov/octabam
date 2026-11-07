@@ -1077,7 +1077,8 @@ sy_car_ok:
         move.l  %a4,%d4                  | modulator (sine / last m)
         sub.l   %d1,%d4
         muls.l  %d2,%d4
-        asr.l   #15,%d4
+        asr.l   #8,%d4                   | /32768 (CF asr #imm is 1..8)
+        asr.l   #7,%d4
         add.l   %d4,%d1
 sy_mix_done:
         | ---- FOLD (RTRG) + SYMM (SETUP D): half-wave skew into the folder ----
@@ -1124,7 +1125,8 @@ sy_skew_div:
         move.l  (%sp)+,%d1               | c
         sub.l   %d1,%d4
         muls.l  %d2,%d4
-        asr.l   #15,%d4
+        asr.l   #8,%d4                   | /32768
+        asr.l   #7,%d4
         add.l   %d4,%d1
 sy_nofold:
         adda.l  %a6,%a5                  | the gain one step on (a linear ramp across the call: no step at a frame edge)
