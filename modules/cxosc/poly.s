@@ -420,7 +420,7 @@ sy_warm:                                 | (sy_env_ramp, 5.8 ms), the carrier an
         move.l  RS_PTR,%a0
         clr.l   4(%a0)                   | the retrig count the packer just latched: no stock retrigs
         clr.b   T_POLY(%a3)              | CX OSC: mono only -- LFO 3 stays SPD3/DEP3 (no VOIC/CHRD)
-        bsr     po_free                  | hard-kill para zombies (fade left them under mono = two pitches)
+        bsr     po_fade
         bsr     po_mring_reset
         lea     KEYS_AT,%a0
         clr.b   (%a0,%d2.l)
@@ -2121,7 +2121,13 @@ po_st_ns:
         move.l  #CV_STRIDE,%d0
         muls.l  %d2,%d0
         lea     CURVALS,%a0
-        moveq   #1,%d6                   | CX: always VOIC 1 (SPD3 is LFO rate, not Tim's cap)
+        mvz.b   CV_VOIC(%a0,%d0.l),%d6   | VOIC: the track's voice cap, locks applied (2..4 here:
+        subq.l  #1,%d6                   | the note started paraphonic on this byte; a byte outside
+        cmpi.l  #3,%d6                   | 1..4 reads 1)
+        bls     po_st_v1
+        moveq   #0,%d6
+po_st_v1:
+        addq.l  #1,%d6
         mvz.b   CV_CHRD(%a0,%d0.l),%d0   | the chord byte, locks applied: shape << 2 | inversion (26 Sep 2026)
         move.l  %d0,%d3
         lsr.l   #2,%d3                   | the shape, 0..31 (0 = "----")
@@ -2389,7 +2395,13 @@ po_ho_fold1:
         muls.l  %d2,%d0
         lea     CURVALS,%a0
         mvz.b   CV_CHRD(%a0,%d0.l),%d3   | the chord byte, locks applied: shape << 2 | inversion
-        moveq   #1,%d6                   | CX: always VOIC 1 (SPD3 ≠ Tim cap)
+        mvz.b   CV_VOIC(%a0,%d0.l),%d6   | VOIC 1..4 (as po_st_v1)
+        subq.l  #1,%d6
+        cmpi.l  #3,%d6
+        bls     po_ho_v1
+        moveq   #0,%d6
+po_ho_v1:
+        addq.l  #1,%d6                   | n
         move.l  %d3,%d0
         lsr.l   #2,%d0                   | the shape
         beq     po_ho_single
@@ -2510,24 +2522,78 @@ po_ho_new1:
 | ---- po_legmode: d2 = track -> d0 = what a CHROMATIC key (or a MIDI note) pressed
 | while another is held does on the track -- THE LEG GATE (2 Oct 2026; the
 | quantizer reaches it through the pointer block's -24, po_mon directly):
-|   0  stock: the held note ends, the new one starts (LEG OFF)
-|   1  mono legato: the trigless path, the mono voice slews (LEG MONO / POLY)
-| CX OSC has no VOIC/CHRD -- LFO SPD3 is a real LFO rate. Reading it as Tim's
-| VOIC (2..4) made overlapping keys take the paraphonic gate (two pitches).
-| Always the mono gate here. Sample tracks unchanged below.
-| LEG is the Part's AMP page-2 byte 5: 0 OFF, 1 MONO, 2.. POLY. tst.l d0 done;
+|   0  stock: the held note ends, the new one starts (a sample track with
+|      GLIDE OFF; a synth track at VOIC 1 with LEG OFF)
+|   1  mono legato: the trigless path, the mono voice slews (VOIC 1, LEG MONO or
+|      POLY); a SAMPLE track with LEG MONO (the 2.6 trigless path: the key
+|      changes the pitch at once, no retrigger; GLIDE is not read there)
+|   2  paraphonic: the key gets a voice of its own, no legato (VOIC 2..4 with
+|      LEG OFF or MONO; and with LEG POLY and CHRD "----" a CHORD PRESS: a key
+|      inside KR_WIN frames -- 150 ms, the recorder's chord window -- of the
+|      track's last live key START (T_LASTK), so a chord fingered on the keys
+|      still gets its voices)
+|   3  paraphonic legato: the trigless path and po_legkey, the chord follows the
+|      key (VOIC 2..4, LEG POLY: with a shape always; with "----" a key later
+|      than the chord window)
+| LEG is the Part's AMP page-2 byte 5 (AMP_P2_OFF + track * 30 + 5: the AMP
+| SETUP page's sixth box, TRIG's byte, po_amp_desc): 0 OFF, 1 MONO, 2 POLY (3
+| and 4, a stock knob's reach on the empty box, read as POLY; on a sample
+| track any nonzero byte is MONO). A stock Part reads OFF. tst.l d0 done;
 | preserves every other register.
 po_legmode:
         bsr     po_is_synth
         beq     po_lm_sample             | not a synth track: its LEG byte, 0 -> 0 (stock), else 1 (mono legato)
-        lea     -8(%sp),%sp
-        movem.l %d1/%a0,(%sp)
-        bsr     po_legbyte               | LEG only — never SPD3-as-VOIC
-        movem.l (%sp),%d1/%a0
-        lea     8(%sp),%sp
+        lea     -16(%sp),%sp
+        movem.l %d1/%d3/%d4/%a0,(%sp)
+        movea.l PART_PTR,%a0
+        mvz.b   PART_IDX,%d0
+        move.l  #6322,%d1
+        muls.l  %d1,%d0
+        adda.l  %d0,%a0                  | the Part
+        move.l  %d2,%d1
+        lsl.l   #3,%d1
+        move.l  %d1,%d0
+        add.l   %d1,%d1
+        add.l   %d0,%d1                  | track * 24
+        adda.l  #LFO_PAGE_OFF,%a0
+        mvz.b   2(%a0,%d1.l),%d3         | VOIC
+        mvz.b   5(%a0,%d1.l),%d4         | CHRD (shape << 2 | inversion)
+        suba.l  #LFO_PAGE_OFF,%a0
+        move.l  %d2,%d1
+        lsl.l   #5,%d1
+        sub.l   %d2,%d1
+        sub.l   %d2,%d1                  | track * 30
+        adda.l  #AMP_P2_OFF,%a0
+        mvz.b   LEG_SLOT2(%a0,%d1.l),%d0 | LEG: 0 OFF, 1 MONO, 2.. POLY
+        subq.l  #2,%d3
+        cmpi.l  #2,%d3                   | VOIC 2..4?
+        bls     po_lm_para
+        tst.l   %d0                      | VOIC 1: OFF -> 0 (stock), else 1 (mono legato)
+        beq     po_lm_out
+        moveq   #1,%d0
+        bra     po_lm_out
+po_lm_para:
+        cmpi.l  #2,%d0                   | VOIC 2..4: POLY -> 3 (or a chord press, 2), else 2
+        bcc     po_lm_leg
+po_lm_two:
+        moveq   #2,%d0
+        bra     po_lm_out
+po_lm_leg:
+        lsr.l   #2,%d4                   | a shape: legato
+        bne     po_lm_three
+        lea     sy_state(%pc),%a0        | "----": inside the chord window of the track's last live
+        move.l  %d2,%d1                  | key START (po_st_cpress stamps T_LASTK) the key is a chord
+        lsl.l   #7,%d1                   | press -- a voice of its own
+        move.l  po_clock+CK_FRAMES(%pc),%d0
+        sub.l   T_LASTK(%a0,%d1.l),%d0
+        cmpi.l  #KR_WIN,%d0
+        bls     po_lm_two
+po_lm_three:
+        moveq   #3,%d0
+po_lm_out:
+        movem.l (%sp),%d1/%d3/%d4/%a0
+        lea     16(%sp),%sp
         tst.l   %d0
-        beq     po_lm_ret                | OFF -> 0
-        moveq   #1,%d0                   | any LEG -> mono legato
         rts
 po_lm_sample:
         lea     -8(%sp),%sp              | a sample track (3 Oct 2026): LEG OFF -> 0 (stock), LEG MONO (any
