@@ -35,8 +35,8 @@ Signal path: **mod FM → carrier → MIX → FOLD → out**.
 
 | Knob | Name | What it does |
 |------|------|----------------|
-| A | CMOR | Carrier morph 0..127 (sine → hard saw) |
-| B | MMOR | Modulator morph 0..127 (sine → DPW saw) |
+| A | CMOR | Carrier morph 0..127 (sine → saw) |
+| B | MMOR | Modulator morph 0..127 (sine → saw) |
 | C | DEC | Index envelope; **127 = HOLD** |
 | D | SYMM | Fold half-wave skew (**64** = even) |
 | E | FDBK | Modulator feedback (default **0** = off) |

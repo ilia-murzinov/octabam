@@ -981,9 +981,8 @@ sy_loop:
         asr.l   #8,%d2
         add.l   %d2,%d4                  | m sine, Q14
         | Stack: 0=MIX, 4=fold/symm, 8=morph 00 00 CMOR MMOR, 12=header.
-        | MMOR: DPW (naive into FM jumps ~46..48). CMOR: aligned naive —
-        | DPW(φc_mod, S_INC) crackled under INDX (dt ≠ Δφ_mod); soft CMOR TBD.
-        | fb always unmorphed sine (saw must not re-enter the fb loop).
+        | MMOR into FM cannot use a naive saw edge (jumps ~46..48). DPW target
+        | + fb always sine. CMOR (carrier) still hard naive — audible saw OK.
         move.l  %d4,S_LASTM(%a3)         | fb source = sine
         mvz.b   11(%sp),%d2              | MMOR
         beq     sy_mod_ok
