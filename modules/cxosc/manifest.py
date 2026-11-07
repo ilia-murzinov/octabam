@@ -1,7 +1,7 @@
 """CX OSC -- Buchla-flavoured complex oscillator (marker-less machine list).
 
 Choose CX OSC in FUNC+SRC / SELECT MACHINE TYPE (FLEX + Part signature "CX",1).
-Mono. PLAYBACK: PTCH (−32..+32) RATO INDX FINE FOLD MIX. SETUP:
+Mono voice; up to ML_FM_MAX=4 tracks per Part. PLAYBACK: PTCH (−32..+32) RATO INDX FINE FOLD MIX. SETUP:
 CMOR/MMOR/DEC/SYMM/FDBK (F blank); LFO PMTR 30..33 (no DEC). No Tim VOIC/CHRD.
 
 Machine list adapted from timhastie/octatrick-modules v2.15 SYNTH MACHINE

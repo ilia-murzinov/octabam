@@ -9,8 +9,9 @@ Signal path every sample:
 
 ## Limit
 
-One CX OSC track per Part. Choosing a second shows `CX OSC: 1 MAX`.
-Remixes that ship CX OSC omit SYNTH MACHINE (same ColdFire seat).
+Up to **four** CX OSC tracks per Part. A fifth shows `CX OSC: 4 MAX`.
+Each track is still a mono voice. Remixes that ship CX OSC omit SYNTH
+MACHINE (same ColdFire seat).
 
 ## Access
 

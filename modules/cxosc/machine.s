@@ -34,8 +34,8 @@
 |
 | THE SELECTION GUARD (2.15). CX OSC and SY DRUM render on the ColdFire, and too many
 | tracks of them freeze the unit. Both lists refuse a choice that would take the ACTIVE
-| Part past the limits of synth/machine_limits.inc (2.15: at most 2 SY DRUM tracks, at
-| most 1 CX OSC track, and CX OSC with at most 1 SY DRUM track), counted over the
+| Part past the limits of machine_limits.inc (at most ML_SY_MAX SY DRUM tracks, at
+| most ML_FM_MAX CX OSC tracks, and CX OSC with at most ML_SY_WITH_FM SY DRUM), over the
 | Part's eight audio tracks by the signature each machine keeps in the Part (ml_guard).
 | A refused choice writes nothing: the track keeps its machine and its patch, the
 | firmware's own message popup shows why (the stock routine and duration the lists use
@@ -660,7 +660,7 @@ fm_sc_refuse:
 | choice is allowed, else the message that refuses it; tst.l done. A stock row, or the row
 | of the machine the track has already, is allowed; a row's machine is refused when the
 | Part's other seven audio tracks hold (by their signatures, ml_sigkind):
-|   CX OSC: ML_FM_MAX CX OSC tracks already ("CX OSC: 1 MAX"), or more than
+|   CX OSC: ML_FM_MAX CX OSC tracks already ("CX OSC: 4 MAX"), or more than
 |             ML_SY_WITH_FM SY DRUM tracks ("FM+SY DRUM: LIMIT");
 |   SY DRUM:  ML_SY_MAX SY DRUM tracks already ("SY DRUM: 2 MAX"), or an CX OSC
 |             track and ML_SY_WITH_FM SY DRUM tracks ("FM+SY DRUM: LIMIT").
