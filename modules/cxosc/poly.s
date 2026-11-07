@@ -408,12 +408,11 @@ sy_cold_nohold:
         moveq   #0,%d1
 sy_cold_hold:
         move.l  %d1,S_HTIM(%a3)
-        bclr    #3,S_ON(%a3)             | LIVE bit: set if this START is a key/MIDI
+        bclr    #3,S_ON(%a3)             | LIVE bit: key/MIDI only — NOT stock HELD[t].
+                                         | Sequencer gates also raise HELD for the note length; treating
+                                         | that as LIVE made HOLD INF honor step-end 0x40 (= HOLD 0).
         lea     KEYS_AT,%a0
-        tst.b   (%a0,%d2.l)
-        bne     sy_cold_live
-        lea     0x460d171d,%a0           | stock HELD[t]
-        tst.b   (%a0,%d2.l)
+        tst.b   (%a0,%d2.l)              | quantizer key identity (panel CHROMATIC)
         bne     sy_cold_live
         bsr     po_mheld_of              | MIDI held list
         beq     sy_cold_seq
@@ -478,7 +477,15 @@ sy_no:
         move.l  %d1,S_CUR(%a3)
         moveq   #0,%d3
 sy_set:
-        move.b  %d3,S_ON(%a3)
+        tst.l   %d3                      | sample: clear; synth: keep LIVE (bit 3) across the write
+        beq     sy_set_off
+        mvz.b   S_ON(%a3),%d0
+        andi.l  #0x08,%d0
+        ori.l   #1,%d0
+        move.b  %d0,S_ON(%a3)
+        bra     sy_ison
+sy_set_off:
+        clr.b   S_ON(%a3)
 sy_ison:
         tst.b   S_ON(%a3)
         beq     sy_sample
