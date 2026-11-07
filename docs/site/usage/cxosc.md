@@ -54,9 +54,11 @@ Slot F is blank.
   (DPW) saw. Heard *through* FM, so needs **INDX**. Same idea as CMOR on
   paper, different target on purpose: a hard saw in the modulator makes the
   FM path explode mid-travel; DPW keeps it continuous.
-- **DEC** — index envelope after a trig. Low = the FM depth falls away
-  quickly; **127 = HOLD** (index stays at the INDX knob). The HOLD icon is
-  a single hollow line at the top of the box.
+- **DEC** — index envelope after a trig (**SETUP C**, not PLAYBACK F —
+  PLAYBACK F is MIX). Low = the FM depth falls away quickly; **127 = HOLD**
+  (INDX tracks the knob instantly). The HOLD icon is a single hollow line
+  at the top of the box. After a layout change, re-select CX OSC so DEC
+  lands on SETUP at 127.
 - **SYMM** — fold half-wave skew. **64** = even fold. Below / above tips
   which polarity the folder emphasises (can mute one side). Needs **FOLD**
   up — at FOLD 0 you will not hear it.
