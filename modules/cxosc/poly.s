@@ -403,8 +403,20 @@ sy_cold1:
         clr.l   S_PHC(%a3)               | silent: phase 0, the gain from 0
         clr.l   S_PHM(%a3)
         clr.l   S_LASTM(%a3)
-        lea     sy_cxmix(%pc),%a0        | MIX lives off the 128 B record (S_MIX@86 aliases T_GMAX)
-        clr.b   (%a0,%d2.l)
+        move.l  %d2,%d0                  | snap MIX/FOLD Q8 to the panel (was clr → click every START)
+        lsl.l   #2,%d0
+        mvz.w   10(%a4),%d1              | RTIM -> MIX
+        lsr.l   #8,%d1
+        lea     sy_cxmix(%pc),%a0
+        move.b  %d1,(%a0,%d2.l)
+        lsl.l   #8,%d1
+        lea     sy_mixq(%pc),%a0
+        move.l  %d1,(%a0,%d0.l)
+        mvz.w   8(%a4),%d1               | RTRG -> FOLD
+        lsr.l   #8,%d1
+        lsl.l   #8,%d1
+        lea     sy_foldq(%pc),%a0
+        move.l  %d1,(%a0,%d0.l)
         clr.l   S_DPWM(%a3)
         clr.l   S_DPWC(%a3)
         clr.l   S_GAIN(%a3)
@@ -601,9 +613,16 @@ sy_mono_inc:
         mvz.w   8(%a4),%d1               | RTRG -> FOLD
         lsr.l   #8,%d1
         move.l  %d2,%d0                  | track (still in d2 here)
+        lea     sy_foldq(%pc),%a0        | one-pole slew — knob jumps were zipper clicks
+        lsl.l   #2,%d0
+        adda.l  %d0,%a0
+        move.l  %d1,%d0                  | target raw
+        bsr     sy_knob_slew             | d0 := slewed FOLD
+        move.l  %d2,%d1
         lea     sy_cxparm(%pc),%a0
-        lsl.l   #2,%d0                   | 4 B a track: FOLD SYMM CMOR MMOR
-        move.b  %d1,(%a0,%d0.l)          | FOLD
+        lsl.l   #2,%d1                   | 4 B a track: FOLD SYMM CMOR MMOR
+        move.b  %d0,(%a0,%d1.l)          | FOLD (slewed)
+        move.l  %d1,%d0                  | parm index (track*4)
         move.l  %d2,%d1
         move.l  #CV_STRIDE,%d3
         mulu.l  %d3,%d1
@@ -621,6 +640,11 @@ sy_symm_nz:
         bsr     cx_lfo_morph             | PMTR 30..33 -> CMOR/MMOR/SYMM + sy_cxfb (d2 = track)
         mvz.w   10(%a4),%d0              | RTIM -> MIX
         lsr.l   #8,%d0
+        move.l  %d2,%d1
+        lea     sy_mixq(%pc),%a0
+        lsl.l   #2,%d1
+        adda.l  %d1,%a0
+        bsr     sy_knob_slew             | d0 := slewed MIX
         lea     sy_cxmix(%pc),%a0
         move.b  %d0,(%a0,%d2.l)
         lea     sy_cxfb(%pc),%a0         | FDBK (SETUP E + LFO PMTR 33)
@@ -946,13 +970,15 @@ sy_mono:
         lea     sy_cxparm(%pc),%a6
         lsl.l   #2,%d1
         mvz.w   2(%a6,%d1.l),%d2         | CMOR<<8|MMOR
-        move.l  %d2,-(%sp)               | morph (under fold)
-        mvz.w   (%a6,%d1.l),%d1          | FOLD<<8|SYMM
-        move.l  %d1,-(%sp)               | fold/symm
-        move.l  64(%sp),%d1              | track (52+12 after header/morph/fold): MIX
-        lea     sy_cxmix(%pc),%a6
-        mvz.b   (%a6,%d1.l),%d1
-        move.l  %d1,-(%sp)               | 0=MIX, 4=fold/symm, 8=morph, 12=header
+        move.l  %d2,-(%sp)               | morph
+        mvz.b   1(%a6,%d1.l),%d2         | SYMM (FOLD amount comes from Q8 slew, not the byte)
+        move.l  %d2,-(%sp)
+        move.l  64(%sp),%d1              | track (52+12 after header/morph/symm)
+        lsl.l   #2,%d1
+        lea     sy_foldq(%pc),%a6        | Q8 FOLD/MIX — fractional through the loop (sustained knob turns)
+        move.l  (%a6,%d1.l),-(%sp)
+        lea     sy_mixq(%pc),%a6
+        move.l  (%a6,%d1.l),-(%sp)       | 0=MIX_Q8, 4=FOLD_Q8, 8=SYMM, 12=morph, 16=header
         move.l  S_PHC(%a3),%d0
         move.l  S_PHM(%a3),%d6
         move.l  S_INC(%a3),%d5
@@ -992,11 +1018,11 @@ sy_loop:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d4                  | m sine, Q14
-        | Stack: 0=MIX, 4=fold/symm, 8=morph 00 00 CMOR MMOR, 12=header.
+        | Stack: 0=MIX_Q8, 4=FOLD_Q8, 8=SYMM, 12=morph 00 00 CMOR MMOR, 16=header.
         | MMOR into FM cannot use a naive saw edge (jumps ~46..48). DPW target
         | + fb always sine. CMOR (carrier) still hard naive — audible saw OK.
         move.l  %d4,S_LASTM(%a3)         | fb source = sine
-        mvz.b   11(%sp),%d2              | MMOR
+        mvz.b   15(%sp),%d2              | MMOR
         beq     sy_mod_ok
         move.l  %d6,%d1                  | raw φm
         move.l  %a4,%d6                  | DPW phase = φm_eff
@@ -1032,7 +1058,7 @@ sy_mod_ok:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d1                  | c sine, Q14
-        mvz.b   14(%sp),%d2              | CMOR (morph at 8+4 park)
+        mvz.b   18(%sp),%d2              | CMOR (morph at 12+4 park)
         beq     sy_car_ok
         move.l  %d1,%d4                  | sine
         move.l  %d6,%d1
@@ -1045,30 +1071,30 @@ sy_mod_ok:
         move.l  %d4,%d1
 sy_car_ok:
         move.l  (%sp)+,%d6               | restore mod phase
-        | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX / 128; 0 = carrier ----
-        move.l  (%sp),%d2                | MIX 0..127
+        | ---- MIX (PLAYBACK F): c' = c + (m - c) * MIX_Q8 / 32768; 0 = carrier ----
+        move.l  (%sp),%d2                | MIX Q8 (slewed)
         beq     sy_mix_done
         move.l  %a4,%d4                  | modulator (sine / last m)
         sub.l   %d1,%d4
         muls.l  %d2,%d4
-        asr.l   #7,%d4
+        asr.l   #15,%d4
         add.l   %d4,%d1
 sy_mix_done:
         | ---- FOLD (RTRG) + SYMM (SETUP D): half-wave skew into the folder ----
         | c_fold = c * gain/64; gain = SYMM (c>=0) or (128-SYMM) (c<0).
-        | 64 = even. drive_q8 = 256 + FOLD*24. out = c + (folded-c)*FOLD/128.
-        move.l  4(%sp),%d2               | FOLD<<8|SYMM
-        lsr.l   #8,%d2
+        | 64 = even. drive = 256 + (FOLD_Q8*24)>>8. out = c + (folded-c)*FOLD_Q8/32768.
+        move.l  4(%sp),%d2               | FOLD Q8
         beq     sy_nofold
         move.l  %d1,-(%sp)               | park c (unbiased dry)
-        move.l  %d2,-(%sp)               | park FOLD amount
-        move.l  %d2,%d4                  | fold*24 = fold*16 + fold*8
+        move.l  %d2,-(%sp)               | park FOLD Q8
+        move.l  %d2,%d4                  | (fold_q8*24)>>8 = fold*24
         lsl.l   #4,%d4
         lsl.l   #3,%d2
         add.l   %d2,%d4
+        asr.l   #8,%d4
         addi.l  #256,%d4                 | drive_q8
         move.l  4(%sp),%d1               | c
-        move.l  12(%sp),%d2              | FOLD<<8|SYMM (under the two parks; was at 4)
+        move.l  16(%sp),%d2              | SYMM (under the two parks; was at 8)
         mvz.b   %d2,%d2                  | SYMM 0..127
         tstl    %d1
         bmi     sy_skew_lo
@@ -1094,11 +1120,11 @@ sy_skew_div:
         asr.l   #8,%d2
         asr.l   #8,%d2
         add.l   %d2,%d4                  | folded, Q14
-        move.l  (%sp)+,%d2               | FOLD
+        move.l  (%sp)+,%d2               | FOLD Q8
         move.l  (%sp)+,%d1               | c
         sub.l   %d1,%d4
         muls.l  %d2,%d4
-        asr.l   #7,%d4
+        asr.l   #15,%d4
         add.l   %d4,%d1
 sy_nofold:
         adda.l  %a6,%a5                  | the gain one step on (a linear ramp across the call: no step at a frame edge)
@@ -1123,8 +1149,9 @@ sy_nofold:
         moveq   #0,%d1
 sy_gend:
         move.w  %d1,S_GPREV(%a3)
-        move.l  (%sp)+,%d1               | drop MIX
-        move.l  (%sp)+,%d1               | drop fold/symm
+        move.l  (%sp)+,%d1               | drop MIX_Q8
+        move.l  (%sp)+,%d1               | drop FOLD_Q8
+        move.l  (%sp)+,%d1               | drop SYMM
         move.l  (%sp)+,%d1               | drop morph
         move.l  (%sp)+,%a2               | the header
         | CX mono: never sum fading para voices under the carrier (was two pitches)
@@ -1376,6 +1403,20 @@ po_legbyte:
         sub.l   %d2,%d3                  | track * 30
         adda.l  #AMP_P2_OFF,%a0
         mvz.b   LEG_SLOT2(%a0,%d3.l),%d0
+        rts
+
+| ---- sy_knob_slew: d0 := one-pole of target d0 (0..127), a0 -> Q8 long ------
+| cur += (target<<8 - cur) >> 3; d0 = cur >> 8. ~8 frames to settle — kills
+| MIX/FOLD zipper when the encoder jumps. Clobbers d1.
+sy_knob_slew:
+        move.l  %d0,%d1
+        lsl.l   #8,%d1                   | target Q8
+        move.l  (%a0),%d0                | cur
+        sub.l   %d0,%d1                  | diff
+        asr.l   #3,%d1                   | /8
+        add.l   %d1,%d0
+        move.l  %d0,(%a0)
+        lsr.l   #8,%d0                   | published raw
         rts
 
 | ---- sy_slew: d6 := the PTCH word slewed toward d6 (GLIDE) ---------------------
@@ -5852,6 +5893,10 @@ sy_cxmix:                                | 8 tracks: PLAYBACK F MIX (S_MIX@86 al
 sy_cxfb:                                 | 8 tracks: effective FDBK (SETUP E + LFO PMTR 33)
         .fill   8, 1, 0
         .align  4
+sy_mixq:                                 | 8 tracks x Q8 current MIX (sy_knob_slew)
+        .fill   8, 4, 0
+sy_foldq:                                | 8 tracks x Q8 current FOLD
+        .fill   8, 4, 0
 po_amp:                                  | (2.20) 8 tracks x 4 bytes: ATK, HOLD, REL as the frame builder wrote them,
         .fill   8 * 4, 1, 0              | 1 once kept (po_amp_snap)
 po_voices:                               | 8 tracks x 4 voices x 64 bytes
