@@ -800,6 +800,16 @@ po_me_atk:
         move.l  #32768,%d1
         bra     po_me_store
 po_me_rel:
+        lea     KEYS_AT,%a1              | CX last-note: if a key/MIDI note is still held, cancel
+        tst.b   (%a1,%d2.l)              | release — never let the previous pitch die under the new one
+        bne     po_me_unrel
+        lea     0x460d171d,%a1           | stock HELD[t] (key+1; quantizer HELD)
+        tst.b   (%a1,%d2.l)
+        bne     po_me_unrel
+        move.l  %a0,-(%sp)
+        bsr     po_mheld_of              | MIDI held list (Z clear = something held)
+        movea.l (%sp)+,%a0
+        bne     po_me_unrel
         mvz.b   2(%a0),%d0               | REL
         lea     po_relk(%pc),%a0
         mvz.w   (%a0,%d0.l*2),%d0        | k, Q16 (0 = INF)
@@ -821,6 +831,10 @@ po_me_rel1:
         cmpi.l  #64,%d1                  | -54 dB: silent
         bgt     po_me_store
         moveq   #0,%d1
+        bra     po_me_store
+po_me_unrel:
+        bclr    #1,S_ON(%a3)             | still held: stay sounding at the new pitch
+        bra     po_me_atk
 po_me_store:
         move.l  %d1,S_GAIN(%a3)
         rts

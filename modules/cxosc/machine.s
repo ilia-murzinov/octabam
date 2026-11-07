@@ -411,6 +411,15 @@ ml_rs_amp:
         addq.l  #1,%d1
         cmpi.l  #12,%d1
         bne     ml_rs_amp
+        moveq   #6,%d1                   | CX: ATK 0 / HOLD INF / REL 0 — no ~0.5 s under-release
+        moveq   #0,%d0
+        bsr     ml_p1byte
+        moveq   #7,%d1
+        moveq   #127,%d0
+        bsr     ml_p1byte
+        moveq   #8,%d1
+        moveq   #0,%d0
+        bsr     ml_p1byte
         move.l  %d2,%d3
         lsl.l   #5,%d3
         sub.l   %d2,%d3
@@ -426,6 +435,9 @@ ml_rs_amps:
         addq.l  #1,%d1
         cmpi.l  #12,%d1
         bne     ml_rs_amps
+        moveq   #11,%d1                  | AMP SETUP slot 11 = LEG → MONO (never stock under-release)
+        moveq   #1,%d0
+        bsr     ml_p2byte
         moveq   #24,%d1                  | 24..29: MULT / TRIG of LFO 1..3
         lea     LFO_P+DEF1+8,%a4         | (slot 8 / 9 defaults: MULT, TRIG)
         bsr     ml_p2pairs
