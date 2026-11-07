@@ -10,8 +10,8 @@ Human manual (params + shots): [`docs/site/usage/cxosc.md`](../../docs/site/usag
 ## Select
 
 **FUNC + SRC** or **SELECT MACHINE TYPE** → **CX OSC** (sixth row). No marker
-file. Stored as FLEX with Part signature `"CX", 1`. At most **one CX OSC track
-per Part** (`ml_guard` / `ML_FM_MAX 1`).
+file. Stored as FLEX with Part signature `"CX", 1`. At most **four CX OSC
+tracks per Part** (`ml_guard` / `ML_FM_MAX 4`).
 
 After a layout change, **re-select CX OSC** (or load `fm_defaults`) so Part
 SETUP bytes match.

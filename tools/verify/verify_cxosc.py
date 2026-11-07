@@ -5,7 +5,7 @@
    (PLAYBACK D / RATE) shifts pitch; extremes stay bounded.
 2. Routing: S_FB ← SETUP E; sy_cxparm FOLD←RTRG SYMM←SETUP D; MIX←RTIM;
    page names FINE/FOLD/MIX; SETUP DEC decay icon.
-3. Guard: `ml_guard_p` refuses a second CX OSC track ("CX OSC: 1 MAX").
+3. Guard: `ml_guard_p` allows four CX OSC tracks; fifth is "CX OSC: 4 MAX".
 4. AMP 2.20: DSP-record ATK shapes attack via `po_amp_snap`.
 
 ColdFire, not dsp_host. Instruction counts are diagnostics, not hardware cycles.
@@ -58,7 +58,7 @@ Q14_PEAK = 0x4000
 RAIL = 0x7FFFF0  # top-24 sample near full scale
 FB_SCALE = 2064  # poly.s: 1.0 cycle / 127 * 2^16
 FM_ROW = 5  # machine.s: sixth list row = CX OSC; after ANALOG BD / OCTA303 when the image has them (main)
-MSG_FM_MAX = b"CX OSC: 1 MAX"
+MSG_FM_MAX = b"CX OSC: 4 MAX"
 
 
 def die(msg):
@@ -112,7 +112,7 @@ def read_cstr(uc, addr, n=32):
 
 
 def check_guard(uc, symbols):
-    """One CX OSC per Part: refuse a second choice; allow first / own / stock."""
+    """Four CX OSC tracks per Part; fifth refused; own-track / stock still ok."""
     clear_part(uc)
     d0 = call_ml_guard_p(uc, symbols, FM_ROW, 0)
     check("guard: first CX OSC on T1 allowed", d0 == 0, f"d0={d0:#x}")
@@ -121,25 +121,31 @@ def check_guard(uc, symbols):
     d0 = call_ml_guard_p(uc, symbols, FM_ROW, 0)
     check("guard: choosing CX OSC again on the same track allowed", d0 == 0)
 
-    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 1)
+    for t in range(1, 4):
+        d0 = call_ml_guard_p(uc, symbols, FM_ROW, t)
+        check(f"guard: CX OSC on T{t + 1} allowed with {t} already", d0 == 0, f"d0={d0:#x}")
+        sign_cx(uc, t)
+
+    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 4)
     msg = read_cstr(uc, d0)
     check(
-        "guard: second track refused with CX OSC: 1 MAX",
+        "guard: fifth track refused with CX OSC: 4 MAX",
         d0 != 0 and msg == MSG_FM_MAX,
         f"d0={d0:#x} msg={msg!r}",
     )
 
-    # Stock row (FLEX = 1): always allowed even with one CX OSC present
-    d0 = call_ml_guard_p(uc, symbols, 1, 1)
-    check("guard: stock row on a free track allowed beside one CX OSC", d0 == 0)
+    # Stock row (FLEX = 1): always allowed beside four CX OSC
+    d0 = call_ml_guard_p(uc, symbols, 1, 5)
+    check("guard: stock row on a free track allowed beside four CX OSC", d0 == 0)
 
-    # Paste-style: destination Part already has CX on T1; choosing CX on T3
+    # Paste-style: Part already full (T1..T4); choosing CX on T6 refused
     clear_part(uc)
-    sign_cx(uc, 0)
-    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 2)
+    for t in range(4):
+        sign_cx(uc, t)
+    d0 = call_ml_guard_p(uc, symbols, FM_ROW, 5)
     msg = read_cstr(uc, d0)
     check(
-        "guard: paste onto another track refused (same ml_guard_p)",
+        "guard: paste onto a fifth track refused (same ml_guard_p)",
         d0 != 0 and msg == MSG_FM_MAX,
         f"msg={msg!r}",
     )
