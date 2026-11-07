@@ -4639,38 +4639,14 @@ po_moff_stock:
 | bit 6 (andl #-65 at 0x4000b522). Every path that posts 0x40 -- the panel key
 | release 0x4004fbfe.. (the last held key), the MIDI note-off's stock block
 | 0x4000dfdc (po_moff's last note), whatever the sequencer posts -- passes this
-| one site. A synth voice (S_ON bit 0) takes the released flag (S_ON bit 1):
-| plan B -- the mono voice's release starts (po_mono_env: the REL law), since the
-| DSP no longer fades anything -- unless the same word carries the START (bit 2):
-| the START retriggers the voice warm (sy_cold), nothing releases. d2 is reloaded from a3 at 0x4000b52c, a0
-| at 0x4000b540: both scratch here; d0 = the word, a3 = the track: kept.
+| one site. CX: mailbox 0x40 is IGNORED. Stock still posts step-end / key-up /
+| MIDI-off; with REL 0 that made every HOLD a blip (gate always won). Note
+| length is S_HTIM from AMP HOLD (127 = INF until STOP/kill/new START); REL
+| runs when that timer ends. Displaced loads kept; clear bit 6 only.
 po_rel:
         movea.l 114(%sp),%a3             | displaced: the track
         move.l  (%a1,%a3.l*4),%d0        | displaced: its mailbox word (bit 6 set)
-        btst    #2,%d0                   | a START in the same word (a panel key pressed while one is held,
-        bne     po_rel_out               | LEG OFF: 0x4004fbfe posts the note-off and the START together): the
-        move.l  %a3,%d2                  | DSP restarts at full this frame, the release never fades -- no flag
-        move.l  %d2,-(%sp)               | park track (po_amp_at / LIVE test)
-        lsl.l   #7,%d2                   | * ST_STRIDE
-        lea     sy_state(%pc),%a0
-        adda.l  %d2,%a0
-        btst    #0,S_ON(%a0)             | a synth plays: it has been released
-        beq     po_rel_drop
-        btst    #3,S_ON(%a0)             | LIVE key/MIDI: always honor note-off
-        bne     po_rel_do
-        move.l  %a0,-(%sp)               | sequencer: HOLD INF must ignore step-end 0x40
-        move.l  4(%sp),%d2               | track
-        bsr     po_amp_at
-        mvz.b   1(%a0),%d0
-        move.l  (%sp)+,%a0
-        cmpi.l  #127,%d0
-        beq     po_rel_drop              | HOLD INF + sequencer = sustain (HTIM already 0)
-po_rel_do:
-        bset    #1,S_ON(%a0)
-po_rel_drop:
-        move.l  (%sp)+,%d2
-po_rel_out:
-        jmp     0x4000b522
+        jmp     0x4000b522               | clear bit 6; do not arm S_ON release
 
 | ---- po_retrig: 0x4000c634 (8 bytes displaced: `moveal 114(sp),a1; moveb (a0,a1.l),d0`,
 | a0 = 0x46104d15) -- the frame builder's per-track copy of the DSP command byte
