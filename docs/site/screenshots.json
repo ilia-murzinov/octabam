@@ -235,20 +235,20 @@
       "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
     }
   },
-  "gateverb": {
+  "verberation": {
     "main": {
-      "image": "gateverb/main.png",
-      "caption": "Gate verb: main parameter page.",
-      "remix": "octabam-inserts",
+      "image": "verberation/main.png",
+      "caption": "VERBERATION: main parameter page.",
+      "remix": "verberation",
       "source": "emulator panel UART",
-      "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
+      "firmware_sha256": "1d9d8840f3db46b5bb35fb1dfed035131cc431385e394307f55fe51e16ad35ee"
     },
     "setup": {
-      "image": "gateverb/setup.png",
-      "caption": "Gateverb: effect selection and setup parameters.",
-      "remix": "octabam-inserts",
+      "image": "verberation/setup.png",
+      "caption": "VERBERATION: effect selection and setup parameters.",
+      "remix": "verberation",
       "source": "emulator panel UART",
-      "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
+      "firmware_sha256": "1d9d8840f3db46b5bb35fb1dfed035131cc431385e394307f55fe51e16ad35ee"
     }
   },
   "delay": {
@@ -923,7 +923,7 @@
     },
     "setup": {
       "image": "cxosc/setup.png",
-      "caption": "SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK PWM.",
+      "caption": "SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK WIDTH.",
       "remix": "cxosc",
       "source": "emulator panel UART",
       "firmware_sha256": "78ace8972d686e5da550449fc067b08fddf68ab68342f7dba5d9606cb862f925"
@@ -964,24 +964,10 @@
   "scope": {
     "main": {
       "image": "scope/osc.png",
-      "caption": "SCOPE OSC with G/P HUD (unit).",
+      "caption": "SCOPE OSC with G/P HUD (quiet ring under the live path).",
       "remix": "scope",
-      "source": "unit SysEx (screendump / SCREEN module), inverted to black-on-white",
-      "firmware_sha256": "b801f1106f82f90f21dcd5de33c3ad21e163dad510eb38fb7acfabeaed30b1bd"
-    },
-    "xy": {
-      "image": "scope/xy.png",
-      "caption": "SCOPE XY (L\u00d7R Lissajous) with G/P HUD (unit).",
-      "remix": "scope",
-      "source": "unit SysEx (screendump / SCREEN module), inverted to black-on-white",
-      "firmware_sha256": "b801f1106f82f90f21dcd5de33c3ad21e163dad510eb38fb7acfabeaed30b1bd"
-    },
-    "all": {
-      "image": "scope/all.png",
-      "caption": "SCOPE ALL: 4\u00d72 mini OSC grid T1\u2013T8 (unit).",
-      "remix": "scope",
-      "source": "unit SysEx (screendump / SCREEN module), inverted to black-on-white",
-      "firmware_sha256": "b801f1106f82f90f21dcd5de33c3ad21e163dad510eb38fb7acfabeaed30b1bd"
+      "source": "emulator panel UART (live_shots.py + scope.script)",
+      "firmware_sha256": "1c63417e490ed070ee86170461b3740f4536b4bad89ad17e2fb546e49f841949"
     },
     "help": {
       "image": "scope/help.png",

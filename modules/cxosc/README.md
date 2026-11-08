@@ -30,7 +30,7 @@ reaches the machines.
 | C | INDX | FM depth (default **0**) |
 | D | FINE | Cents (−64..+63; raw **64** = 0c) |
 | E | FOLD | Wavefolder dry/wet after MIX (default **0** = bypass) |
-| F | MIX | Folder **input** crossfade carrier↔mod (**0** = carrier only). Not the fold amount. |
+| F | MIX | Folder **input** crossfade carrier↔**MMOR morph** (**0** = carrier, **127** = mod solo). Not the fold amount. |
 
 Signal path: **mod → FM → carrier → MIX (fold input) → FOLD → out**.
 See [`docs/site/usage/cxosc.md`](../../docs/site/usage/cxosc.md) for the diagrams.
@@ -41,15 +41,15 @@ See [`docs/site/usage/cxosc.md`](../../docs/site/usage/cxosc.md) for the diagram
 
 | Knob | Name | What it does |
 |------|------|----------------|
-| A | CMOR | Carrier morph 0..127 (**0** sine → **64** saw → **127** square) |
-| B | MMOR | Modulator morph 0..127 (same; needs **INDX**) |
+| A | CMOR | Carrier morph 0..127 (**0** sine → **64** saw → **127** square); **FUNC** snaps |
+| B | MMOR | Modulator morph 0..127 (same; needs **INDX**); **FUNC** snaps |
 | C | DEC | Index envelope; **127 = HOLD** |
 | D | SYMM | Fold half-wave skew (**64** = even) |
 | E | FDBK | Modulator feedback (default **0** = off) |
-| F | PWM | Pulse width for the square end (**64** ≈ 50%) |
+| F | WIDTH | Cycle lean (**64** = neutral): sine soft lean; saw phase-skew (8%..92% φ warp); square duty (**64** ≈ 50%) |
 
 LFO PMTR **30 = CMOR**, **31 = MMOR**, **32 = SYMM**, **33 = FDBK**.
-DEC/PWM are not LFO destinations. Mono only — AMP HOLD owns note length
+DEC/WIDTH are not LFO destinations. Mono only — AMP HOLD owns note length
 (**HOLD INF** = until STOP); select seeds ATK 0 / HOLD INF / REL 0 / LEG MONO.
 
 CMOR/MMOR targets and traps: [`MORPH.md`](MORPH.md).
@@ -98,7 +98,7 @@ ROM hooks, e.g. MIDI note-on). Not an FX2 id — machine signature `"CX", 1`.
 
 ## Cost
 
-One mono voice under Unicorn: about **1662** instructions/frame (peak ~1701;
+One mono voice under Unicorn: about **2035** instructions/frame (peak ~2074;
 `verify_cxosc`). Up to **four** CX OSC tracks per Part by `ml_guard`.
 ColdFire headroom on a loaded Part on the unit is still **open**
 ([#852](https://github.com/sambanks/octabam/issues/852)).
