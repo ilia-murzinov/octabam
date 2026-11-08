@@ -291,7 +291,7 @@ def capture_cxosc(p,r):
     enc(p,2,-40)  # DEC off HOLD so the fall shows
     enc(p,3,20)   # SYMM off 64 (skew)
     enc(p,4,24)   # FDBK above 0 so the loop OR shows
-    shot(p,'cxosc','setup','SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK.',r)
+    shot(p,'cxosc','setup','SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK PWM.',r)
 
 
 def capture_synth(p,r):
