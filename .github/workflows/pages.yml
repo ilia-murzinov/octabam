@@ -6,7 +6,7 @@
 name: 📖 Pages
 on:
   push:
-    branches: [main]
+    branches: [main, ilia]
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
   build:
     name: build the site
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -30,6 +30,19 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r docs/site/requirements.txt
+      # Tim v2.22+ manifests call stock_guard() at import (needs MAIN OS).
+      # make recon alone is not enough on a bare runner: analyze.sh skips
+      # extraction when elektron-firmware-tool is missing and still exits 0.
+      - name: Fetch and extract stock MAIN OS
+        run: |
+          set -euo pipefail
+          make os
+          scripts/vendor.sh eft
+          make -C vendor/elektron-firmware-tool
+          mkdir -p out/raw
+          vendor/elektron-firmware-tool/elektron-firmware-tool \
+            -i downloads/extracted/OCTATRACK_OS1.40C.syx -d 3 -o out/raw
+          test -f out/raw/section_3_MAIN_OS.bin
       - run: python3 tools/site/gen_pages.py
       - run: mkdocs build --strict --config-file docs/site/mkdocs.yml
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0

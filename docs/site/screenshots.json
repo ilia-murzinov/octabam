@@ -235,20 +235,20 @@
       "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
     }
   },
-  "verberation": {
+  "gateverb": {
     "main": {
-      "image": "verberation/main.png",
-      "caption": "VERBERATION: main parameter page.",
-      "remix": "verberation",
+      "image": "gateverb/main.png",
+      "caption": "Gate verb: main parameter page.",
+      "remix": "octabam-inserts",
       "source": "emulator panel UART",
-      "firmware_sha256": "1d9d8840f3db46b5bb35fb1dfed035131cc431385e394307f55fe51e16ad35ee"
+      "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
     },
     "setup": {
-      "image": "verberation/setup.png",
-      "caption": "VERBERATION: effect selection and setup parameters.",
-      "remix": "verberation",
+      "image": "gateverb/setup.png",
+      "caption": "Gateverb: effect selection and setup parameters.",
+      "remix": "octabam-inserts",
       "source": "emulator panel UART",
-      "firmware_sha256": "1d9d8840f3db46b5bb35fb1dfed035131cc431385e394307f55fe51e16ad35ee"
+      "firmware_sha256": "ef2f2ccb670c7f2f09f48d2e07e46a394d791f1458f3eaa5e6d8807d51903482"
     }
   },
   "delay": {

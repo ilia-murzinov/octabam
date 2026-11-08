@@ -64,13 +64,13 @@ PLACE = {
     "DIRECT_JUMP_KYOTI": "sequencer", "RELOAD_FROM_PROJECT": "sequencer", "RLEN PLEN": "sequencer",
     "REC_TRIG_MUTE": "sequencer", "REC THRESHOLD": "sequencer", "PATTERN MUTE": "sequencer",
     "MUTE_MODES": "sequencer", "SCALE QUANTIZER": "sequencer", "QUANTIZE_LIVE_REC_TOGGLE": "sequencer",
-    "EUCLID FILL": "sequencer", "TRACK PATTERNS": "sequencer", "TUNER": "sequencer",
+    "TRACK PATTERNS": "sequencer", "TUNER": "sequencer",
+    "EUCLID FILL": "utilities",
     "KITS": "parts", "MIDI SCENES": "parts", "SCENES P2": "parts", "PLOCKS P2": "parts", "MORPH": "parts",
     "CC MAP": "midi-usb", "CC FEEDBACK": "midi-usb", "USB": "midi-usb",
     "BRAIN": "brain",
     "COPY PROJECT": "utilities", "BUFFER SAVER": "utilities", "FX2 LOCK": "utilities",
     "MODE DEFAULTS": "utilities", "REMIX SWITCH": "utilities",
-    "EUCLID FILL": "utilities",
     "LOFI AMF FIX": "fixes", "RECORDER LOOP FIX": "fixes", "BATCH_BUGFIXES": "fixes",
     "ERASE_EMPTY_TRIGLESS_LOCKS": "fixes", "ATA WRITE GUARD": "fixes",
     "EVENTS": "inside", "STORE": "inside", "HOOKS": "inside", "MEMORY": "inside",
@@ -436,7 +436,7 @@ def index_page(name: str, r, mods) -> str:
               f"[Build and Install]({_up('index')}web-builder.md). Nothing from Elektron is on this site; "
               f"the builder patches your copy in your browser. After the flash, SYSTEM STATUS → OS VERSION "
               f"shows `{r.name.upper()}` and the build number.", "",
-              f"Back up the card first. To go back to stock, follow [Safety and Recovery]({_up('index')}safety.md).", ""]
+              f"Back up the card first. To go back to stock, follow [Home § Safety]({_up('index')}index.md#safety).", ""]
     return "\n".join([f"# {heading}", ""] + intro) + "\n"
 
 

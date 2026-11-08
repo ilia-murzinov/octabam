@@ -1,0 +1,197 @@
+/* Dark chassis + amber accents. Typography stays with the theme/fonts.css.
+   Homage only — no Elektron logos or proprietary fonts.
+   Signature: the shifted-octa mark (img/mark-icon.svg) and amber CTAs. */
+
+:root,
+.dark {
+  color-scheme: dark;
+
+  --font-sans: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-heading: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-inter: var(--font-sans);
+  --default-font-family: var(--font-sans);
+  --default-mono-font-family: var(--font-mono);
+  --radius: 0;
+
+  --ot-amber: #c45c26;
+  --ot-amber-hot: #e08a4a;
+  --ot-amber-dim: #8f4519;
+  --ot-chassis: #121212;
+  --ot-panel: #1a1a1a;
+  --ot-bezel: #2a2a2a;
+  --ot-ink: #e8e4dc;
+  --ot-mute: #9a958c;
+
+  --background: #121212;
+  --foreground: #e8e4dc;
+  --card: #1a1a1a;
+  --card-foreground: #e8e4dc;
+  --popover: #1a1a1a;
+  --popover-foreground: #e8e4dc;
+  --primary: #c45c26;
+  --primary-foreground: #121212;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #e8e4dc;
+  --muted: #222;
+  --muted-foreground: #9a958c;
+  --accent: #2a2118;
+  --accent-foreground: #c45c26;
+  --destructive: #e2553d;
+  --border: #3a3a3a;
+  --input: #2a2a2a;
+  --ring: #c45c26;
+  --sidebar: #0e0e0e;
+  --sidebar-foreground: #e8e4dc;
+  --sidebar-primary: #c45c26;
+  --sidebar-primary-foreground: #121212;
+  --sidebar-accent: #1f1810;
+  --sidebar-accent-foreground: #c45c26;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: #c45c26;
+  --surface: #1a1a1a;
+  --surface-foreground: #c8c4bc;
+  --code: #0e0e0e;
+  --code-foreground: #c8f07a;
+  --code-highlight: #222;
+  --selection: #c45c26;
+  --selection-foreground: #121212;
+}
+
+html {
+  background: var(--ot-chassis);
+}
+
+body {
+  background: var(--ot-chassis) !important;
+  color: var(--foreground);
+}
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+a {
+  color: var(--ot-amber);
+  text-underline-offset: 0.18em;
+  transition: color 120ms ease;
+}
+a:hover {
+  color: var(--ot-amber-hot);
+}
+a:focus-visible {
+  outline: 2px solid var(--ot-amber);
+  outline-offset: 2px;
+}
+
+/* Header brand mark */
+header a[href] .size-8 svg,
+header a[href] span.size-8 svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+header a[href]:hover {
+  color: var(--ot-amber-hot);
+}
+
+body,
+.font-sans {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "liga" 0, "calt" 1;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  color: var(--foreground) !important;
+}
+h2 {
+  border-bottom: 1px solid var(--ot-bezel);
+  padding-bottom: 0.35rem;
+}
+
+/* Page title in the content header */
+#page-header h1 {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Brand title in the top bar */
+header a[href] h1 {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+}
+
+[aria-current="page"],
+.active {
+  color: var(--ot-amber) !important;
+}
+
+/* Home lead: CTA row under the opening paragraphs */
+article .typography > p > a[href="web-builder.md"] strong,
+article .typography > p > a[href="./web-builder.md"] strong,
+article .typography > p > a[href="web-builder.html"] strong {
+  font-weight: 700;
+}
+
+article .typography > p:has(> a[href*="web-builder"]) {
+  margin: 1.35rem 0 1.1rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+
+/* Credits: plain linked lists from the generated fragment */
+article .typography p:has(> strong > a),
+article .typography > p > strong:first-child {
+  line-height: 1.7;
+}
+article .typography p > strong:has(> a) {
+  color: var(--ot-ink);
+}
+
+.table-wrapper,
+article table {
+  border: 1px solid var(--ot-bezel) !important;
+}
+.table-wrapper th,
+article th {
+  background: #1f1810 !important;
+  color: var(--ot-amber) !important;
+}
+
+pre, .highlight {
+  border: 1px solid var(--ot-bezel) !important;
+  background: #0e0e0e !important;
+}
+code {
+  font-family: var(--font-mono) !important;
+}
+
+.admonition,
+details {
+  border: 1px solid var(--ot-amber-dim) !important;
+  background: #16120e !important;
+}
+
+article .typography img {
+  background: #0a0a0a !important;
+  border: 1px solid var(--ot-bezel) !important;
+  image-rendering: pixelated;
+}
+
+::selection {
+  background: var(--ot-amber);
+  color: #121212;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a {
+    transition: none;
+  }
+}

@@ -1,18 +1,222 @@
 {
  "version": "v0.4",
- "commit": "9e2545bc951c5379649b61f0a7577e05cd8e9d25",
- "dev": false,
- "build": "04",
- "date": "2026-11-04",
+ "commit": "ecb316f34870a015c5989d9b6f35a076875ec70e",
+ "dev": true,
+ "build": "I5",
+ "date": "2026-11-07",
+ "featureRows": [
+  "SCOPE",
+  "COPY PROJECT",
+  "DARK REV",
+  "SYNTH",
+  "CX OSC",
+  "VOID",
+  "RESONATOR",
+  "SHATTER",
+  "STUTTR"
+ ],
+ "features": {
+  "base": [
+   "COPY PROJECT",
+   "DARK REV",
+   "SCOPE",
+   "SHATTER",
+   "SYNTH",
+   "VOID"
+  ],
+  "base-stuttr": [
+   "COPY PROJECT",
+   "DARK REV",
+   "SCOPE",
+   "STUTTR",
+   "SYNTH",
+   "VOID"
+  ],
+  "base-reson": [
+   "COPY PROJECT",
+   "DARK REV",
+   "RESONATOR",
+   "SCOPE",
+   "SHATTER",
+   "SYNTH"
+  ],
+  "base-vres": [
+   "COPY PROJECT",
+   "DARK REV",
+   "RESONATOR",
+   "SCOPE",
+   "SYNTH",
+   "VOID"
+  ],
+  "cx": [
+   "COPY PROJECT",
+   "CX OSC",
+   "DARK REV",
+   "SCOPE",
+   "SHATTER",
+   "VOID"
+  ],
+  "cx-stuttr": [
+   "COPY PROJECT",
+   "CX OSC",
+   "DARK REV",
+   "SCOPE",
+   "STUTTR",
+   "VOID"
+  ],
+  "cx-reson": [
+   "COPY PROJECT",
+   "CX OSC",
+   "DARK REV",
+   "RESONATOR",
+   "SCOPE",
+   "SHATTER"
+  ],
+  "cx-vres": [
+   "COPY PROJECT",
+   "CX OSC",
+   "DARK REV",
+   "RESONATOR",
+   "SCOPE",
+   "VOID"
+  ]
+ },
  "remixes": [
   {
-   "name": "octabam",
-   "title": "octabam",
-   "version": "OCTABAM04",
-   "imageName": "OCTABAM 04",
-   "patch": "patches/octabam.obp",
-   "patchBytes": 203074,
-   "sha256": "9159aca19b927478c9be8ebe5f86028c0f1a6f43c80d54d69fc739d753362977"
+   "name": "base",
+   "title": "base",
+   "version": "OCTABAMI5",
+   "imageName": "BASE I3",
+   "patch": "patches/base.obp",
+   "patchBytes": 136496,
+   "sha256": "970c34808bbb354cc1d8f2a3942f84bd59f5ff850525b20a2b0d988fa3ed4e35",
+   "features": [
+    "COPY PROJECT",
+    "DARK REV",
+    "SCOPE",
+    "SHATTER",
+    "SYNTH",
+    "VOID"
+   ]
+  },
+  {
+   "name": "base-stuttr",
+   "title": "base-stuttr",
+   "version": "OCTABAMI5",
+   "imageName": "BASE-STUTTR I3",
+   "patch": "patches/base-stuttr.obp",
+   "patchBytes": 136877,
+   "sha256": "c31cc0f8d143a001eabab47d1914b24b4737dd0c2c8bd643fa4b8e0f4fbc192b",
+   "features": [
+    "COPY PROJECT",
+    "DARK REV",
+    "SCOPE",
+    "STUTTR",
+    "SYNTH",
+    "VOID"
+   ]
+  },
+  {
+   "name": "base-reson",
+   "title": "base-reson",
+   "version": "OCTABAMI5",
+   "imageName": "BASE-RESON I3",
+   "patch": "patches/base-reson.obp",
+   "patchBytes": 135454,
+   "sha256": "66c5b40a964051221404c2ad136d1ed2ba6929946012f16ef9a1db60d1433e33",
+   "features": [
+    "COPY PROJECT",
+    "DARK REV",
+    "RESONATOR",
+    "SCOPE",
+    "SHATTER",
+    "SYNTH"
+   ]
+  },
+  {
+   "name": "base-vres",
+   "title": "base-vres",
+   "version": "OCTABAMI5",
+   "imageName": "BASE-VRES I3",
+   "patch": "patches/base-vres.obp",
+   "patchBytes": 136650,
+   "sha256": "2d526c45cc74c8200fe05532a1c05a05fc006f07768cf4cbf2dd50a655386b6e",
+   "features": [
+    "COPY PROJECT",
+    "DARK REV",
+    "RESONATOR",
+    "SCOPE",
+    "SYNTH",
+    "VOID"
+   ]
+  },
+  {
+   "name": "cx",
+   "title": "cx",
+   "version": "OCTABAMI5",
+   "imageName": "CX I5",
+   "patch": "patches/cx.obp",
+   "patchBytes": 119989,
+   "sha256": "911162f783d5efd517f76b7ab0c1f68bef145b36b523c2edc7574d09c04ad98e",
+   "features": [
+    "COPY PROJECT",
+    "CX OSC",
+    "DARK REV",
+    "SCOPE",
+    "SHATTER",
+    "VOID"
+   ]
+  },
+  {
+   "name": "cx-stuttr",
+   "title": "cx-stuttr",
+   "version": "OCTABAMI5",
+   "imageName": "CX-STUTTR I5",
+   "patch": "patches/cx-stuttr.obp",
+   "patchBytes": 120354,
+   "sha256": "7cbd215e000a4ae3687e3a63f141a2814df7aaab76c7a6d28fb4bcb97ad4b213",
+   "features": [
+    "COPY PROJECT",
+    "CX OSC",
+    "DARK REV",
+    "SCOPE",
+    "STUTTR",
+    "VOID"
+   ]
+  },
+  {
+   "name": "cx-reson",
+   "title": "cx-reson",
+   "version": "OCTABAMI5",
+   "imageName": "CX-RESON I5",
+   "patch": "patches/cx-reson.obp",
+   "patchBytes": 118861,
+   "sha256": "57fd57ffdc7f11e7bd4bae57f14611a4fd2ff6ca50bedf67788de4c262226819",
+   "features": [
+    "COPY PROJECT",
+    "CX OSC",
+    "DARK REV",
+    "RESONATOR",
+    "SCOPE",
+    "SHATTER"
+   ]
+  },
+  {
+   "name": "cx-vres",
+   "title": "cx-vres",
+   "version": "OCTABAMI5",
+   "imageName": "CX-VRES I5",
+   "patch": "patches/cx-vres.obp",
+   "patchBytes": 120119,
+   "sha256": "3f84c0b4a5043d874e246373275e190ea37d4383034f8d9c291226c27660537a",
+   "features": [
+    "COPY PROJECT",
+    "CX OSC",
+    "DARK REV",
+    "RESONATOR",
+    "SCOPE",
+    "VOID"
+   ]
   }
  ]
 }

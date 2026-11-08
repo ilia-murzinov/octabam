@@ -462,6 +462,19 @@ jobs:
         with:
           python-version: '3.12'
 
+      # Tim v2.22+ manifests call stock_guard() at import (needs MAIN OS).
+      # Same trap as Pages: recon without EFT exits 0 and leaves no section_3.
+      - name: ⬇️ Fetch Stock OS
+        run: |
+          set -euo pipefail
+          make os
+          scripts/vendor.sh eft
+          make -C vendor/elektron-firmware-tool
+          mkdir -p out/raw
+          vendor/elektron-firmware-tool/elektron-firmware-tool \
+            -i downloads/extracted/OCTATRACK_OS1.40C.syx -d 3 -o out/raw
+          test -f out/raw/section_3_MAIN_OS.bin
+
       # the manual site's pages include the generated reference files, so
       # they must exist before the doclinks scan of the tracked pages
       - name: 📝 Generate Pages

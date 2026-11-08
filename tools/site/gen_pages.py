@@ -33,7 +33,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1])); import too
 from remix import index, registry  # noqa: E402
 from remix.schema import CATEGORY_TITLE, Category  # noqa: E402
 
-GH = "https://github.com/sambanks/octabam"
+GH_UPSTREAM = "https://github.com/sambanks/octabam"
+GH_FORK = "https://github.com/ilia-murzinov/octabam"
+# Back-compat for any leftover GH uses in this file / tests.
+GH = GH_UPSTREAM
 
 _SMALL = {"a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "of", "on", "or", "the", "to", "with", "over"}
 _UPPER = {"os", "din", "dj", "eq", "bd", "usb", "midi", "cc", "cpu", "dsp", "cf", "lfo", "ata", "txtr", "amf",
@@ -76,6 +79,7 @@ def _label(m) -> str:
         "bbd": "BBD delay",
         "blackpyramids-303": "BlackPyramids 303",
         "character-txtr": "Character TXTR",
+        "cxosc": "Complex oscillator",
         "devilish": "dEVILish",
         "dlcopy": "Effect loader (copier)",
         "dlpump": "Effect loader (sender)",
@@ -105,6 +109,11 @@ def _author(m) -> str:
     return f"[{m.author}]({m.author_url})" if m.author_url else (m.author or "?")
 
 
+def _site_keys():
+    import release
+    return set(getattr(release, "SITE_MODULES", ()) or ())
+
+
 def _records(m) -> dict:
     path = OUT.parent / "screenshots.json"
     records = json.loads(path.read_text()) if path.exists() else {}
@@ -112,10 +121,12 @@ def _records(m) -> dict:
 
 
 def _module_url(m) -> str:
+    """Canonical tree for the module: fork for SITE_MODULES, upstream otherwise."""
     d = pathlib.Path("modules") / m.name
+    base = GH_FORK if m.key in _site_keys() else GH_UPSTREAM
     if (ROOT / d / "README.md").exists():
-        return f"{GH}/blob/main/{d}/README.md"
-    return f"{GH}/tree/main/{d}"
+        return f"{base}/blob/main/{d}/README.md"
+    return f"{base}/tree/main/{d}"
 
 
 def _figure(record: dict) -> list[str]:
@@ -150,31 +161,82 @@ def screen_reference(m) -> list[str]:
 
 
 def directory_page(mods, manual_page: dict) -> str:
-    """The feature directory: first what is in the release, by the manual's sections, each linked to its
-    manual page; then every other contributed module by category, each linked to its page here."""
-    import gen_manual
-    import release
-    v = release.VERSION
-    lines = ["# Feature Directory", "",
-             f"Every feature the project has. The first part is what is in Octabam {v}, with a page in the "
-             "[manual](manual/octabam/index.md) for each; the second part is the rest, with a page here for each. "
-             "The stock effects are described in Elektron's own manual.", "",
-             f"## In Octabam {v}", ""]
-    mine = {k: m for k, m in mods.items() if k in manual_page and not m.is_stock}
-    for folder, title in gen_manual.SECTIONS:
-        ms = sorted((m for m in mine.values()
-                     if (folder == "brain") == (m.key == "BRAIN") and (m.key == "BRAIN" or gen_manual.section_of(m) == folder)),
-                    key=lambda m: _label(m).lower())
-        if ms:
-            lines += [f"### {title}", "", "| Feature | Author |", "|---|---|"]
-            lines += [f"| [{_label(m)}](manual/{manual_page[m.key]}) | {_author(m)} |" for m in ms] + [""]
-    lines += [f"## Not in Octabam {v}", ""]
+    """Directory of Ilia's modules documented on this site."""
+    site_keys = _site_keys()
+    lines = ["# Modules", "",
+             "Modules developed on this fork, with usage notes on this site. "
+             "The rest of each `base*` / `cx*` image is credited on "
+             "[Home](../index.md#credits). "
+             "Build an image on [Build and Install](../web-builder.md).", ""]
     for cat, ms in index.by_category(mods).items():
-        ms = [m for m in ms if not m.is_stock and m.key not in manual_page]
+        ms = [m for m in ms if m.key in site_keys]
         if not ms:
             continue
         lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
         lines += [f"| [{_label(m)}](modules/{m.name}.md) | {_author(m)} |" for m in ms] + [""]
+    return "\n".join(lines) + "\n"
+
+
+def _display_author(m) -> tuple[str, str]:
+    """(sort_key, markdown author cell) — normalize known author spellings."""
+    if m.is_stock:
+        return ("Elektron", "Elektron (stock)")
+    raw = (m.author or "?").strip()
+    url = (m.author_url or "").strip()
+    # Collapse alternate spellings used across manifests.
+    aliases = {
+        "sambanks": ("Sam Banks", "https://github.com/sambanks"),
+        "Sam Banks": ("Sam Banks", "https://github.com/sambanks"),
+        "iliamurzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "ilia-murzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "timhastie/octatrick-modules": (
+            "Tim Hastie (octatrick)", "https://github.com/timhastie/octatrick-modules"),
+        "Zac Kyoti": ("Zac Kyoti", "https://github.com/Zac-Kyoti"),
+        "markandrus/octemu": ("markandrus", "https://github.com/markandrus/octemu"),
+        "bkkbrls-del/midisc": ("bkkbrls-del", "https://github.com/bkkbrls-del/midisc"),
+        "bryantysinger/octa-bt-pt": (
+            "bryantysinger", "https://github.com/bryantysinger/octa-bt-pt"),
+        "sanderlegit": ("sanderlegit", "https://github.com/sanderlegit"),
+        "radiohagen": ("radiohagen", "https://github.com/radiohagen"),
+        "yvesrosius": ("yvesrosius", "https://github.com/yvesrosius"),
+    }
+    name, href = aliases.get(raw, (raw, url))
+    if href:
+        return (name, f"[{name}]({href})")
+    return (name, name)
+
+
+def shipped_credits_page(mods) -> str:
+    """Author → modules as plain linked lists for BUILDER_REMIXES (+ SITE_MODULES)."""
+    import release
+    keys = set(getattr(release, "SITE_MODULES", ()) or ())
+    for n in getattr(release, "BUILDER_REMIXES", ()) or ():
+        keys |= set(registry.remix(n).modules)
+    by: dict[str, list] = {}
+    author_md: dict[str, str] = {}
+    for key in keys:
+        m = mods[key]
+        sort_name, md = _display_author(m)
+        author_md[sort_name] = md
+        by.setdefault(sort_name, []).append(m)
+    lines = [
+        "<!-- generated by tools/site/gen_pages.py — do not edit -->",
+        "",
+    ]
+    site_keys = _site_keys()
+    for author in sorted(by, key=lambda a: (a == "Elektron", a.lower())):
+        ms = sorted(by[author], key=lambda m: _label(m).lower())
+        items = []
+        for m in ms:
+            name = _label(m)
+            if m.is_stock:
+                items.append(name)
+            elif m.key in site_keys:
+                # Paths are from docs/site/ (index.md includes this fragment).
+                items.append(f"[{name}](reference/modules/{m.name}.md)")
+            else:
+                items.append(f"[{name}]({_module_url(m)})")
+        lines += [f"**{author_md[author]}** — {', '.join(items)}.", ""]
     return "\n".join(lines) + "\n"
 
 
@@ -186,16 +248,17 @@ def module_page(m, mods, manual_page: dict) -> str:
     if m.author_url:
         who = f'<a href="{html.escape(m.author_url)}">{who}</a>'
     lines = ["---", "not_in_nav: true", "---", "", f"# {_label(m)}", "", f'<p class="byline">By {who}</p>', ""]
-    target = manual_page.get(m.key)
     import release
-    v = release.VERSION
-    if target:
-        lines += [f"This feature is in Octabam {v}: see its [manual page](../manual/{target}).", ""]
-    else:
-        lines += [f'!!! note "Not in Octabam {v}"', f"    This feature is not in the {v} image.", ""]
+    builder = getattr(release, "BUILDER_REMIXES", ()) or ()
+    in_builder = sorted(
+        n for n in builder
+        if m.key in set(registry.remix(n).modules))
+    if in_builder:
+        listed = ", ".join(f"`{n}`" for n in in_builder)
+        lines += [f"Ships in: {listed}.", ""]
     # Usage that leads with architecture diagrams: prose + path first, LCD
     # shots under ## Screens. Everyone else keeps a hero screen under the title.
-    _DIAGRAM_FIRST = frozenset({"void", "resonator", "shatter", "stuttr"})
+    _DIAGRAM_FIRST = frozenset({"cxosc", "void", "resonator", "shatter", "stuttr"})
     if m.name in _DIAGRAM_FIRST and fragment.is_file():
         lines += [f'--8<-- "usage/{m.name}.md"', ""]
         recs = _records(m)
@@ -214,36 +277,32 @@ def module_page(m, mods, manual_page: dict) -> str:
         else:
             lines += [m.doc, ""]
         lines += screen_reference(m)
-    rows = [f"| Author | {_author(m)} |",
-            f"| Category | {CATEGORY_TITLE[m.category or Category.REFERENCE]} |"]
-    if m.requires:
-        rows.append("| Requires | " + ", ".join(
-            f"[{k}]({mods[k].name}.md)" if k in mods and not mods[k].is_stock else k for k in m.requires) + " |")
-    if m.conflicts:
-        rows.append("| Conflicts | " + "; ".join(
-            (f"[{o}]({mods[o].name}.md)" if o in mods and not mods[o].is_stock else o) + f" — {why}"
-            for o, why in m.conflicts) + " |")
-    lines += ['??? note "Module facts"', ""]
-    lines += ["    " + line if line else "" for line in [m.doc, "", "| Detail | Value |", "|---|---|"] + rows + ["", f"On GitHub: {_module_url(m)}"]]
-    lines += ["", "[Feature directory](../modules.md)"]
+    lines += ["", "[Build](../../web-builder.md)", " · ", "[ilia · octabam](../../index.md)"]
     return "\n".join(lines) + "\n"
 
 
 def main(quiet: bool = False) -> int:
     import gen_manual
     import release
+    import shutil
     mods = registry.modules()
     official = [(n, registry.remix(n)) for n in release.REMIXES]
+    if OUT.exists():
+        shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
     jobs = {}
     manual_page = gen_manual.published_pages(mods, official)
+    site_keys = _site_keys()
     jobs["modules.md"] = directory_page(mods, manual_page)
+    jobs["_credits-shipped.md"] = shipped_credits_page(mods)
     for m in mods.values():
-        if not m.is_stock:
-            jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
+        if m.key not in site_keys:
+            continue
+        jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
     for name, r in official:
         jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, r, mods)) + "\n"
-    jobs.update(gen_manual.main(mods, official))
+    if official:
+        jobs.update(gen_manual.main(mods, official))
     for name, text in sorted(jobs.items()):
         (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_text(text)
