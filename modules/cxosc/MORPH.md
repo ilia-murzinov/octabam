@@ -8,9 +8,9 @@ Working notes from the CX OSC morph pass. Code: `poly.s` (`sy_wshape`,
 
 | Knob | Page | Role |
 |------|------|------|
-| **CMOR** | PLAYBACK SETUP A | Carrier waveshape 0..127; **FUNC** snaps 0 / 64 / 127 |
-| **MMOR** | PLAYBACK SETUP B | Modulator waveshape 0..127 (heard through FM; needs **INDX**); **FUNC** snaps 0 / 64 / 127 |
-| **WIDTH** | PLAYBACK SETUP F | Cycle lean (**64** = neutral): sine soft lean / saw phase-skew / square duty (**64** = 50%; duty maps 0..127 → 16..110) |
+| **CAR** (was CMOR) | PLAYBACK SETUP A | Carrier waveshape 0..127; **FUNC** snaps 0 / 64 / 127 |
+| **MOD** (was MMOR) | PLAYBACK SETUP B | Modulator waveshape 0..127 (heard through FM; needs **INDX**); **FUNC** snaps 0 / 64 / 127 |
+| **WIDTH** | PLAYBACK SETUP F | Cycle lean — LCD **−64..+63** (**0** = neutral, byte 64): sine soft lean / saw phase-skew / square duty (**0** ≈ 50%; duty maps byte 0..127 → 16..110) |
 
 Morph map (both oscillators):
 
@@ -23,7 +23,7 @@ Morph map (both oscillators):
 0..63 linear sine→saw; 64..127 linear saw→square (both `/63`). MMOR always
 builds the DPW pulse (no dummy-square below 64 — that stepped at the landmark).
 
-LFO SETUP PMTR **30 = CMOR**, **31 = MMOR**. WIDTH is panel-only (not an LFO dest).
+LFO SETUP PMTR **30 = CAR**, **31 = MOD**. WIDTH is panel-only (not an LFO dest).
 
 ## WIDTH through the morph
 
@@ -63,16 +63,17 @@ the same way MIX 0 solos the carrier.
 | `sy_dpw` / `S_DPWM` | MMOR saw |
 | `sy_dpw_pulse` / `S_DPWC` / `S_DUTY` | MMOR square; large-jump reprime only |
 | `fm_e6_morph` | FUNC → landmark snap 0/64/127 on CMOR/MMOR |
+| `pg_wid_morph` | SETUP A/B icon: live sine→saw→square outline |
 
 Stack in `sy_loop`: `0=MIX_Q8, 4=FOLD_Q8, 8=WIDTH, 12=SYMM, 16=morph (00 00 CMOR MMOR)`.
 
 ## On-unit check
 
-1. FOLD ≈ 0, SYMM 64, DEC 127, WIDTH 64.
+1. FOLD ≈ 0, SYMM 64, DEC 127, WIDTH LCD **0** (byte 64).
 2. **CMOR** 0→64→127, INDX 0: sine → hard saw → WIDTH square.
 3. **FUNC + CMOR/MMOR**: lands on 0 / 64 / 127 only.
-4. **WIDTH** with CMOR 64: **64** = clean saw; 0 / 127 = steep-then-shallow (or flip) — still a saw, not sine mush.
-5. **WIDTH** with CMOR 0: sine lean; CMOR 127: duty, 64 ≈ 50%.
+4. **WIDTH** LCD with CMOR 64: **0** = clean saw; −64 / +63 = steep↔shallow — still a saw.
+5. **WIDTH** with CMOR 0: sine lean; CMOR 127: duty, LCD **0** ≈ 50%.
 6. **WIDTH** with MIX 127, MMOR 64 / 127: saw skew + square duty without zipper.
 7. **MMOR** 0→127, INDX ~40, CMOR 0: smooth FM colour; no jump mid-travel.
 8. **MIX 127**, INDX 0, MMOR 0→64→127: hear mod sine → DPW saw → DPW square.
