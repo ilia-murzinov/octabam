@@ -919,14 +919,14 @@
       "caption": "CX OSC PLAYBACK: PTCH RATO INDX FINE FOLD MIX.",
       "remix": "cxosc",
       "source": "emulator panel UART",
-      "firmware_sha256": "ab5fcc8cb061d9d4136b127ac128ea725914279c376dfde7fbc8ca5ba30f6733"
+      "firmware_sha256": "86df5a1a91d7d2e58970ce7037e1af048d5f83b2eb8bc11e455b25cdcbb69fa1"
     },
     "setup": {
       "image": "cxosc/setup.png",
       "caption": "SRC SETUP with CX OSC: CMOR MMOR DEC SYMM FDBK.",
       "remix": "cxosc",
       "source": "emulator panel UART",
-      "firmware_sha256": "ab5fcc8cb061d9d4136b127ac128ea725914279c376dfde7fbc8ca5ba30f6733"
+      "firmware_sha256": "86df5a1a91d7d2e58970ce7037e1af048d5f83b2eb8bc11e455b25cdcbb69fa1"
     }
   },
   "morph": {

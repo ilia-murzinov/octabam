@@ -308,7 +308,7 @@ MODULE = Module(
         "machine select / PLAYBACK then FDBK / MIDI / STOP / Part. verify_cxosc + "
         "make check REMIX=cxosc"
     ),
-    doc="CX OSC in the machine list (no marker file): PTCH RATO INDX FINE FOLD MIX, SETUP CMOR/MMOR/DEC/SYMM/FDBK, LFO PMTR 30..33 (no DEC), mono. Local fork of FM SYNTH.",
+    doc="CX OSC in the machine list (no marker): PTCH RATO INDX FINE FOLD MIX, SETUP CMOR/MMOR/DEC/SYMM/FDBK, LFO PMTR 30..33 (no DEC), up to 4 mono / Part, AMP HOLD owns length. Local fork of FM SYNTH.",
     conflicts=(
         ("SYNTH MACHINE", "both own the FLEX/STATIC kind-table renderers, page cave 0x400d24d0, and machine-list sites"),
         ("BLACKPYRAMIDS_303", "shares ColdFire ROM hooks (e.g. MIDI note-on 0x4000e746) — build refuses the pair"),

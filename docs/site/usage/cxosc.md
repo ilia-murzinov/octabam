@@ -1,7 +1,7 @@
-A **complex oscillator** as its own track machine: two-operator FM into a
-sine wavefolder, with modulator feedback and sine→saw morphs on each
-operator. ColdFire voice (fork of Tim Hastie's FM SYNTH engine) — not an
-edit of the SYNTH MACHINE submodule.
+A **complex oscillator** in the machine list: two-operator FM into a sine
+wavefolder, with modulator feedback and sine→saw morphs on each operator.
+No marker sample — it takes the ColdFire voice seat (remixes that ship it
+omit SYNTH MACHINE). Up to **four** mono CX OSC tracks per Part.
 
 Signal path every sample:
 
@@ -9,20 +9,40 @@ Signal path every sample:
 
 ## Limit
 
-Up to **four** CX OSC tracks per Part. A fifth shows `CX OSC: 4 MAX`.
-Each track is still a mono voice. Remixes that ship CX OSC omit SYNTH
-MACHINE (same ColdFire seat).
+A fifth CX OSC track shows `CX OSC: 4 MAX`. Each track is one mono voice.
 
 ## Access
 
-Double-tap the track key, or **FUNC + SRC** → **CX OSC** (under PICKUP;
-scrolls with other machines). No marker sample — the Part stores FLEX with
+### Select
+
+Same sixth list row (**CX OSC**, under PICKUP). Part stores FLEX with
 signature `"CX", 1`.
 
-After a layout change (or a Part saved under an older knob map),
-**re-select CX OSC** on the track so PLAYBACK / SETUP match the current
-defaults. Old Parts that still keep SYMM / DEC / FDBK on the PLAYBACK row
-will sound wrong until you re-pick the machine.
+- Double-tap the track key → machine list → **CX OSC** → YES
+- **FUNC + SRC** → **SELECT MACHINE TYPE** → **CX OSC** → YES
+- From **SRC SETUP**’s left machine list → **CX OSC** → YES
+
+On a track that already has a sample, **FUNC + SRC** may open the sample
+list first — **LEFT** reaches the machines.
+
+### Pages
+
+- **PLAYBACK** — PTCH RATO INDX FINE FOLD MIX
+- **FUNC + PLAYBACK** — **SRC SETUP** — CMOR MMOR DEC SYMM FDBK (F blank)
+- **AMP** — ATK / HOLD / REL (engine-owned). Selecting CX seeds ATK 0 /
+  HOLD INF / REL 0 and LEG MONO
+- **LFO** — PMTR 30..33 reach SETUP morphs / feedback (below). No VOIC /
+  CHRD — LFO 3 stays SPD3 / DEP3
+
+**FUNC** on PLAYBACK knobs: PTCH snaps −32 / 0 / +32; RATO snaps classic
+FM ratios.
+
+### Play
+
+Trigs, chromatic keys, or MIDI — last note wins. AMP **HOLD** owns note
+length (**HOLD INF** = until STOP). P-locks, scenes, and MIDI CCs hit
+PLAYBACK / SETUP like any machine. Stock FX1 / FX2 and quantizer GLIDE
+work as usual.
 
 ![CX OSC PLAYBACK: PTCH, RATO, INDX, FINE, FOLD, MIX.](../../img/cxosc/source.png)
 
@@ -32,7 +52,7 @@ will sound wrong until you re-pick the machine.
 
 | Page | Knob | Range | Default | What it does |
 |---|---|---|---|---|
-| PLAYBACK | PTCH | −32..+32 | 0 | coarse pitch (semitones); chromatic / MIDI add on top; FUNC snaps −32 / 0 / +32 |
+| PLAYBACK | PTCH | −32..+32 | 0 | coarse pitch (semitones); chromatic / MIDI add on top |
 | PLAYBACK | RATO | 0.25..4 | ~1 | modulator∶carrier; free on the knob, **FUNC** snaps classic FM ratios |
 | PLAYBACK | INDX | 0..127 | 0 | FM depth; **0 = no FM** (carrier / fold only) |
 | PLAYBACK | FINE | −64..+63 ¢ | 0c (raw 64) | cents |
@@ -45,29 +65,20 @@ will sound wrong until you re-pick the machine.
 | SETUP | FDBK | 0..127 | 0 | modulator feedback (always the unmorphed mod sine) |
 | SETUP | F | — | — | blank |
 
-**FUNC + PLAYBACK** opens SETUP (header **SRC SETUP**).
-
 ### How the knobs interact
 
 - **Clean sine carrier:** INDX, FOLD, FDBK, CMOR, MMOR at 0.
-- **Hear FM:** raise INDX. RATO sets the sideband spacing (1 = octaves;
+- **Hear FM:** raise INDX. RATO sets sideband spacing (1 = octaves;
   non-integers clang). MMOR and FDBK are silent until INDX is up.
 - **Folder:** FOLD is dry/wet into a sine-table fold. MIX chooses the
-  *input* to that fold — carrier only, or carrier blended with the
-  modulator. SYMM tips which polarity the folder emphasises (can mute
-  one side).
-- **Morph while folding:** FOLD uses a sine table, so a high FOLD can make
-  a saw-ish CMOR still sound “sine-ish”. Drop FOLD near 0 when auditioning
-  CMOR.
-- **DEC vs MIX:** DEC is **SETUP C**. MIX is **PLAYBACK F**. They are not
-  the same knob.
-- **CMOR vs MMOR:** same idea (sine→saw), different target. Carrier morph
-  is a hard saw (fine on the audible out). Modulator morph is DPW so the
-  FM path stays continuous — a hard saw in the mod would explode mid-travel.
+  *input* to that fold. SYMM tips which polarity the folder emphasises.
+- **Morph while folding:** high FOLD can make a saw-ish CMOR still sound
+  sine-ish — drop FOLD near 0 when auditioning CMOR.
+- **DEC vs MIX:** DEC is SETUP C; MIX is PLAYBACK F.
+- **CMOR vs MMOR:** same idea, different target. Carrier = hard saw on
+  the out; modulator = DPW so the FM path stays continuous.
 
 ## LFO
-
-On a CX OSC track, LFO **PMTR** reaches:
 
 | PMTR | Destination |
 |---|---|
@@ -76,18 +87,8 @@ On a CX OSC track, LFO **PMTR** reaches:
 | 32 | SYMM |
 | 33 | FDBK |
 
-DEC is not an LFO destination — the index envelope stays under the DEC
-knob (and locks / scenes).
-
-## Playing it
-
-- Mono voice: trigs, chromatic keys, or MIDI. Last note wins.
-- AMP **ATK / HOLD / REL** still shape level (engine-owned envelope;
-  selecting CX seeds ATK 0 / HOLD INF / REL 0 and LEG MONO).
-- GLIDE (quantizer row) slews pitch; there is no VOIC / CHRD page — LFO 3
-  stays SPD3 / DEP3.
-- P-locks, scenes, and MIDI CCs hit PLAYBACK / SETUP like any machine.
-- Stock FX1 / FX2 on the track work as usual.
+DEC is not an LFO destination — it stays under the DEC knob (and locks /
+scenes).
 
 ### A short listen path
 
