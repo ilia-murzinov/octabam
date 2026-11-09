@@ -21,6 +21,7 @@
 | po_lfdname: 0x4003bff2 (jmp, 8 B). Stock loads LFD_MACHTAB into a0 then picks
 | a2 = tbl[machine]. A FLEX pick becomes the page resolver's PLAYBACK descriptor
 | (CX OSC's page on a CX track) so LFO SETUP prints PTCH RATO INDX FINE FOLD MIX.
+| Conflicts with OCTA303 (same formatter site family at 0x4003bff0).
 po_lfdname:
         lea     LFD_MACHTAB,%a0
         movea.l (%a0,%d0.l*4),%a2        | displaced: the stock pick

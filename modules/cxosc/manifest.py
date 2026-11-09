@@ -5,9 +5,8 @@ Mono voice. PLAYBACK: PTCH (−32..+32) RATO INDX FINE FOLD MIX. SETUP:
 CAR/MOD/DEC/SYMM/FDBK/PWM; LFO PMTR lists PLAYBACK names + 30..33 CAR/MOD/SYMM/FDBK (no DEC/PWM). No Tim VOIC/CHRD.
 
 Machine list adapted from timhastie/octatrick-modules v2.15 SYNTH MACHINE
-(MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE and
-BLACKPYRAMIDS_303. Beside ANALOG BD or OCTA303 it shares the machine list
-through HOOKS (machine_rows): its row follows theirs.
+(MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE, OCTA303 and BLACKPYRAMIDS_303. Beside
+ANALOG BD it shares the machine list through HOOKS (machine_rows).
 """
 
 import os
@@ -58,10 +57,6 @@ def _hooks_inc(modules):
     """modules/hooks's flags and, beside another machine, CX OSC's place in the
     machine_rows chain (its row; the next machine's routines)."""
     from remix import hooks_flags
-    if _cxosc_place(modules) != "DRAM" and "OCTA303" in modules:
-        raise ValueError("CX OSC: PLACE=CAVE beside OCTA303 -- both take the PLAYBACK page "
-                         "resolver 0x40031ece and the cave's jump there cannot be chained; "
-                         "build with PLACE=DRAM")
     return hooks_flags.inc("CX OSC", modules)
 
 
@@ -312,6 +307,7 @@ MODULE = Module(
     doc="Buchla-style complex oscillator (FM + wavefolder + morphs + feedback): PTCH RATO INDX FINE FOLD MIX, SETUP CAR/MOD/DEC/SYMM/FDBK/PWM (sine→saw→square; PWM sine lean / saw phase-skew / square duty), LFO PMTR shows PLAYBACK names + 30..33 CAR/MOD/SYMM/FDBK. Local fork of FM SYNTH.",
     conflicts=(
         ("SYNTH MACHINE", "both own the FLEX/STATIC kind-table renderers, page cave 0x400d24d0, and machine-list sites"),
+        ("OCTA303", "both rewrite LFO SETUP PMTR PLAYBACK names at 0x4003bff0/0x4003bff2 — refuse the pair"),
         ("BLACKPYRAMIDS_303", "shares ColdFire ROM hooks (e.g. MIDI note-on 0x4000e746) — build refuses the pair"),
     ),
     gates=(

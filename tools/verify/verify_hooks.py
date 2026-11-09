@@ -807,8 +807,8 @@ def main():
     print("verify_hooks: CHROMATIC bridges under Unicorn")
     chromatic()
     print("verify_hooks: machine rows under Unicorn")
-    for on in (("ANALOG BD", "OCTA303"), ("OCTA303", "CX OSC"), ("ANALOG BD", "CX OSC"),
-               ("ANALOG BD", "OCTA303", "CX OSC")):
+    # OCTA303 conflicts with CX OSC (LFO SETUP PMTR names) — no pair / triple with both.
+    for on in (("ANALOG BD", "OCTA303"), ("ANALOG BD", "CX OSC")):
         machines(on)
     print("verify_hooks: FREE LOOP beside REC_TRIG_MUTE under Unicorn")
     free_loop()

@@ -52,7 +52,7 @@ Spec: [docs/specs/HOOKS.md](../../docs/specs/HOOKS.md) — every bridge with its
   and reopening on an OCTA-303 track opens scrolled with its row boxed. ANALOG BD
   and OCTA303 alone are byte-identical to the base (28 Oct 2026).
 - Machine rows, a chain of three (31 Oct 2026): under Unicorn (`verify_hooks`),
-  for ANALOG BD + OCTA303, OCTA303 + CX OSC, ANALOG BD + CX OSC and all three,
+  for ANALOG BD + OCTA303 and ANALOG BD + CX OSC (OCTA303 conflicts with CX OSC),
   the head's row type for every machine (signatures `AB 1`, `TB 1`, `CX 1`),
   the drawer's stubs over every top row and screen row (108 cases with eight
   rows), each row's name through the chain and in the head's SRC SETUP table,
@@ -60,14 +60,9 @@ Spec: [docs/specs/HOOKS.md](../../docs/specs/HOOKS.md) — every bridge with its
   shadow from every starting machine (CX OSC's machine change runs over the
   user's stock image). Under the port with a fresh project, on
   [`test/hooks-machines-cx`](../../remixes/test/hooks-machines-cx/README.md) and
-  [`test/hooks-machines-all`](../../remixes/test/hooks-machines-all/README.md):
-  `verify_octa303_ui` (its row from the remix, `hooks_flags.image_row`),
-  `verify_analog_bassdrum_ui` on the three-machine image, and `verify_cxosc`
-  (Unicorn, on each image's runtime, its guard on its own row) pass; choosing CX OSC
-  from the panel (the list's last row, YES) stores FLEX signed `CX 1` in the Part
-  and its shadow and publishes its page in its row's PB_TABLE slot -- by a scratch
-  script run on both images, not a gate. A first run with OCTA303 heading the
-  render chain never loaded the project: CX OSC's page code reads its records
-  from the words before the FLEX kind entry's renderer, so CX OSC heads that chain.
-  ANALOG BD, OCTA303 and CX OSC alone are byte-identical to the base.
+  [`test/hooks-machines-all`](../../remixes/test/hooks-machines-all/README.md)
+  (ANALOG BD + CX OSC; OCTA303 conflicts with CX OSC):
+  `verify_analog_bassdrum_ui` and `verify_cxosc` pass; choosing CX OSC from the
+  panel stores FLEX signed `CX 1` in the Part and its shadow. ANALOG BD, OCTA303
+  and CX OSC alone are byte-identical to the base.
 - Not flashed. Apart from the machine rows, not run under the ColdFire port with a project.
