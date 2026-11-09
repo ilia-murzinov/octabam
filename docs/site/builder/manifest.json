@@ -1,9 +1,9 @@
 {
  "version": "v0.4",
- "commit": "3ae6d7a751a9839e9b4401b7618bfd82fb8e00db",
+ "commit": "72144a48b2e72864514b65323450bb01b2d5aa67",
  "dev": true,
- "build": "I7",
- "date": "2026-11-08",
+ "build": "I8",
+ "date": "2026-11-09",
  "featureRows": [
   "SCOPE",
   "COPY PROJECT",
@@ -85,11 +85,11 @@
   {
    "name": "base",
    "title": "base",
-   "version": "OCTABAMI7",
-   "imageName": "BASE I7",
+   "version": "OCTABAMI8",
+   "imageName": "BASE I8",
    "patch": "patches/base.obp",
    "patchBytes": 136518,
-   "sha256": "09ac29657de58a022a197187a2f1df29a58b55a7afa136f05b5924f6ccabd12f",
+   "sha256": "f66b2f05a21cbcf07b481284de2722667e84e45e1a957d4e4f5b641113cbee39",
    "features": [
     "COPY PROJECT",
     "DARK REV",
@@ -102,11 +102,11 @@
   {
    "name": "base-stuttr",
    "title": "base-stuttr",
-   "version": "OCTABAMI7",
-   "imageName": "BASE-STUTTR I7",
+   "version": "OCTABAMI8",
+   "imageName": "BASE-STUTTR I8",
    "patch": "patches/base-stuttr.obp",
    "patchBytes": 136828,
-   "sha256": "33e8e7c2abf31edc7a5b84a5a68c2642da6b37628cee263bfcff7cc8f8057ed6",
+   "sha256": "907c7926d5cab72e681a1c11d1b6acf5f6b658f2d65809aeacde982dd9971e8d",
    "features": [
     "COPY PROJECT",
     "DARK REV",
@@ -119,11 +119,11 @@
   {
    "name": "base-reson",
    "title": "base-reson",
-   "version": "OCTABAMI7",
-   "imageName": "BASE-RESON I7",
+   "version": "OCTABAMI8",
+   "imageName": "BASE-RESON I8",
    "patch": "patches/base-reson.obp",
-   "patchBytes": 135368,
-   "sha256": "f0525d4798810ee34c04d6045fb10a33a3325d21841e6e62c4ddf3486786924d",
+   "patchBytes": 135369,
+   "sha256": "1b461db1a1d89defdd7b75f748ac7c5fe41f938946a8e45cb9ae791cb169521e",
    "features": [
     "COPY PROJECT",
     "DARK REV",
@@ -136,11 +136,11 @@
   {
    "name": "base-vres",
    "title": "base-vres",
-   "version": "OCTABAMI7",
-   "imageName": "BASE-VRES I7",
+   "version": "OCTABAMI8",
+   "imageName": "BASE-VRES I8",
    "patch": "patches/base-vres.obp",
    "patchBytes": 136537,
-   "sha256": "d238681c857298aaf1b39933a9abe56ed81618d7b280bfc3df461ee7d9e28dea",
+   "sha256": "2041055f23418daeccc1e1adf312228580787667dd78d4f0980b1a5b07a42adc",
    "features": [
     "COPY PROJECT",
     "DARK REV",
@@ -153,11 +153,11 @@
   {
    "name": "cx",
    "title": "cx",
-   "version": "OCTABAMI7",
-   "imageName": "CX I7",
+   "version": "OCTABAMI8",
+   "imageName": "CX I8",
    "patch": "patches/cx.obp",
-   "patchBytes": 120675,
-   "sha256": "7a4a86680fee0471e40c861c9d8ca2f624ebaff68ef57d9b9c79f2d0ca54c01d",
+   "patchBytes": 120734,
+   "sha256": "746fa1de84456dd61b8bb1815b9c7edc52f1275a0f2fd9d17a08966f7d616402",
    "features": [
     "COPY PROJECT",
     "CX OSC",
@@ -170,11 +170,11 @@
   {
    "name": "cx-stuttr",
    "title": "cx-stuttr",
-   "version": "OCTABAMI7",
-   "imageName": "CX-STUTTR I7",
+   "version": "OCTABAMI8",
+   "imageName": "CX-STUTTR I8",
    "patch": "patches/cx-stuttr.obp",
-   "patchBytes": 121027,
-   "sha256": "6a48ce4632baf0d5173d7d20eb8ab14258ba96fa5a3033bad3b3fcb10fa984f1",
+   "patchBytes": 121127,
+   "sha256": "a6f196ac5f47dc29cb3213f40d707646be9d3bfad691dcdcadab2ef08428d37a",
    "features": [
     "COPY PROJECT",
     "CX OSC",
@@ -187,11 +187,11 @@
   {
    "name": "cx-reson",
    "title": "cx-reson",
-   "version": "OCTABAMI7",
-   "imageName": "CX-RESON I7",
+   "version": "OCTABAMI8",
+   "imageName": "CX-RESON I8",
    "patch": "patches/cx-reson.obp",
-   "patchBytes": 119565,
-   "sha256": "afbc01344cddff4d1f2d866f977b583765097b0e8c06bf4398bb090cdb3a07ff",
+   "patchBytes": 119667,
+   "sha256": "ed30c1eed2ac3d3209cd157b6a7af0f3a8cd7f3b17e577f353b2fe9ae08caa68",
    "features": [
     "COPY PROJECT",
     "CX OSC",
@@ -204,11 +204,11 @@
   {
    "name": "cx-vres",
    "title": "cx-vres",
-   "version": "OCTABAMI7",
-   "imageName": "CX-VRES I7",
+   "version": "OCTABAMI8",
+   "imageName": "CX-VRES I8",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 120791,
-   "sha256": "ae34d8b7d96bb4c6d7c6e82fff444f613c9366902b29172bf5afdef53116f2fe",
+   "patchBytes": 120925,
+   "sha256": "79927fa1bda371fb33e9d415a813c6895a58d64a9224894418e7d4f3171d49ec",
    "features": [
     "COPY PROJECT",
     "CX OSC",
