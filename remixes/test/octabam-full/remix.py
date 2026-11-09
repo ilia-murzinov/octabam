@@ -16,13 +16,13 @@ OURS = ("MODULATION", "SPECTRUM", "CHARACTER", "TRANSIENT", "DISTORX")
 # Every other ColdFire module that can share this image (the ledger; HOOKS joins the pairs that
 # share a stock site). Not here: ANALOG BD (its fixed pre-boot DSP scratch 0x40b00000 is under
 # this much DRAM code), SYNTH MACHINE (the cave 0x400d24d0 the stock DELAY reads, and OCTA303's
-# renderer and resolver), CX OSC's CAVE form (the same cave: PLACE is pinned to DRAM below),
+# renderer and resolver), CX OSC (conflicts with OCTA303 on LFO SETUP PMTR names),
 # CF METER IDLE and WAVE LOAD (CF METER's FX2 id is MODULATION's),
 # MIDI LOOPBACK (MIDI SCENES), DIRECT JUMP and PERSISTENT BUFFERS (DIRECT_JUMP_KYOTI and BUFFER
 # SAVER do their jobs), and the bus and diagnostic modules (TEMPO SYNC, TEMPO BUS, RIG HOSTS, BOOT TRACE).
 COLDFIRE = ("OCTA303", "MORPH", "REC THRESHOLD", "BUFFER SAVER", "COPY PROJECT", "EUCLID FILL",
             "FX2 LOCK", "MIDI SCALES", "RND NAME", "SCOPE", "TRACK PATTERNS",
-            "VARISPEED", "STEM REC", "CX OSC")
+            "VARISPEED", "STEM REC")
 STOCK_FX1 = ("FILTER", "EQUALIZER", "DJ EQ", "PHASER", "FLANGER", "CHORUS", "SPATIALIZER",
              "COMB FILTER", "SIDECHAIN_COMPRESSOR", "LO-FI")
 
@@ -64,7 +64,6 @@ REMIX = Remix(
               ("octabam.usb", "CUE"): 1, ("octabam.usb", "MASTER"): 0,
               ("octabam.usb", "IN"): "OFF",
               ("kyoti.mute-modes", "PLACE"): Pin("DRAM"),
-              ("ilia.cxosc", "PLACE"): Pin("DRAM"),   # beside OCTA303: only the DRAM page chains (modules/hooks)
               ("octabam.sidechain-compressor", "FORM"): Pin("SHARED"),
               ("octabam.sidechain-compressor", "PLACE"): Pin("DRAM"),
               # no bus here, so the cycle envelope is not priced with the stations on FX1 only

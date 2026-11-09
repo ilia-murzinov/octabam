@@ -1039,8 +1039,8 @@ def main():
              "hooks-core": ("PHASER", "DARK REV"),   # LOAD METER's DSP half in PHASER's (as stock-meter-a), CF METER's readout in DARK's (as cfmeter)
              "hooks-free-loop": (),   # FREE LOOP + REC_TRIG_MUTE + REC THRESHOLD: ColdFire, no DSP words
              "hooks-machines": ("SPRING REV",),   # ANALOG BD's voices in SPRING's words, as analog-bassdrum
-             "hooks-machines-all": ("SPRING REV",),   # the same, with CX OSC
-             "hooks-machines-cx": (),   # OCTA303 + CX OSC: ColdFire, no DSP words
+             "hooks-machines-all": ("SPRING REV",),   # ANALOG BD + CX OSC (OCTA303 conflicts with CX)
+             "hooks-machines-cx": ("SPRING REV",),   # ANALOG BD + CX OSC
              "analog-bassdrum": ("SPRING REV",),
               "blackpyramids-303": ("SPRING REV",),   # its DSP voice in SPRING's words, as ANALOG BD's
              "sidechain-compressor": ("SPRING REV",), "kyoti-mute-sidechain": ("SPRING REV",),   # its DSP section in SPRING's words
@@ -1059,6 +1059,7 @@ def main():
              "rec-cs1-skip": (),   # REC CS1 SKIP: ColdFire, no DSP words, on the 14 stock effects
              "slow-lfo": (),   # SLOW LFO: ColdFire, no DSP words, on the 14 stock effects
              "bar-led": (),   # BAR LED: ColdFire, no DSP words, on the 14 stock effects
+             "xfcurve": (), "xfcurve-scurve": (),   # XF CURVE: ColdFire, no DSP words, on the 14 stock effects
              # the twelve io remixes: the IN module's RX inject is placed in SPATIALIZER's words
              **{f"usb-io-{o}-{i}": ("SPATIALIZER",) for o in ("tracks", "tracks-main-cue", "main-cue", "main") for i in ("ab", "cd", "abcd")},
              "octatrick": ("SPATIALIZER",),   # USB's ABCD input inject, as in the io remixes
