@@ -1,8 +1,8 @@
-/* Builder: one column of equal-width controls. Chassis amber. */
+/* Builder: one column of equal-width controls. Chassis greyscale. */
 
 #octabam-builder {
-  --ob-accent: #c45c26;
-  --ob-accent-hot: #e08a4a;
+  --ob-accent: #d4d4d4;
+  --ob-accent-hot: #f0f0f0;
   --ob-ink: #121212;
   --ob-panel: #121212;
   --ob-col: min(100%, 26rem);
@@ -54,7 +54,7 @@
 #octabam-builder #ob-chosen {
   display: block;
   margin: 0;
-  color: var(--muted-foreground, #9a958c);
+  color: var(--muted-foreground, #8e8e8e);
   font-size: 0.8em;
   line-height: 1.35;
   font-weight: 400;
@@ -112,7 +112,7 @@
 
 #octabam-builder button#ob-go:disabled {
   background: transparent !important;
-  color: var(--muted-foreground, #9a958c) !important;
+  color: var(--muted-foreground, #8e8e8e) !important;
   border-color: #3a3a3a !important;
   opacity: 1;
   cursor: not-allowed;
@@ -176,7 +176,7 @@
 
 #octabam-builder .ob-dd-menu li:hover,
 #octabam-builder .ob-dd-menu li[aria-selected="true"] {
-  background: #1f1810;
+  background: #1c1c1c;
 }
 
 #octabam-builder #ob-status,
@@ -223,7 +223,7 @@
 #octabam-builder .ob-features th[scope="row"],
 #octabam-builder .ob-features .ob-corner {
   color: var(--ob-accent);
-  background: #1f1810;
+  background: #1c1c1c;
   text-align: left;
   padding-left: 0.5rem;
   font-weight: 650;
@@ -236,7 +236,7 @@
 
 #octabam-builder .ob-features tr.ob-row-hover > th[scope="row"],
 #octabam-builder .ob-features thead th.ob-col-hover {
-  background: color-mix(in srgb, var(--ob-accent) 35%, #1f1810);
+  background: color-mix(in srgb, var(--ob-accent) 35%, #1c1c1c);
 }
 
 #octabam-builder .ob-features .ob-cell-hover {

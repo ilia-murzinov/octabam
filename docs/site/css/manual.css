@@ -82,12 +82,14 @@ article .typography p:has(> img) + p:has(> em:only-child) {
 :root {
   --font-sans: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-heading: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: none;
 }
 
 /* Page header: the title's cap height starts at the top of the buttons. */
@@ -105,9 +107,19 @@ article {
 article .typography > h1:first-child + :not(.byline) {
   margin-top: 0;
 }
-/* The header row carries only the previous/next arrows. */
-#page-header button[data-slot="button"] {
-  display: none;
+/* No Copy Page / prev / next chrome. */
+#page-header button:has(.tabler-icon-copy),
+#previous-button,
+#next-button {
+  display: none !important;
+}
+div.mx-auto.flex.flex-wrap.h-16.w-full.max-w-2xl:has(.tabler-icon-arrow-left),
+div.mx-auto.flex.flex-wrap.h-16.w-full.max-w-2xl:has(.tabler-icon-arrow-right) {
+  display: none !important;
+}
+/* Trailing "Build · ilia · octabam" crumb on module pages */
+article .typography > p:last-child:has(> a[href*="web-builder"]):has(> a[href$="index.html"]) {
+  display: none !important;
 }
 /* The author line sits close under the header row (the article's 1rem gap is pulled back). */
 article .typography > p.byline {

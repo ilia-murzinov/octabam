@@ -1,6 +1,5 @@
-/* Dark chassis + amber accents. Typography stays with the theme/fonts.css.
-   Homage only — no Elektron logos or proprietary fonts.
-   Signature: the shifted-octa mark (img/mark-icon.svg) and amber CTAs. */
+/* Greyscale chassis. Layout = original working theme.
+   Pixel (Silkscreen) = chrome only. Body = JetBrains, normal case. */
 
 :root,
 .dark {
@@ -8,53 +7,54 @@
 
   --font-sans: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-  --font-heading: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-heading: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
+  --font-pixel: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
   --font-inter: var(--font-sans);
   --default-font-family: var(--font-sans);
   --default-mono-font-family: var(--font-mono);
   --radius: 0;
 
-  --ot-amber: #c45c26;
-  --ot-amber-hot: #e08a4a;
-  --ot-amber-dim: #8f4519;
+  --ot-amber: #c8c8c8;
+  --ot-amber-hot: #f0f0f0;
+  --ot-amber-dim: #6a6a6a;
   --ot-chassis: #121212;
   --ot-panel: #1a1a1a;
-  --ot-bezel: #2a2a2a;
-  --ot-ink: #e8e4dc;
-  --ot-mute: #9a958c;
+  --ot-bezel: #2e2e2e;
+  --ot-ink: #e6e6e6;
+  --ot-mute: #8e8e8e;
 
   --background: #121212;
-  --foreground: #e8e4dc;
+  --foreground: #e6e6e6;
   --card: #1a1a1a;
-  --card-foreground: #e8e4dc;
+  --card-foreground: #e6e6e6;
   --popover: #1a1a1a;
-  --popover-foreground: #e8e4dc;
-  --primary: #c45c26;
+  --popover-foreground: #e6e6e6;
+  --primary: #d4d4d4;
   --primary-foreground: #121212;
-  --secondary: #2a2a2a;
-  --secondary-foreground: #e8e4dc;
+  --secondary: #2e2e2e;
+  --secondary-foreground: #e6e6e6;
   --muted: #222;
-  --muted-foreground: #9a958c;
-  --accent: #2a2118;
-  --accent-foreground: #c45c26;
-  --destructive: #e2553d;
+  --muted-foreground: #8e8e8e;
+  --accent: #252525;
+  --accent-foreground: #d4d4d4;
+  --destructive: #b0b0b0;
   --border: #3a3a3a;
-  --input: #2a2a2a;
-  --ring: #c45c26;
+  --input: #2e2e2e;
+  --ring: #d4d4d4;
   --sidebar: #0e0e0e;
-  --sidebar-foreground: #e8e4dc;
-  --sidebar-primary: #c45c26;
+  --sidebar-foreground: #e6e6e6;
+  --sidebar-primary: #d4d4d4;
   --sidebar-primary-foreground: #121212;
-  --sidebar-accent: #1f1810;
-  --sidebar-accent-foreground: #c45c26;
-  --sidebar-border: #2a2a2a;
-  --sidebar-ring: #c45c26;
+  --sidebar-accent: #1c1c1c;
+  --sidebar-accent-foreground: #f0f0f0;
+  --sidebar-border: #2e2e2e;
+  --sidebar-ring: #d4d4d4;
   --surface: #1a1a1a;
-  --surface-foreground: #c8c4bc;
+  --surface-foreground: #c8c8c8;
   --code: #0e0e0e;
-  --code-foreground: #c8f07a;
+  --code-foreground: #d4d4d4;
   --code-highlight: #222;
-  --selection: #c45c26;
+  --selection: #d4d4d4;
   --selection-foreground: #121212;
 }
 
@@ -86,67 +86,110 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-/* Header brand mark */
 header a[href] .size-8 svg,
 header a[href] span.size-8 svg {
   width: 1.35rem;
   height: 1.35rem;
+  shape-rendering: crispEdges;
 }
 header a[href]:hover {
   color: var(--ot-amber-hot);
 }
 
+/* Body: readable mono, normal case — NEVER Silkscreen paragraphs */
 body,
-.font-sans {
+.font-sans,
+article .typography,
+article .typography p,
+article .typography li,
+article .typography td {
   font-family: var(--font-mono) !important;
   font-feature-settings: "liga" 0, "calt" 1;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  transform: none !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-heading) !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.01em !important;
-  text-transform: none !important;
+/* Pixel titles only */
+h1, h2, h3, h4,
+#page-header h1,
+header a[href] h1 {
+  font-family: var(--font-pixel) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
   text-shadow: none !important;
   color: var(--foreground) !important;
+  transform: none !important;
+  -webkit-font-smoothing: none;
+  line-height: 1.35 !important;
+}
+h1, #page-header h1 {
+  font-size: 1.5rem !important;
+  color: #f0f0f0 !important;
 }
 h2 {
+  font-size: 1.05rem !important;
   border-bottom: 1px solid var(--ot-bezel);
   padding-bottom: 0.35rem;
 }
-
-/* Page title in the content header */
-#page-header h1 {
-  font-family: var(--font-heading) !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.01em;
+h3, h4 {
+  font-size: 0.9rem !important;
+  color: #c8c8c8 !important;
 }
 
-/* Brand title in the top bar */
 header a[href] h1 {
-  font-family: var(--font-heading) !important;
-  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  margin: 0 !important;
 }
 
+/* Sidebar: pixel labels, theme spacing intact (don't crush layout) */
+[data-slot="sidebar"] a,
+[data-slot="sidebar"] [data-sidebar="menu-button"] {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.7rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  -webkit-font-smoothing: none;
+  color: #b0b0b0 !important;
+  text-decoration: none !important;
+}
+[data-slot="sidebar"] a:hover,
+[data-slot="sidebar"] [data-sidebar="menu-button"]:hover {
+  color: #f0f0f0 !important;
+}
+[data-slot="sidebar"] a[aria-current="page"],
+[data-slot="sidebar"] [data-sidebar="menu-button"][data-active="true"],
 [aria-current="page"],
 .active {
-  color: var(--ot-amber) !important;
+  color: #f0f0f0 !important;
+}
+[data-slot="sidebar"] [data-sidebar="group-label"] {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #6a6a6a !important;
+  -webkit-font-smoothing: none;
 }
 
-/* Home lead: CTA row under the opening paragraphs */
 article .typography > p > a[href="web-builder.md"] strong,
 article .typography > p > a[href="./web-builder.md"] strong,
 article .typography > p > a[href="web-builder.html"] strong {
+  font-family: var(--font-pixel);
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: none;
 }
 
 article .typography > p:has(> a[href*="web-builder"]) {
   margin: 1.35rem 0 1.1rem;
   font-size: 1.05rem;
-  letter-spacing: 0.01em;
 }
 
-/* Credits: plain linked lists from the generated fragment */
 article .typography p:has(> strong > a),
 article .typography > p > strong:first-child {
   line-height: 1.7;
@@ -161,8 +204,19 @@ article table {
 }
 .table-wrapper th,
 article th {
-  background: #1f1810 !important;
-  color: var(--ot-amber) !important;
+  background: #1c1c1c !important;
+  color: #d4d4d4 !important;
+  font-family: var(--font-pixel) !important;
+  font-weight: 400 !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  -webkit-font-smoothing: none;
+}
+.table-wrapper td,
+article td {
+  text-transform: none !important;
+  font-family: var(--font-mono) !important;
 }
 
 pre, .highlight {
@@ -171,18 +225,31 @@ pre, .highlight {
 }
 code {
   font-family: var(--font-mono) !important;
+  text-transform: none !important;
 }
 
 .admonition,
 details {
   border: 1px solid var(--ot-amber-dim) !important;
-  background: #16120e !important;
+  background: #161616 !important;
+}
+.admonition-title,
+details summary {
+  font-family: var(--font-pixel) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem !important;
+  -webkit-font-smoothing: none;
 }
 
 article .typography img {
   background: #0a0a0a !important;
   border: 1px solid var(--ot-bezel) !important;
   image-rendering: pixelated;
+}
+article .typography img[src$=".svg"] {
+  filter: invert(1);
+  image-rendering: auto;
 }
 
 ::selection {
@@ -191,7 +258,5 @@ article .typography img {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  a {
-    transition: none;
-  }
+  a { transition: none; }
 }

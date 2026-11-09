@@ -22,7 +22,7 @@ theme:
   name: shadcn
   show_title: true
   show_stargazers: false
-  accent: orange
+  accent: zinc
   icon: img/mark-icon.svg
   favicon: img/favicon.png
   pygments_style:
@@ -31,7 +31,7 @@ theme:
 nav:
   # This site has one job: build a personal image, then read the fork
   # modules that image carries. Grouped by what they are on the unit.
-  - ilia · octabam: index.md
+  - Home: index.md
   - Build: web-builder.md
   - Effects:
       - Resonator: reference/modules/resonator.md

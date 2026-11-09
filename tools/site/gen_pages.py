@@ -277,7 +277,6 @@ def module_page(m, mods, manual_page: dict) -> str:
         else:
             lines += [m.doc, ""]
         lines += screen_reference(m)
-    lines += ["", "[Build](../../web-builder.md)", " · ", "[ilia · octabam](../../index.md)"]
     return "\n".join(lines) + "\n"
 
 
