@@ -362,9 +362,36 @@ def capture_midi_follow(p,r):
     shot(p,'midi-follow','fixed','FOLLOW: FIXED octave 3 and TRIG update.',r)
 
 
+def resolve_project(raw):
+    """Refuse empty/cwd/out trees. Empty Path('') is cwd — that nested
+    out/manual-captures into itself (~28G) and hung on rmtree (9 Nov 2026)."""
+    text=(raw or '').strip()
+    if not text:
+        raise SystemExit(
+            'capture_manual needs a project: pass --project DIR, set OT_PROJECT, '
+            'or write one path into ~/.octabam_project '
+            '(empty used to resolve to cwd and recurse forever under out/manual-captures)'
+        )
+    src=Path(text).expanduser().resolve()
+    if not src.is_dir():
+        raise SystemExit(f'project not a directory: {src}')
+    root=ROOT.resolve(); out=OUT.resolve()
+    if src in (root, out) or out in src.parents or src in out.parents:
+        raise SystemExit(
+            f'refusing project {src}: must be outside the repo out/ tree '
+            f'(copying the worktree or out/manual-captures nests forever)'
+        )
+    return src
+
+
 def prepare(remix,project,assignments):
     label='manual-features' if remix.startswith('../') else remix
     work=OUT/label;work.mkdir(parents=True,exist_ok=True)
+    src=resolve_project(str(project))
+    dst=(work/'project').resolve()
+    # Belt: never copytree a tree that contains the destination.
+    if dst==src or src in dst.parents:
+        raise SystemExit(f'refusing project {src}: it contains capture work dir {dst}')
     print('Building '+remix,flush=True)
     env=dict(os.environ,REMIX=remix,XBUS='1',SPEC='1',BUILD='91')
     with (work/'build.log').open('w') as f:
@@ -373,7 +400,7 @@ def prepare(remix,project,assignments):
     fixture=work/'project'
     if fixture.exists():
         shutil.rmtree(fixture)
-    shutil.copytree(project,fixture)
+    shutil.copytree(src,fixture)
     # Hybrid/card dumps often land read-only; .strd copies and ot_project writes need u+w.
     for root, dirs, files in __import__('os').walk(fixture):
         __import__('os').chmod(root, 0o755)
@@ -433,7 +460,10 @@ def main():
     ap.add_argument('groups',nargs='+',choices=['core','plocks','features','inserts','bus','extras','machines','probes','midi-scales','midi-loopback','midi-follow','utilities','varispeed','usb','octa303','cxosc','distorx','verberation','devilish','morph','free-loop','vibrato'])
     cfg=Path.home()/'.octabam_project'
     ap.add_argument('--project',default=os.environ.get('OT_PROJECT') or (cfg.read_text().strip() if cfg.is_file() else ''))
-    a=ap.parse_args();OUT.mkdir(parents=True,exist_ok=True)
+    a=ap.parse_args()
+    # Fail before mkdir/build so an empty default never starts a nest.
+    resolve_project(a.project)
+    OUT.mkdir(parents=True,exist_ok=True)
     for group in a.groups:
         assignments=[]
         if group=='core': jobs=[('octabam',capture_core,[])]

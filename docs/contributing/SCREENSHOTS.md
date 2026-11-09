@@ -69,11 +69,15 @@ Groups and what each captures, from the `shot(...)` calls:
 | `utilities` | `buffer-saver` | buffer-saver (a one-second take, then FUNC + PROJ: the SAVE SAMPLES? question) |
 
 The project is `--project`, `OT_PROJECT`, or the path in
-`~/.octabam_project`. The tool copies it to `out/manual-captures/<remix>/project`
-and edits only the copy: it assigns each track's effect with
-`ot_project.set_fx` (so the project needs no pre-arranged layout), builds
-with `BUILD=91 XBUS=1 SPEC=1`, and stages a card with `stage_card.py`.
-Logs: `build.log`, `stage.log`, `port.log` beside the image.
+`~/.octabam_project`. **Required** — an empty value used to resolve to
+cwd and `copytree` the whole worktree into `out/manual-captures/<remix>/project`,
+nesting until the disk filled (burned 9 Nov 2026). The tool refuses the
+repo root and anything under `out/`. It copies the project to
+`out/manual-captures/<remix>/project` and edits only the copy: it assigns
+each track's effect with `ot_project.set_fx` (so the project needs no
+pre-arranged layout), builds with `BUILD=91 XBUS=1 SPEC=1`, and stages a
+card with `stage_card.py`. Logs: `build.log`, `stage.log`, `port.log`
+beside the image.
 
 Prerequisites: a worktree with `vendor/`, `.venv/` and
 `out/raw/section_3_MAIN_OS.bin` (`AGENTS.md`, "Worktrees and the shared
