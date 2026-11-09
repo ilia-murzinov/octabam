@@ -5,8 +5,9 @@ Mono voice. PLAYBACK: PTCH (−32..+32) RATO INDX FINE FOLD MIX. SETUP:
 CAR/MOD/DEC/SYMM/FDBK/PWM; LFO PMTR lists PLAYBACK names + 30..33 CAR/MOD/SYMM/FDBK (no DEC/PWM). No Tim VOIC/CHRD.
 
 Machine list adapted from timhastie/octatrick-modules v2.15 SYNTH MACHINE
-(MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE, OCTA303 and BLACKPYRAMIDS_303. Beside
-ANALOG BD it shares the machine list through HOOKS (machine_rows).
+(MIT / Modwerk chooser lineage). Conflicts with SYNTH MACHINE and
+BLACKPYRAMIDS_303. Beside ANALOG BD or OCTA303 it shares the machine list
+through HOOKS (machine_rows): its row follows theirs.
 """
 
 import os
@@ -57,11 +58,17 @@ def _hooks_inc(modules):
     """modules/hooks's flags and, beside another machine, CX OSC's place in the
     machine_rows chain (its row; the next machine's routines)."""
     from remix import hooks_flags
+    if _cxosc_place(modules) != "DRAM" and "OCTA303" in modules:
+        raise ValueError("CX OSC: PLACE=CAVE beside OCTA303 -- both take the PLAYBACK page "
+                         "resolver 0x40031ece and the cave's jump there cannot be chained; "
+                         "build with PLACE=DRAM")
     return hooks_flags.inc("CX OSC", modules)
 
 
 def poly_include(modules, remix=None):
-    """First pass: hooks. Second pass (poly.s before RAM state): LFO morph."""
+    """First pass: hooks. Second pass (poly.s before RAM state): LFO morph.
+    po_lfdname is last in the LFO_NAME chain — no MC_NEXT — so the morph
+    unit does not re-include hooks (macros would redefine)."""
     with open(os.path.join(_HERE, "lfo_morph.inc.s"), encoding="utf-8") as _lf:
         morph = _lf.read()
     return "\n".join((
@@ -98,8 +105,8 @@ LFO_PAGE_HOOK = 0x40031e62
 LFO_PAGE_STOCK = bytes.fromhex("203c400d37f6" "606c")
 LFD_EDIT_HOOK = 0x400392cc
 LFD_EDIT_STOCK = bytes.fromhex("2003" "7406" "4c420807")
-LFD_NAME_HOOK = 0x4003bff2               # PMTR PLAYBACK names: machine table -> page resolver
-LFD_NAME_STOCK = bytes.fromhex("41f9400d5f38" "605a")  # lea LFD_MACHTAB,a0; bras 0x4003c054
+LFD_NAME_HOOK = 0x4003bff0               # PMTR PLAYBACK names (HOOKS LFO_NAME chain with OCTA303)
+LFD_NAME_STOCK = bytes.fromhex("711041f9400d5f38")  # mvs.b (a0),d0; lea LFD_MACHTAB,a0
 LFD_STAGE_HOOK = 0x40058488
 LFD_MOVE_HOOK = 0x4003a45c
 LFD_DRAW_HOOK = 0x400574cc
@@ -299,15 +306,17 @@ MODULE = Module(
     author_url="https://github.com/ilia-murzinov",
     proof=Proof.HARDWARE,
     proof_note=(
-        "MKII CX 67 (author): CAR/MOD labels; outline morph icons (±4 amp); bipolar PWM LCD; "
-        "SYMM 1px lower. CX 66 outline; CX 65 silhouettes; CX 63 saw PWM skew liked on unit. "
+        "MKII CX 75 (author): unit PLAYBACK/SETUP shots via SCREEN; saw landmark left-drop+linear "
+        "rise; SYMM midline row 6 (±4, matches CAR/MOD). CX 67 CAR/MOD labels + outline ±4 + bipolar "
+        "PWM LCD. CX 66 outline; CX 65 silhouettes; CX 63 saw PWM skew liked on unit. "
         "CX 48: sine→saw→square + PWM; FINE/FOLD/MIX; HOLD INF; slew. "
-        "Prior CX 41 / CX 28 / VRCS-CX VS. verify_cxosc + make check REMIX=cxosc"
+        "MKII CX-CF 69 (9 Nov 2026): CF METER — 4× CX idle 22%/ISR 272 us; 6× ~12%/309; "
+        "7× idle 0%/355 max 446 (wall) → ML_FM_MAX=6; author confirmed 6 MAX toast on unit. Prior CX 41 / CX 28 / VRCS-CX VS. "
+        "verify_cxosc + make check REMIX=cxosc"
     ),
     doc="Buchla-style complex oscillator (FM + wavefolder + morphs + feedback): PTCH RATO INDX FINE FOLD MIX, SETUP CAR/MOD/DEC/SYMM/FDBK/PWM (sine→saw→square; PWM sine lean / saw phase-skew / square duty), LFO PMTR shows PLAYBACK names + 30..33 CAR/MOD/SYMM/FDBK. Local fork of FM SYNTH.",
     conflicts=(
         ("SYNTH MACHINE", "both own the FLEX/STATIC kind-table renderers, page cave 0x400d24d0, and machine-list sites"),
-        ("OCTA303", "both rewrite LFO SETUP PMTR PLAYBACK names at 0x4003bff0/0x4003bff2 — refuse the pair"),
         ("BLACKPYRAMIDS_303", "shares ColdFire ROM hooks (e.g. MIDI note-on 0x4000e746) — build refuses the pair"),
     ),
     gates=(
@@ -339,7 +348,8 @@ MODULE = Module(
                "LFO SETUP PMTR walk includes 30/31 on CX OSC",
                kind="jmp", pad_to=8),
         Detour(LFD_NAME_HOOK, LFD_NAME_STOCK, "poly", "po_lfdname",
-               "LFO SETUP PMTR PLAYBACK names: page resolver (PTCH RATO INDX FINE FOLD MIX on CX) instead of Flex machine-table names",
+               "LFO SETUP PMTR PLAYBACK names at 0x4003bff0 (HOOKS LFO_NAME with OCTA303): "
+               "page resolver → PTCH RATO INDX FINE FOLD MIX on a CX track",
                kind="jmp", pad_to=8),
         Detour(LFD_STAGE_HOOK, LFD_PEA_STOCK, "poly", "cx_lfo_stage",
                "LFO SETUP stages CX PMTR destination count", kind="jmp"),
