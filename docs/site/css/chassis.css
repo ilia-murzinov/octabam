@@ -175,6 +175,75 @@ header a[href] h1 {
   -webkit-font-smoothing: none;
 }
 
+/* Mobile menu (#bottom-sidebar): same Silkscreen chrome as desktop sidebar.
+   Theme ships text-2xl + gap-12 here — override hard. Silkscreen reads large
+   optically, so sizes sit a hair under the desktop sidebar's 0.7rem. */
+#menu-button,
+#menu-button span {
+  font-family: "Silkscreen", "JetBrains Mono", ui-monospace, monospace !important;
+  font-size: 0.6rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  -webkit-font-smoothing: none !important;
+  line-height: 1.2 !important;
+}
+#menu-button span.sr-only {
+  font-size: 0 !important;
+}
+#menu-button > span.flex {
+  height: auto !important;
+}
+
+#bottom-sidebar,
+#bottom-sidebar * {
+  font-family: "Silkscreen", "JetBrains Mono", ui-monospace, monospace !important;
+  -webkit-font-smoothing: none !important;
+}
+
+#bottom-sidebar .flex.flex-col.gap-12 {
+  gap: 0.55rem !important;
+  padding: 0.55rem 0.75rem !important;
+}
+#bottom-sidebar .flex.flex-col.gap-8 {
+  gap: 0.4rem !important;
+}
+#bottom-sidebar .flex.flex-col.gap-4 {
+  gap: 0.15rem !important;
+}
+#bottom-sidebar .flex.flex-col.gap-3 {
+  gap: 0 !important;
+}
+
+#bottom-sidebar .text-muted-foreground,
+#bottom-sidebar div.text-sm,
+#bottom-sidebar div.font-medium {
+  font-size: 0.5rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #6a6a6a !important;
+  line-height: 1.25 !important;
+  margin: 0.15rem 0 0.05rem !important;
+}
+
+#bottom-sidebar a,
+#bottom-sidebar a.text-2xl,
+#bottom-sidebar a.text-sm,
+#bottom-sidebar a.font-medium {
+  font-size: 0.6rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  line-height: 1.2 !important;
+  color: #b0b0b0 !important;
+  text-decoration: none !important;
+  padding: 0.08rem 0 !important;
+}
+#bottom-sidebar a:hover {
+  color: #f0f0f0 !important;
+}
+
 article .typography > p > a[href="web-builder.md"] strong,
 article .typography > p > a[href="./web-builder.md"] strong,
 article .typography > p > a[href="web-builder.html"] strong {
