@@ -77,16 +77,11 @@ recon: ## Unpack + static recon -> out/raw/section_3_MAIN_OS.bin
 
 # -------------------------------------------------------------------- build --
 
-# Tim stock ML_FM_MAX is 1 (v2.15) or 2 (v2.22); Ilia needs 4. Leave Tim file dirty.
-define ensure-ml-fm-max
-	@$(PY) tools/build/ensure_ml_fm_max.py
-endef
 
 
 .PHONY: bus
 bus: ## THE build: one server per core, cross-core bus -> out/mainos_bus.bin
 	$(need-remix)
-	$(ensure-ml-fm-max)
 	@test -f out/raw/section_3_MAIN_OS.bin || { echo "missing out/raw/section_3_MAIN_OS.bin (the stock OS every build reads) -- run 'make os' then 'make recon'"; exit 1; }
 	REMIX=$(REMIX) BUILD=$(BUILD) XBUS=1 SPEC=1 python3 tools/build/build_bus.py
 
@@ -98,7 +93,6 @@ bus-plain: ## Build without specialization (both servers on both cores)
 .PHONY: rmx
 rmx: ## REMIX SWITCH: the build as an .RMX for /BRAIN/REMIXES/ on the card -> out/<NAME>.RMX (RMX=NAME, 15 characters; default <REMIX> <BUILD>). make image writes one too
 	$(need-remix)
-	$(ensure-ml-fm-max)
 	@# The image names itself (BRAIN's heading, REMIX SWITCH's RUNNING row), so
 	@# the build is told the name the file gets. Recursive, because the name
 	@# must be set for `bus` itself.
