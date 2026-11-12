@@ -35,19 +35,21 @@ What the window shows (same cells as stock SETUP pages):
 
 **LEN** shows the active **pattern** length.
 
-## Lanes
+## Mental model
 
-**LANE** (**C**) chooses what **A** / **B** and the step grid edit:
+On each track SEQ keeps two kinds of rhythm:
+
+1. **One TRIG lane** for the track. **PULS** / **ROT** (and a free **`[CUE]`** mask) decide where **sample trigs** land.
+2. **One PLCK lane per destination.** Knob **D** picks the destination (**AMP** / **VOL**, **SRC** / **PTCH**, …). That destination has its own **PULS**, **ROT**, **DPTH**, and free mask on the track.
+
+**LANE** (**C**) chooses which of those lanes **A** / **B** and the step grid edit. Scroll **D** while **LANE** is **PLCK** to load that destination's saved **PULS** / **ROT** into **A** / **B**. Knob **D** / **E** stay live on **`[YES]`** even when **LANE** is **TRIG**.
+
+So one track can hold sample trigs on one Euclidean, **PTCH** locks on another, **VOL** locks on a third. **`[YES]`** writes the focused lane. On **TRIG** it also places or clears locks for **only the current destination** on those sample-trig steps.
 
 | **LANE** | Grid / A / B | **`[YES]`** |
 |---|---|---|
 | **TRIG** | Sample-trig Euclidean | Rewrites **sample trigs**; places / reshapes locks for **only the current destination** on those steps; matches that destination's PLCK **PULS** / **ROT** to the TRIG rhythm |
 | **PLCK** | That destination's lock Euclidean | Leaves the sample-trig pattern; rewrites **only this destination's** locks (**trigless trigs** where there is no sample trig); clears this destination on misses, including on steps that still have a sample trig |
-
-Knob **D** / **E** stay live on **`[YES]`** even when **LANE** is **TRIG**.
-Scroll **D** while **LANE** is **PLCK** to load that destination's saved
-**PULS** / **ROT** into **A** / **B**. Each destination keeps its own
-**PULS**, **ROT**, **DPTH**, and free mask on the track.
 
 ## Write-only grid
 
@@ -98,7 +100,7 @@ TRIG **PULS** 5, destination **AMP** / **VOL**, **ROT** / **DPTH** / PLCK
 In the figures: black = lock on a sample trig; hatch = **trigless trig**;
 white = no lock.
 
-### Sample trigs only
+### Place sample trigs
 
 Empty track. **LANE** = **TRIG**, **D** = **SRC** / **PTCH**, **DPTH** = 0,
 set **PULS**, **`[YES]`**:
@@ -107,24 +109,24 @@ set **PULS**, **`[YES]`**:
 
 Sample trigs land. Current destination locks clear because **DPTH** is 0.
 
-### Sample trigs with pitch on the same steps
+### Lock pitch on those trigs
 
 **LANE** = **TRIG**, set **PULS** / **ROT**, **D** = **SRC** / **PTCH**,
 **DPTH** non-zero, **`[YES]`**. Sample trigs land; **PTCH** locks sit on
 those steps; that destination's PLCK **PULS** / **ROT** match the TRIG
 rhythm.
 
-### Stack a second destination
+### Add volume locks on another rhythm
 
 You already have sample trigs + **PTCH**. Switch to **LANE** = **PLCK**,
 **D** = **AMP** / **VOL**, set a different **PULS** / **ROT**, **`[YES]`**:
 
 ![PLCK writes only VOL. Sample trigs and PTCH stay.](../../img/seq/stack-vol.png)
 
-**VOL** locks follow the plock rhythm (**trigless trigs** where there is no
-sample trig). Sample trigs and **PTCH** stay.
+**VOL** locks follow that destination's PLCK rhythm (**trigless trigs**
+where there is no sample trig). Sample trigs and **PTCH** stay.
 
-### Regenerate trigs, keep other destination locks
+### Change the sample-trig rhythm
 
 Sample trigs with **PTCH** + **VOL**. Keep **D** = **SRC** / **PTCH**,
 change TRIG **PULS**, **`[YES]`**:
@@ -136,7 +138,7 @@ change TRIG **PULS**, **`[YES]`**:
 - **VOL** (other destination) is kept. Where a sample trig disappears but
   **VOL** remains, the step becomes a **trigless trig**.
 
-### Overwrite one destination from PLCK
+### Rewrite one destination's locks
 
 **PTCH** was placed from **TRIG**. Switch to **LANE** = **PLCK**, **D** =
 **SRC** / **PTCH**, change **ROT**, **`[YES]`**:
@@ -145,9 +147,9 @@ change TRIG **PULS**, **`[YES]`**:
 
 - **PTCH** clears on every miss, including on sample trigs that still fire,
   then writes on the new PLCK hits (**trigless trig** if no sample trig).
-- Other destination stacks (**VOL**, filter, …) stay.
+- Other destinations (**VOL**, filter, …) stay.
 
-### Clear one destination
+### Clear one destination's locks
 
 **LANE** = **PLCK**, that destination's **PULS** = 0, **`[YES]`**:
 
@@ -156,7 +158,7 @@ change TRIG **PULS**, **`[YES]`**:
 Clears this destination over the pattern length. Sample trigs stay. Orphan
 trigless bits drop when nothing else remains on the step.
 
-### CUE then YES
+### Randomize hits with CUE
 
 Focus the lane (**TRIG** or **PLCK**), set **PULS** to the hit count you
 want, press **`[CUE]`** (exactly that many hits at random on that lane),

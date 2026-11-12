@@ -168,6 +168,7 @@ def wrap(title: str, body: str, h: int) -> str:
     </marker>
   </defs>
   <style>
+    .title {{ font: 22px ui-monospace, Menlo, Consolas, monospace; fill:#111; font-weight:700; }}
     .t {{ font: 15px ui-monospace, Menlo, Consolas, monospace; fill:#111; font-weight:700; }}
     .t-sm {{ font: 13px ui-monospace, Menlo, Consolas, monospace; fill:#222; }}
     .t-xs {{ font: 12px ui-monospace, Menlo, Consolas, monospace; fill:#333; }}
@@ -186,6 +187,7 @@ def wrap(title: str, body: str, h: int) -> str:
 
 def make(
     name: str,
+    example_title: str,
     knobs: list[dict],
     headline: str,
     before: list,
@@ -194,7 +196,10 @@ def make(
     footer: str,
 ) -> Path:
     parts: list[str] = []
-    kn, y = knobs_svg(knobs, 16)
+    parts.append(
+        f'<text class="title" x="{W/2}" y="36" text-anchor="middle">{esc(example_title)}</text>'
+    )
+    kn, y = knobs_svg(knobs, 52)
     parts.append(kn)
     parts.append(
         f'<text class="t" x="{W/2}" y="{y+30}" text-anchor="middle">{esc(headline)}</text>'
@@ -217,15 +222,17 @@ def make(
     parts.append(legend_svg(y_leg + 24))
     h = y_leg + 66
     path = OUT / f"{name}.svg"
-    path.write_text(wrap(name, "\n".join(parts), int(h)))
+    path.write_text(wrap(example_title, "\n".join(parts), int(h)))
     print(f"{name}.svg h={int(h)}")
     return path
 
 
 # Knob D on the unit is PAGE + PARAM (no "DEST" caption): SRC/PTCH, AMP/VOL, …
+# example_title matches the ### headings in docs/site/usage/seq.md
 SPECS = [
     (
         "notes-only",
+        "Place sample trigs",
         [
             {"lab": "PULS", "val": "4", "inv": True},
             {"lab": "ROT", "val": "0", "inv": False},
@@ -242,6 +249,7 @@ SPECS = [
     ),
     (
         "stack-vol",
+        "Add volume locks on another rhythm",
         [
             {"lab": "PULS", "val": "4", "inv": True},
             {"lab": "ROT", "val": "1", "inv": False},
@@ -266,6 +274,7 @@ SPECS = [
     ),
     (
         "trig-reshape",
+        "Change the sample-trig rhythm",
         [
             {"lab": "PULS", "val": "2", "inv": True},
             {"lab": "ROT", "val": "0", "inv": False},
@@ -293,6 +302,7 @@ SPECS = [
     ),
     (
         "plck-overwrite",
+        "Rewrite one destination's locks",
         [
             {"lab": "PULS", "val": "4", "inv": False},
             {"lab": "ROT", "val": "1", "inv": True},
@@ -320,6 +330,7 @@ SPECS = [
     ),
     (
         "clear-dest",
+        "Clear one destination's locks",
         [
             {"lab": "PULS", "val": "0", "inv": True},
             {"lab": "ROT", "val": "0", "inv": False},
