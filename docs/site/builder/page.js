@@ -92,18 +92,18 @@ const FEAT_SHORT = {
   "RND NAME": "RND",
 };
 
-/** Module key → docs/site/reference/modules/<slug>.html (mkdocs). */
+/** Module key → site page. use_directory_urls:false → *.html next to web-builder.html. */
 const FEAT_HREF = {
-  "SCOPE": "../reference/modules/scope/",
-  "COPY PROJECT": "../reference/modules/copy-project/",
-  "CX OSC": "../reference/modules/cxosc/",
-  "VOID": "../reference/modules/void/",
-  "RESONATOR": "../reference/modules/resonator/",
-  "SHATTER": "../reference/modules/shatter/",
-  "STUTTR": "../reference/modules/stuttr/",
-  "SEQ": "../reference/modules/seq/",
-  "PERSISTENT BUFFERS": "../reference/modules/persistent-buffers/",
-  "RND NAME": "../reference/modules/rnd-name/",
+  "SCOPE": "reference/modules/scope.html",
+  "COPY PROJECT": "reference/modules/copy-project.html",
+  "CX OSC": "reference/modules/cxosc.html",
+  "VOID": "reference/modules/void.html",
+  "RESONATOR": "reference/modules/resonator.html",
+  "SHATTER": "reference/modules/shatter.html",
+  "STUTTR": "reference/modules/stuttr.html",
+  "SEQ": "reference/modules/seq.html",
+  "PERSISTENT BUFFERS": "reference/modules/persistent-buffers.html",
+  "RND NAME": "reference/modules/rnd-name.html",
 };
 
 function featLabel(feat, { link = true } = {}) {
