@@ -148,37 +148,27 @@ ic_fold_ord:
         bra     blit
 
 
-| CLIP H: sine → square. lim = 5 − flat; samples past lim snap to ±5.
-| flat 0 = pure sine; flat 5 = full square. Continuous through the knob.
+| CLIP: sine → square by lerp. h = s + (±5 − s) * v / 127. Continuous.
+| Lobe fill like FOLD so it reads next to the folder.
 ic_clip:
         bsr     ic_clr
-        movel   %d6,%d5
-        moveq   #5,%d0
-        mulul   %d0,%d5
-        moveq   #127,%d0
-        divul   %d0,%d5                  | flat 0..5
-        moveq   #5,%d4
-        subl    %d5,%d4                  | lim = 5 − flat
         moveq   #1,%d7
 ic_clip_lp:
         lea     fold_sin(%pc),%a0
-        mvsb    %a0@(0,%d7:l),%d3
-        tstl    %d5
-        beq     ic_clip_use              | flat 0: keep sine
-        movel   %d3,%d0
-        tstl    %d0
-        bpl     ic_clip_ab
-        negl    %d0
-ic_clip_ab:
-        cmpl    %d4,%d0
-        ble     ic_clip_use
+        mvsb    %a0@(0,%d7:l),%d3        | s
         tstl    %d3
         bmi     ic_clip_neg
-        moveq   #5,%d3
-        bra     ic_clip_use
+        moveq   #5,%d4                   | sq = +5
+        bra     ic_clip_sq
 ic_clip_neg:
-        moveq   #-5,%d3
-ic_clip_use:
+        moveq   #-5,%d4                  | sq = −5
+ic_clip_sq:
+        movel   %d4,%d0
+        subl    %d3,%d0                  | sq − s
+        mulsl   %d6,%d0
+        moveq   #127,%d1
+        divsl   %d1,%d0                  | (sq−s)*v/127
+        addl    %d0,%d3                  | h
         moveq   #6,%d1
         subl    %d3,%d1
         bpl     ic_clip_r0
@@ -203,8 +193,7 @@ ic_clip_draw:
         bra     blit
 
 
-| CRSH: sample-hold sine. hold = 1..8 grows with the knob; flat steps +
-| vertical walls. Same lobe convention as FOLD.
+| CRSH: thin sample-hold LINE (not a filled lobe). hold 1..8; flats + walls.
 ic_crsh:
         bsr     ic_clr
         movel   %d6,%d5
@@ -213,14 +202,14 @@ ic_crsh:
         moveq   #127,%d0
         divul   %d0,%d5
         addql   #1,%d5                   | hold 1..8
-        moveq   #-1,%d4                  | prev row (−1 = none)
+        moveq   #-1,%d4                  | prev row
         moveq   #1,%d7
 ic_crsh_lp:
         movel   %d7,%d0
-        subql   #1,%d0                   | x-1
-        divul   %d5,%d0                  | (x-1)/hold
+        subql   #1,%d0
+        divul   %d5,%d0
         mulul   %d5,%d0
-        addql   #1,%d0                   | src = 1 + floor*((x-1)/hold)*hold
+        addql   #1,%d0                   | src
         cmpil   #15,%d0
         ble     ic_crsh_src
         moveq   #15,%d0
@@ -228,7 +217,7 @@ ic_crsh_src:
         lea     fold_sin(%pc),%a0
         mvsb    %a0@(0,%d0:l),%d3
         moveq   #6,%d1
-        subl    %d3,%d1                  | row = 6 − s
+        subl    %d3,%d1
         bpl     ic_crsh_r0
         moveq   #0,%d1
 ic_crsh_r0:
@@ -237,17 +226,10 @@ ic_crsh_r0:
         moveq   #12,%d1
 ic_crsh_r1:
         movel   %d1,%a3                  | this row
-        | 2-px plateau: rows d1 and d1±1 toward mid
-        moveq   #6,%d2
-        cmpl    %d1,%d2
-        bge     ic_crsh_ord
-        movel   %d1,%d0
-        movel   %d2,%d1
-        movel   %d0,%d2
-ic_crsh_ord:
-        movel   %d7,%d0
+        movel   %d7,%d0                  | 1-px plateau (vline clobbers d1)
+        movel   %a3,%d1
+        movel   %a3,%d2
         bsr     vline
-        | wall from previous plateau
         cmpil   #-1,%d4
         beq     ic_crsh_next
         cmpl    %d4,%a3
@@ -256,9 +238,9 @@ ic_crsh_ord:
         movel   %a3,%d2
         cmpl    %d1,%d2
         bge     ic_crsh_w
-        movel   %d1,%d0
+        movel   %d1,%a5
         movel   %d2,%d1
-        movel   %d0,%d2
+        movel   %a5,%d2
 ic_crsh_w:
         movel   %d7,%d0
         bsr     vline
