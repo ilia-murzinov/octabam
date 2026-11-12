@@ -29,7 +29,7 @@ MODULE = Module(
         fx2_id=0x0a,
         donor_desc=0x400d58b8,        # DARK REV
         abbr=b"SHTR",
-        fullname=b"Shatter",
+        fullname=b"SHATTER",
         build_tag=False,
     ),
     params=(

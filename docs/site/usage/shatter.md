@@ -9,7 +9,7 @@ self-modulates into hash and dropouts. **LIM** is a hard ceiling after
 ## Access
 
 Select a track, press **`[FX2]`** (or **`[FX1]`** when the remix lists it
-there), pick **Shatter**.
+there), pick **SHATTER**.
 
 ## Operation
 
