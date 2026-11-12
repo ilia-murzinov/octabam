@@ -3655,6 +3655,7 @@ ea_rts: rts
         .globl  ef_win, ef_steps, ef_pulses, ef_rot, ef_dest, ef_depth
         .globl  ef_cursor, ef_targets, ef_focus, ef_bank, ef_dep_mem
         .globl  ef_plk_mem, ef_lane_mem, ef_lane, ef_ppulses, ef_prot
+        .globl  ef_ask, ef_unlocked, ef_from_cue, ef_free
         .globl  ef_cx_bank, ef_cx_bits  | CX OSC SETUP fills (stackable)
 ef_win:     .long 0
 ef_steps:   .long 16
