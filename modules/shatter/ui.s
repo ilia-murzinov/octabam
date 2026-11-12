@@ -216,14 +216,14 @@ ic_crsh_lp:
 ic_crsh_src:
         lea     fold_sin(%pc),%a0
         mvsb    %a0@(0,%d0:l),%d3
-        moveq   #6,%d1
+        moveq   #5,%d1                   | mid 5: 1 px down from FOLD; peak clears top
         subl    %d3,%d1
         bpl     ic_crsh_r0
         moveq   #0,%d1
 ic_crsh_r0:
-        cmpil   #12,%d1
+        cmpil   #11,%d1                  | never row 12 (clips the widget top)
         ble     ic_crsh_r1
-        moveq   #12,%d1
+        moveq   #11,%d1
 ic_crsh_r1:
         movel   %d1,%a3                  | this row
         movel   %d7,%d0                  | 1-px plateau (vline clobbers d1)
@@ -315,19 +315,25 @@ ic_tone_h0:
         ble     ic_tone_h1
         moveq   #12,%d0
 ic_tone_h1:
-        movel   %d0,%d5
-        moveq   #0,%d1
+        movel   %d0,%d5                  | h; draw 1..h (1 px up from sitting on bottom)
+        moveq   #1,%d1
         movel   %d5,%d2
-        subql   #1,%d2
+        cmpil   #12,%d2
+        ble     ic_tone_d0
+        moveq   #12,%d2
+ic_tone_d0:
         movel   %d7,%d0
         bsr     vline
         movel   %d7,%d0
         addql   #1,%d0
         cmpil   #16,%d0
         bgt     ic_tone_next
-        moveq   #0,%d1
+        moveq   #1,%d1
         movel   %d5,%d2
-        subql   #1,%d2
+        cmpil   #12,%d2
+        ble     ic_tone_d1
+        moveq   #12,%d2
+ic_tone_d1:
         bsr     vline
 ic_tone_next:
         addql   #1,%d7
