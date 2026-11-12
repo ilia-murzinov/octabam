@@ -21,11 +21,10 @@
 ; DECY high → low damp.
 ;
 ; LIM (slot 11): stereo-linked peak GR after MIX. Instant attack, release
-; ~63 ms. thresh = 0.75 - LIM*0.5625/128 (floor 0.1875) into $29 (0 = off).
-; LIM 1 ≈ -2.5 dB, LIM 127 ≈ -14.5 dB. -12 was still hot on unit; -18
-; was too quiet. Block-rate g = thresh/max(level,thresh) into $2b.
-; Nested do+div inside the sample DO is forbidden; no rep in proc.
-; MIX 0 is bit-exact dry when LIM is 0.
+; ~63 ms. thresh = 0.75 - LIM*0.625/128 (floor 0.125) into $29 (0 = off).
+; LIM 1 ≈ -2.5 dB, LIM 127 ≈ -18 dB (SHATTER curve). Block-rate
+; g = thresh/max(level,thresh) into $2b. Nested do+div inside the sample
+; DO is forbidden; no rep in proc. MIX 0 is bit-exact dry when LIM is 0.
 ;
 ; r7: $00..$0f L 4*(low,band), $10..$1f R same,
 ;     $20 fx2-dry  $21 MIX  $22 damp  $23 exc
