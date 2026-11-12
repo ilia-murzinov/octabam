@@ -15,6 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "tools"), str(ROOT / "tools/verify"), str(ROOT / "tools/panel")]
 
 from stems_panel import MenuPort  # noqa: E402
+from panel_server import popup_geometry  # noqa: E402
 
 IMAGE = ROOT / "out/mainos_bus.bin"
 CARD = ROOT / "out/_seq_scenarios_card.img"
@@ -32,6 +33,10 @@ M_OBJ = 0x460e5e30
 M_LAB = 0x460e5e2c
 NV_SCALE = 0x100b14ec
 NV_ROOT = 0x100b14ee
+# Stock confirm dialog owns keys while ARE YOU SURE? is up (store.s / DIALOG).
+DIALOG_OPEN = 0x460e5cd0
+UI_WINDOW = 0x460d175c
+POPUP = 0x46c7d34c
 
 FAILS = 0
 
@@ -460,17 +465,32 @@ def run_scenarios() -> int:
               port.long(s.ask) != 0, f"ask={port.long(s.ask)}")
         check("CUE while baked soft-hides SEQ (dialog not under SEQ)",
               port.long(s.ef) == 0, f"ef_win={port.long(s.ef):#x}")
+        check("CUE while baked: stock DIALOG_OPEN owns keys",
+              port.long(DIALOG_OPEN) != 0, f"dlg={port.long(DIALOG_OPEN):#x}")
+        geo = popup_geometry(port.rt.uc)
+        check("CUE while baked: popup geometry on screen (above SEQ)",
+              geo is not None and port.long(UI_WINDOW) == POPUP,
+              f"geo={geo} ui_win={port.long(UI_WINDOW):#x}")
         check("CUE while baked does not change trigs yet", mask_of(port) == baked)
         check("CUE while baked leaves from_cue clear", port.long(s.from_cue) == 0)
-        # Knob poll must not recreate SEQ on top of the dialog.
+        # Knob poll must not recreate SEQ on top of the dialog (the HW bug).
         port.proc.command(f"knob {0x30:#x} 1", "ok")
+        port.run(200)
+        port.proc.command(f"knob {0x31:#x} 1", "ok")
         port.run(200)
         check("knob while dialog keeps SEQ soft-hidden",
               port.long(s.ask) != 0 and port.long(s.ef) == 0,
               f"ask={port.long(s.ask)} win={port.long(s.ef):#x}")
+        check("knob while dialog keeps DIALOG_OPEN + popup",
+              port.long(DIALOG_OPEN) != 0
+              and popup_geometry(port.rt.uc) is not None
+              and port.long(s.ef) == 0,
+              f"dlg={port.long(DIALOG_OPEN):#x} geo={popup_geometry(port.rt.uc)} "
+              f"win={port.long(s.ef):#x}")
         # Dialog YES unlocks only.
         port.press("yes", settle=700)
         check("dialog YES clears ef_ask", port.long(s.ask) == 0)
+        check("dialog YES clears DIALOG_OPEN", port.long(DIALOG_OPEN) == 0)
         check("dialog YES sets ef_unlocked", port.long(s.unlocked) != 0)
         check("dialog YES restores SEQ", port.long(s.ef) != 0,
               f"ef_win={port.long(s.ef):#x}")
