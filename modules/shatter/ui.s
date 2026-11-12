@@ -342,7 +342,7 @@ ic_tone_next:
         bra     blit
 
 
-| RATE A: tick density (VOID/STUTTR family), double-thick.
+| RATE A: tick density, 1-px ticks.
 ic_rate:
         bsr     ic_clr
         movel   %d6,%d5
@@ -353,15 +353,10 @@ ic_rate:
         addql   #1,%d5                   | n = 1..8
         cmpil   #1,%d5
         bne     ic_rate_many
-        moveq   #7,%d7
-ic_rate_fat:
+        moveq   #8,%d0                   | single centre tick
         moveq   #2,%d1
         moveq   #10,%d2
-        movel   %d7,%d0
         bsr     vline
-        addql   #1,%d7
-        cmpil   #9,%d7
-        ble     ic_rate_fat
         bra     blit
 ic_rate_many:
         moveq   #0,%d7                   | i
@@ -375,16 +370,7 @@ ic_rate_lp:
         addql   #1,%d0                   | x
         moveq   #2,%d1
         moveq   #10,%d2
-        movel   %d0,%a3
         bsr     vline
-        movel   %a3,%d0
-        addql   #1,%d0
-        cmpil   #16,%d0
-        bgt     ic_rate_next
-        moveq   #2,%d1
-        moveq   #10,%d2
-        bsr     vline
-ic_rate_next:
         addql   #1,%d7
         cmpl    %d5,%d7
         blt     ic_rate_lp
