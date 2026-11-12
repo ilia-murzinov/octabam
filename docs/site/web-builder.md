@@ -6,12 +6,13 @@ uploaded. See [who wrote what](index.md#credits) before you credit a
 feature.
 
 Every build includes [Scope](reference/modules/scope.md),
-[Copy Project](reference/modules/copy-project.md), DARK REV, stock
-COMPRESSOR, and [Complex Oscillator](reference/modules/cxosc.md). PLATE
-and SPRING are harvested so the inserts fit. The matrix below only shows
-what differs: VOID / SHATTER / RESONATOR. Other lettered remixes
-(`base*`, `cx-stuttr`, …) stay in the repo for local flash; this page
-does not offer them.
+[Copy Project](reference/modules/copy-project.md), DARK REV,
+[Complex Oscillator](reference/modules/cxosc.md),
+[SEQ](reference/modules/seq.md), Persistent Buffers, Rnd Name, and stock
+COMPRESSOR. PLATE and SPRING are harvested so the inserts fit. The matrix
+below only shows what differs: VOID / SHATTER / RESONATOR. Other lettered
+remixes (`base*`, `cx-stuttr`, …) stay in the repo for local flash; this
+page does not offer them.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),

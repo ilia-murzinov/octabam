@@ -5,24 +5,20 @@
  "build": "J4",
  "date": "2026-11-12",
  "featureRows": [
-  "CX OSC",
   "VOID",
   "RESONATOR",
   "SHATTER"
  ],
  "features": {
   "cx": [
-   "CX OSC",
    "SHATTER",
    "VOID"
   ],
   "cx-reson": [
-   "CX OSC",
    "RESONATOR",
    "SHATTER"
   ],
   "cx-vres": [
-   "CX OSC",
    "RESONATOR",
    "VOID"
   ]
@@ -37,7 +33,6 @@
    "patchBytes": 126103,
    "sha256": "ed3329ee28252e824e4f54f5343357221b0b493b4cef97bdb2e868bffb5a918e",
    "features": [
-    "CX OSC",
     "SHATTER",
     "VOID"
    ]
@@ -51,7 +46,6 @@
    "patchBytes": 124596,
    "sha256": "b1e7881361d035ca7f36771e29b2019f5b1fb73ee4d517c68356bd527fbfb690",
    "features": [
-    "CX OSC",
     "RESONATOR",
     "SHATTER"
    ]
@@ -65,7 +59,6 @@
    "patchBytes": 125362,
    "sha256": "12b96422327b25e039e79e958af6ac01438edeae4bd881c91129a7a9b71032dc",
    "features": [
-    "CX OSC",
     "RESONATOR",
     "VOID"
    ]
@@ -74,6 +67,10 @@
  "alwaysOn": [
   "SCOPE",
   "COPY PROJECT",
-  "DARK REV"
+  "DARK REV",
+  "CX OSC",
+  "SEQ",
+  "PERSISTENT BUFFERS",
+  "RND NAME"
  ]
 }
