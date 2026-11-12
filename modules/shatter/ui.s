@@ -148,8 +148,8 @@ ic_fold_ord:
         bra     blit
 
 
-| CLIP H: sine → square (flat duty grows with the knob).
-| Same lobe convention as FOLD (d1 = 6 − s, fill to midline).
+| CLIP H: sine → square. lim = 5 − flat; samples past lim snap to ±5.
+| flat 0 = pure sine; flat 5 = full square. Continuous through the knob.
 ic_clip:
         bsr     ic_clr
         movel   %d6,%d5
@@ -157,32 +157,28 @@ ic_clip:
         mulul   %d0,%d5
         moveq   #127,%d0
         divul   %d0,%d5                  | flat 0..5
+        moveq   #5,%d4
+        subl    %d5,%d4                  | lim = 5 − flat
         moveq   #1,%d7
 ic_clip_lp:
         lea     fold_sin(%pc),%a0
         mvsb    %a0@(0,%d7:l),%d3
-        cmpil   #3,%d5
-        bge     ic_clip_sq
-        cmpil   #1,%d5
-        blt     ic_clip_sin
+        tstl    %d5
+        beq     ic_clip_use              | flat 0: keep sine
         movel   %d3,%d0
         tstl    %d0
         bpl     ic_clip_ab
         negl    %d0
 ic_clip_ab:
-        cmpil   #4,%d0                   | |s| > ~0.7 of peak
-        ble     ic_clip_sin
-ic_clip_sq:
+        cmpl    %d4,%d0
+        ble     ic_clip_use
         tstl    %d3
-        bmi     ic_clip_bot
-        moveq   #1,%d1
-        moveq   #6,%d2
-        bra     ic_clip_draw
-ic_clip_bot:
-        moveq   #6,%d1
-        moveq   #11,%d2
-        bra     ic_clip_draw
-ic_clip_sin:
+        bmi     ic_clip_neg
+        moveq   #5,%d3
+        bra     ic_clip_use
+ic_clip_neg:
+        moveq   #-5,%d3
+ic_clip_use:
         moveq   #6,%d1
         subl    %d3,%d1
         bpl     ic_clip_r0
@@ -207,157 +203,70 @@ ic_clip_draw:
         bra     blit
 
 
-| CRSH v4: plateau count 8→2; fat 2-px bars + walls.
-| Heights stored as Python-y (0=top); drawn as asm row = 12 − y.
+| CRSH: sample-hold sine. hold = 1..8 grows with the knob; flat steps +
+| vertical walls. Same lobe convention as FOLD.
 ic_crsh:
         bsr     ic_clr
         movel   %d6,%d5
-        moveq   #6,%d0
+        moveq   #7,%d0
         mulul   %d0,%d5
         moveq   #127,%d0
         divul   %d0,%d5
-        moveq   #8,%d4
-        subl    %d5,%d4                  | n = 8 − 6v/127
-        cmpil   #2,%d4
-        bge     ic_crsh_n
-        moveq   #2,%d4
-ic_crsh_n:
-        lea     heights(%pc),%a2
-        moveq   #0,%d7                   | i
-ic_crsh_hloop:
-        cmpil   #3,%d4
-        ble     ic_crsh_alt
-        cmpil   #5,%d4
-        ble     ic_crsh_tab
-        | n >= 6: sample sin at plateau center, bucket-quantize
+        addql   #1,%d5                   | hold 1..8
+        moveq   #-1,%d4                  | prev row (−1 = none)
+        moveq   #1,%d7
+ic_crsh_lp:
         movel   %d7,%d0
-        lsll    #1,%d0
-        addql   #1,%d0                   | 2i+1
-        moveq   #14,%d1
-        mulul   %d1,%d0
-        movel   %d4,%d1
-        lsll    #1,%d1                   | 2n
-        divul   %d1,%d0
-        addql   #1,%d0                   | cx
-        cmpil   #1,%d0
-        bge     ic_crsh_cxlo
-        moveq   #1,%d0
-ic_crsh_cxlo:
+        subql   #1,%d0                   | x-1
+        divul   %d5,%d0                  | (x-1)/hold
+        mulul   %d5,%d0
+        addql   #1,%d0                   | src = 1 + floor*((x-1)/hold)*hold
         cmpil   #15,%d0
-        ble     ic_crsh_cx
+        ble     ic_crsh_src
         moveq   #15,%d0
-ic_crsh_cx:
+ic_crsh_src:
         lea     fold_sin(%pc),%a0
         mvsb    %a0@(0,%d0:l),%d3
-        addql   #6,%d3                   | t = s+6 → 0..12
-        moveq   #4,%d0
-        cmpil   #7,%d4
-        bge     ic_crsh_bk
-        moveq   #3,%d0                   | buckets
-ic_crsh_bk:
-        movel   %d0,%d1
-        subql   #1,%d1                   | buckets-1
-        mulul   %d1,%d3
-        addql   #6,%d3
-        moveq   #12,%d0
-        divul   %d0,%d3                  | b = round-ish
-        moveq   #8,%d0
-        mulul   %d0,%d3
-        divul   %d1,%d3                  | b*8/(buckets-1)
-        moveq   #10,%d0
-        subl    %d3,%d0                  | y
-        cmpil   #1,%d0
-        bge     ic_crsh_y0
-        moveq   #1,%d0
-ic_crsh_y0:
-        cmpil   #10,%d0
-        ble     ic_crsh_yst
-        moveq   #10,%d0
-        bra     ic_crsh_yst
-ic_crsh_alt:
-        movel   %d7,%d0
-        andil   #1,%d0
-        beq     ic_crsh_a2
-        moveq   #9,%d0
-        bra     ic_crsh_yst
-ic_crsh_a2:
-        moveq   #2,%d0
-        bra     ic_crsh_yst
-ic_crsh_tab:
-        lea     crsh_tab5(%pc),%a0
-        mvzb    %a0@(0,%d7:l),%d0
-ic_crsh_yst:
-        moveb   %d0,%a2@(0,%d7:l)
-        addql   #1,%d7
-        cmpl    %d4,%d7
-        blt     ic_crsh_hloop
-
-        moveq   #0,%d7
-        moveq   #-1,%d5                  | prev y
-ic_crsh_draw:
-        mvzb    %a2@(0,%d7:l),%d3        | y
-        | x0 = 1 + i*14/n
-        movel   %d7,%d0
-        moveq   #14,%d1
-        mulul   %d1,%d0
-        divul   %d4,%d0
-        addql   #1,%d0
-        | x1 = 1 + (i+1)*14/n - 1
-        movel   %d7,%d1
-        addql   #1,%d1
-        moveq   #14,%d2
-        mulul   %d2,%d1
-        divul   %d4,%d1                  | (i+1)*14/n
-        cmpl    %d0,%d1
-        bge     ic_crsh_xok
-        movel   %d0,%d1
-ic_crsh_xok:
-        movel   %d0,%a3                  | x0
-        movel   %d1,%a4                  | x1
-        | hline at y and y+1 → asm rows 12-y and 11-y
-        movel   %a3,%d0
+        moveq   #6,%d1
+        subl    %d3,%d1                  | row = 6 − s
+        bpl     ic_crsh_r0
+        moveq   #0,%d1
+ic_crsh_r0:
+        cmpil   #12,%d1
+        ble     ic_crsh_r1
         moveq   #12,%d1
-        subl    %d3,%d1
-        movel   %a4,%d2
-        bsr     hline
-        movel   %a3,%d0
-        moveq   #11,%d1
-        subl    %d3,%d1
-        movel   %a4,%d2
-        bsr     hline
-        cmpil   #-1,%d5
-        beq     ic_crsh_next
-        cmpl    %d5,%d3
-        beq     ic_crsh_next
-        movel   %a3,%d0
-        moveq   #12,%d1
-        subl    %d5,%d1
-        moveq   #12,%d2
-        subl    %d3,%d2
+ic_crsh_r1:
+        movel   %d1,%a3                  | this row
+        | 2-px plateau: rows d1 and d1±1 toward mid
+        moveq   #6,%d2
         cmpl    %d1,%d2
-        bge     ic_crsh_w0
-        movel   %d1,%a5
+        bge     ic_crsh_ord
+        movel   %d1,%d0
         movel   %d2,%d1
-        movel   %a5,%d2
-ic_crsh_w0:
+        movel   %d0,%d2
+ic_crsh_ord:
+        movel   %d7,%d0
         bsr     vline
-        movel   %a3,%d0
-        moveq   #11,%d1
-        subl    %d5,%d1
-        moveq   #11,%d2
-        subl    %d3,%d2
+        | wall from previous plateau
+        cmpil   #-1,%d4
+        beq     ic_crsh_next
+        cmpl    %d4,%a3
+        beq     ic_crsh_next
+        movel   %d4,%d1
+        movel   %a3,%d2
         cmpl    %d1,%d2
-        bge     ic_crsh_w1
-        movel   %d1,%a5
+        bge     ic_crsh_w
+        movel   %d1,%d0
         movel   %d2,%d1
-        movel   %a5,%d2
-ic_crsh_w1:
+        movel   %d0,%d2
+ic_crsh_w:
+        movel   %d7,%d0
         bsr     vline
 ic_crsh_next:
-        movel   %d3,%d5
+        movel   %a3,%d4
         addql   #1,%d7
-        cmpl    %d4,%d7
-        blt     ic_crsh_draw
+        cmpil   #15,%d7
+        ble     ic_crsh_lp
         bra     blit
 
 
@@ -397,30 +306,25 @@ ic_mode_go:
 
 
 | TONE B: shelf wedge, low-left ↔ high-right; double-column thick.
-| Bars grow from the bottom (asm row 0).
+| h = round(10*((15-x)*(127-v)+(x-1)*v)/(14*127)); v=64 is a flat bar.
 ic_tone:
         bsr     ic_clr
         moveq   #1,%d7
 ic_tone_lp:
-        | lo_h = 10*(15-x)/14 ; hi_h = 10*(x-1)/14
         moveq   #15,%d0
-        subl    %d7,%d0
+        subl    %d7,%d0                  | 15-x
+        moveq   #127,%d1
+        subl    %d6,%d1                  | 127-v
+        mulul   %d1,%d0                  | (15-x)*(127-v)
+        movel   %d7,%d1
+        subql   #1,%d1                   | x-1
+        mulul   %d6,%d1                  | (x-1)*v
+        addl    %d1,%d0
         moveq   #10,%d1
         mulul   %d1,%d0
-        moveq   #14,%d1
-        divul   %d1,%d0                  | lo_h
-        movel   %d7,%d1
-        subql   #1,%d1
-        moveq   #10,%d2
-        mulul   %d2,%d1
-        moveq   #14,%d2
-        divul   %d2,%d1                  | hi_h
-        movel   %d1,%d2
-        subl    %d0,%d2                  | hi-lo
-        mulsl   %d6,%d2
-        moveq   #127,%d1
-        divsl   %d1,%d2
-        addl    %d2,%d0                  | h
+        addil   #889,%d0                 | + 14*127/2 for round
+        movel   #1778,%d1                | 14*127
+        divul   %d1,%d0                  | h
         tstl    %d0
         bgt     ic_tone_h0
         bra     ic_tone_next
@@ -429,7 +333,7 @@ ic_tone_h0:
         ble     ic_tone_h1
         moveq   #12,%d0
 ic_tone_h1:
-        movel   %d0,%d5                  | h
+        movel   %d0,%d5
         moveq   #0,%d1
         movel   %d5,%d2
         subql   #1,%d2
@@ -580,8 +484,6 @@ hline1:
 
 fold_sin:
         .byte   0, 3, 5, 6, 5, 3, 0, -3, -5, -6, -5, -3, 0, 3, 5, 3, 0
-crsh_tab5:
-        .byte   2, 5, 9, 4, 8
         .align  2
 
 fmt_mode_tab:
@@ -604,9 +506,6 @@ mask:
         .endr
 data:
         .fill   17, 4, 0
-heights:
-        .fill   8, 1, 0
-        .align  2
 
 img_fdbk:
         .long   0x00000000, 0x00000000, 0x00000000, 0x00000000

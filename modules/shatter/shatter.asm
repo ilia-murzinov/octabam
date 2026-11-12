@@ -16,17 +16,17 @@
 ;
 ; CHAOS: a block-rate phase advances by RATE; each wrap flips polarity (+/-1).
 ;
-; LIM (page-2 slot 9): stereo-linked peak envelope, infinite ratio to a
-; ceiling. Instant attack ($7fffff), release ~63 ms ($000bd0). No makeup.
-; thresh = 1 - LIM*0.875/128 (floor 0.125); LIM 0 leaves the mix untouched.
+; LIM (page-2 slot 9): hard ceiling after MIX. No envelope, no div (a
+; per-sample div froze the unit on CX LIM). thresh = 1 - LIM*0.875/128
+; (floor 0.125); LIM 0 leaves the mix untouched.
 ;
 ; r7: $00 fb L  $01 fb R  $02 hold L  $03 hold R  $04 srr phase
 ;     $05 tone L  $06 tone R  $07 polarity (+1/-1)  $08 chaos phase
 ;     $09 srr wrap (1 this sample)  $0a brr n (0..12)  $0b srr inc
-;     $0c clip thresh  $0d lim level_s  $19 lim thresh (0 = LIM off)
-;     $1b mixed L  $1c mixed R (post-MIX stash for the brickwall)
+;     $0c clip thresh  $19 lim thresh (0 = LIM off)
+;     $1b mixed L  $1c mixed R (post-MIX stash for the ceiling)
 ;     $10..$18 per-block: drv, fold, clip, crsh, fdbk, mix, mode, tone, rate
-; Every mpy is x0,y1 or y0,x0 (signed). No rep. init preserves r1.
+; Every mpy is x0,y1 or y0,x0 (signed). No rep. No div. init preserves r1.
 ; SRR phase is stored from a1 (never move a,x: -- that saturates and sticks).
 ; ---------------------------------------------------------------------------
 
@@ -44,7 +44,6 @@ init:
         move    a,x:(r7+$0a)
         move    a,x:(r7+$0b)            ; srr inc (set each block)
         move    a,x:(r7+$0c)            ; clip thresh
-        move    a,x:(r7+$0d)            ; lim level_s
         move    a,x:(r7+$19)            ; lim thresh (0 = off)
         move    a,x:(r7+$1b)            ; mixed L stash
         move    a,x:(r7+$1c)            ; mixed R stash
@@ -407,52 +406,32 @@ sh15:
         mpy     x0,y1,a
         add     b,a
         move    a,x:(r7+$1c)            ; mixed R stash (LIM)
-; ---- LIM brickwall after MIX (stereo-linked; 0 skips) ----------------------
-        move    x:(r7+$19),b            ; thresh; 0 = off
-        tst     b
-        beq     sh20
-        move    x:(r7+$1b),a            ; |L|
-        abs     a
-        move    a,x1
-        move    x:(r7+$1c),a            ; |R|
-        abs     a
-        cmp     x1,a
-        tlt     x1,a                    ; peak = max(|L|,|R|)
-        move    a,x0                    ; peak
-        move    x:(r7+$0d),b            ; level_s
-        tfr     x0,a
-        sub     b,a                     ; d = peak - level_s
-        move    #>$7fffff,x1            ; attack = 1 (instant peak catch)
-        move    #>$000bd0,b             ; release ~63 ms
+; ---- LIM hard ceiling after MIX (0 skips). No div. -------------------------
+        move    x:(r7+$19),a            ; thresh; 0 = off
         tst     a
-        move    a,x0                    ; d (moves keep the flags)
-        tpl     x1,b                    ; rising: attack
-        move    b,y1
-        mpy     x0,y1,a
-        move    x:(r7+$0d),b
-        add     b,a
-        move    a,x:(r7+$0d)            ; level_s
-        move    x:(r7+$19),x0           ; thresh
+        beq     sh20
+        move    a,x0                    ; thresh in x0 for cmp/tgt
+        move    x:(r7+$1b),a            ; clamp L to ±thresh
+        move    a,y0
+        abs     a
         cmp     x0,a
-        ble     sh21                    ; level_s <= thresh: g = 1
-        move    a,x0                    ; divisor = level_s
-        move    x:(r7+$19),a            ; dividend = thresh
-        andi    #$fe,ccr
-        do      #$18,>sh22
-        div     x0,a
-sh22:
-        move    a0,x0                   ; g = thresh / level_s
-        move    x0,y1
-        bra     sh23
-sh21:
-        move    #>$7fffff,y1            ; g = 1
-sh23:
-        move    x:(r7+$1b),x0           ; L *= g
-        mpy     x0,y1,a
+        tgt     x0,a
+        move    y0,b
+        tst     b
+        bpl     sh24
+        neg     a
+sh24:
         move    a,x:(r7+$1b)
-        move    x:(r7+$1c),x0           ; R *= g
-        mpy     x0,y1,a
-        move    a,x:(r7+$1c)
+        move    x:(r7+$1c),a            ; clamp R
+        move    a,y0
+        abs     a
+        cmp     x0,a
+        tgt     x0,a
+        move    y0,b
+        tst     b
+        bpl     sh25
+        neg     a
+sh25:
         move    a,x:(r0)-               ; write R, r0 -> L
         move    x:(r7+$1b),a
         move    a,x:(r0)+n0             ; write L, r0 -> R

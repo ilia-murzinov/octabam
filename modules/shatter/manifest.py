@@ -1,9 +1,9 @@
-"""SHATTER -- multi-stage crush with chaotic feedback and a post-MIX brickwall.
+"""SHATTER -- multi-stage crush with chaotic feedback and a post-MIX ceiling.
 
 A per-track insert: DRV into a wavefolder, hard or soft clip, combined
 bit/sample-rate crush, then a feedback loop with a tone shelf. MODE CHAOS
-flips feedback polarity from a free-running ramp. LIM is a stereo-linked
-brickwall after MIX. MIX 0 is bit-exact dry when LIM is 0.
+flips feedback polarity from a free-running ramp. LIM is a hard ceiling
+after MIX (no envelope, no div). MIX 0 is bit-exact dry when LIM is 0.
 """
 
 from remix.schema import (BusRole, Category, DspSection, Formatter, Gate, Harness,
@@ -24,7 +24,7 @@ MODULE = Module(
     proof=Proof.CHECK,
     proof_note="verify_shatter (incl. LIM peak/rail). Pre-LIM tip SHATTER S6 was "
                "HW on Ilia's MKII 21 Oct 2026; this tip not yet on hardware.",
-    doc="Crush insert: fold, clip, crush, chaotic FDBK, brickwall after MIX.",
+    doc="Crush insert: fold, clip, crush, chaotic FDBK, hard ceiling after MIX.",
     menu=MenuEntry(
         fx2_id=0x0a,
         donor_desc=0x400d58b8,        # DARK REV
@@ -55,7 +55,7 @@ MODULE = Module(
         Param(b"RATE", 64, active=True, **_W("wid_rate"),
               doc="CHAOS: how fast the polarity flips; ignored in HARD and SOFT"),
         Param(b"LIM", 0, active=True, formatter=_P,
-              doc="stereo brickwall after MIX; 0 is off, higher lowers the ceiling"),
+              doc="hard ceiling after MIX; 0 is off, higher lowers the ceiling"),
         _BLANK, _BLANK,
     ),
     mode_slot=6,
