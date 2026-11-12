@@ -17,8 +17,8 @@
 ; CHAOS: a block-rate phase advances by RATE; each wrap flips polarity (+/-1).
 ;
 ; LIM (page-2 slot 9): hard ceiling after MIX. No envelope, no div (a
-; per-sample div froze the unit on CX LIM). thresh = 1 - LIM*0.875/128
-; (floor 0.125); LIM 0 leaves the mix untouched.
+; per-sample div froze the unit on CX LIM). Block-rate thresh =
+; (127-LIM)<<16 into $19 (0 = off), same abs/cmp/tgt shape as CLIP.
 ;
 ; r7: $00 fb L  $01 fb R  $02 hold L  $03 hold R  $04 srr phase
 ;     $05 tone L  $06 tone R  $07 polarity (+1/-1)  $08 chaos phase
@@ -150,23 +150,19 @@ shc0:
         add     x0,a
         move    a,x:(r7+$18)
         move    x:(r6+$d),a             ; LIM slot 9 = $d bits 8-15
-        and     #>$7f00,a
-        asl     #$8,a,a                 ; -> LIM<<16 like page-1 knobs
-        tst     a
+        and     #>$7f00,a               ; LFO dirt; 0 = off
         beq     shlim0
-        move    a,x0                    ; thresh = 1 - LIM*0.875/128
-        move    #>$700000,y1            ; 0.875
-        mpy     x0,y1,a
-        move    #>$7fffff,b
-        sub     a,b
-        move    #>$100000,x0            ; floor ~0.125
+        asl     #$8,a,a                 ; LIM<<16
+        move    #>$7f0000,b             ; not #$800000 (signed -1.0)
+        sub     a,b                     ; (127-LIM)<<16
+        move    #>$010000,x0            ; floor: LIM 127 still a hair open
         cmp     x0,b
         tlt     x0,b
         move    b,x:(r7+$19)
         bra     shlim1
 shlim0:
         clr     a
-        move    a,x:(r7+$19)            ; 0 = skip brickwall
+        move    a,x:(r7+$19)
 shlim1:
 ; ---- CHAOS polarity (block rate) ------------------------------------------
         move    x:(r7+$16),a
@@ -304,10 +300,10 @@ sh08:
         move    x:(r7+$15),y1           ; MIX
         mpy     x0,y1,a
         add     b,a
-        move    a,x:(r7+$1b)            ; mixed L stash (LIM)
-        move    a,x:(r0)+n0             ; out L; r0 -> R
+        move    a,x:(r7+$1b)            ; mixed L stash; r0 stays on L
 ; ============================= R channel ===================================
-        move    x:(r0),x0               ; dry R
+; Dry R via (r0+n0); r0 stays on L until the unified write below.
+        move    x:(r0+n0),x0            ; dry R
         move    x:(r7+$10),y0           ; DRV
         mpy     y0,x0,a
         asl     #$3,a,a                 ; 8 * DRV * dry
@@ -398,7 +394,7 @@ sh15:
         add     b,a
         move    a,x:(r7+$06)
         move    a,x:(r7+$01)
-        move    x:(r0),b                ; dry R
+        move    x:(r0+n0),b             ; dry R (r0 still on L)
         move    y0,a
         sub     b,a
         move    a,x0
@@ -406,12 +402,12 @@ sh15:
         mpy     x0,y1,a
         add     b,a
         move    a,x:(r7+$1c)            ; mixed R stash (LIM)
-; ---- LIM hard ceiling after MIX (0 skips). No div. -------------------------
-        move    x:(r7+$19),a            ; thresh; 0 = off
+; ---- LIM hard ceiling after MIX (0 skips). thresh from block rate in $19. --
+        move    x:(r7+$19),a
         tst     a
         beq     sh20
-        move    a,x0                    ; thresh in x0 for cmp/tgt
-        move    x:(r7+$1b),a            ; clamp L to ±thresh
+        move    a,x0                    ; thresh (CLIP-shaped clamp)
+        move    x:(r7+$1b),a            ; clamp L
         move    a,y0
         abs     a
         cmp     x0,a
@@ -432,13 +428,11 @@ sh24:
         bpl     sh25
         neg     a
 sh25:
-        move    a,x:(r0)-               ; write R, r0 -> L
-        move    x:(r7+$1b),a
-        move    a,x:(r0)+n0             ; write L, r0 -> R
-        move    (r0)+                   ; past R
-        bra     sh16
+        move    a,x:(r7+$1c)
 sh20:
-        move    x:(r7+$1c),a            ; LIM off: write mixed R
+        move    x:(r7+$1b),a
+        move    a,x:(r0)+n0
+        move    x:(r7+$1c),a
         move    a,x:(r0)+
 sh16:
         nop
