@@ -35,7 +35,7 @@ nav:
   - Build: web-builder.md
   - Effects:
       - Resonator: reference/modules/resonator.md
-      - Shatter: reference/modules/shatter.md
+      - SHATTER: reference/modules/shatter.md
       - Stuttr: reference/modules/stuttr.md
       - Void: reference/modules/void.md
   - Machines:
