@@ -67,7 +67,7 @@ Same 3x2 cells as stock SETUP pages:
 | **B** | **ROT** | Rotation of the focused lane |
 | **C** | **LANE** | **TRIG** or **PLCK** |
 | **D** | page + param | Lock destination. Two lines, LFO SETUP **PMTR** style (**AMP** / **VOL**, **SRC** / **PTCH**, …). On **CX OSC** also **SRC** / **CAR** **MOD** **SYMM** **FDBK** **PWM** |
-| **E** | **DPTH** | How far locks swing from the Part value. **0** clears that destination. **SRC** / **PTCH** stays in scale around the Part's **PLAYBACK** **PTCH**. **AMP** / **VOL** sits at or below the Part's **AMP** **VOL**. Anything else swings ± **DPTH** |
+| **E** | **DPTH** | How far locks swing from the Part value. **0** clears that destination. **SRC** / **PTCH** with SCALE ON stays in scale around the Part's **PLAYBACK** **PTCH**; SCALE OFF locks that Part **PTCH** on every hit. **AMP** / **VOL** sits at or below the Part's **AMP** **VOL**. Anything else swings ± **DPTH** |
 | **F** | | Empty |
 
 **LEN** shows the active **pattern** length.
@@ -103,16 +103,26 @@ to zero depth). Empty trigless steps drop when nothing else remains on them.
 
 ## Clear menu
 
-**`[FUNC]`** + **`[BANK]`** while SEQ is open opens a list on top of SEQ
-(SEQ stays open). Outside SEQ that chord is still stock PATTERN SETTINGS.
+While SEQ is open, **`[FUNC]`** + **`[BANK]`** opens a three-row clear
+list. Use it when the knobs still show a shape you like, but the
+**pattern** already has locks or trigs you want gone. List **`[YES]`**
+clears immediately. There is no second SEQ **`[YES]`**.
 
-| Row | Immediate result (list **`[YES]`**) |
+**`[NO]`**, or **`[FUNC]`** + **`[BANK]`** again, closes the list and
+returns to SEQ.
+
+| Row | What it is for |
 |---|---|
-| **CLEAR DEST** | Wipe the current destination's locks on this track. Reset that destination's **DPTH** / PLCK **PULS** / **ROT** to 0. |
-| **CLEAR ALL DEST** | Wipe every SEQ destination on this track. Leave sample trigs. Reset all destination recipes for the track. |
-| **CLEAR ALL+TRIGS** | Clear all destinations, then wipe sample trigs and reset the TRIG recipe (**PULS** 5). |
+| **CLEAR DEST** | Remove locks for the destination under **D** only. Sample trigs stay. That destination's **DPTH** / PLCK **PULS** / **ROT** go to 0, so the next SEQ **`[YES]`** starts clean for that destination. Reach for this when pitch or volume locks are wrong but the hits are right. |
+| **CLEAR ALL DEST** | Remove every SEQ lock destination on this track. Sample trigs stay. Every destination's **DPTH** / PLCK **PULS** / **ROT** go to 0. Reach for this when the hits are right but the lock layers are a mess. |
+| **CLEAR ALL+TRIGS** | Same wipe as **CLEAR ALL DEST**, then remove sample trigs and set the TRIG lane to **PULS** 5 / **ROT** 0. Empty this track's SEQ writing and start over. |
 
-No second SEQ **`[YES]`**. **`[NO]`** or **`[BANK]`** again closes the list.
+Knob **PULS** 0 / **DPTH** 0 still clear one destination through a normal
+SEQ **`[YES]`**. The list is the fast wipe when you do not want a new
+Euclidean fill first.
+
+Outside SEQ, **`[FUNC]`** + **`[BANK]`** is stock **TRACK TRIG EDIT**
+(the TRIGS / SLIDE / SWING / REC.TRG window).
 
 ## Examples
 

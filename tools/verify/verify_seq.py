@@ -600,6 +600,11 @@ def check_ui(src: str) -> None:
           "wm_plock:" in _block(src, "ef_write_mask:", "ef_tl_bit_addr:")
           and "ef_tl_set" in _block(src, "wm_plock:", "wm_dest_clr:")
           and "ef_phit" in _block(src, "wm_plock:", "wm_dest_clr:"))
+    check("LANE=PLOCK leaves sample trigs alone (wm_keep_trig, no mask-0 rewrite)",
+          "wm_keep_trig:" in _block(src, "ef_write_mask:", "ef_tl_bit_addr:")
+          and "bne.w   wm_keep_trig" in _block(src, "ef_write_mask:", "wm_plock:")
+          and "ef_hit" not in _block(src, "wm_keep_trig:", "wm_dest_clr:")
+          and "ef_bit_addr" in _block(src, "wm_keep_trig:", "wm_plock:"))
     check("PULSE0 / dest-clear drops orphan TL (ef_tl_reconcile, stack-safe)",
           "ef_tl_reconcile:" in src
           and "ef_tl_reconcile" in _block(src, "wm_mtl:", "9:")
@@ -612,17 +617,52 @@ def check_ui(src: str) -> None:
           and "tstl    ef_ppulses" in _block(src, "wm0b:", "wm_on:")
           and "beq.s   wm_off" in _block(src, "wm0b:", "wm_on:")
           and "ef_pfree" not in _block(src, "wm0b:", "wm_on:"))
-    check("FUNC+BANK clear LISTPOP over SEQ (no WDESTROY / ef_close)",
+    man = (ROOT / "modules/seq/manifest.py").read_text()
+    check("FUNC+BANK clear LISTPOP (soft-close SEQ; restore on list close)",
           "ef_clear_menu:" in src
           and "M_OPEN" in src and "EF_CL_CBS" in src
           and "ef_cl_dest:" in src and "ef_cl_all:" in src
           and "ef_cl_all_trigs:" in src
-          and "WDESTROY" not in _block(src, "ef_clear_menu:", "ef_cl_dest:")
-          and "ef_close" not in _block(src, "ef_clear_menu:", "ef_cl_dest:")
-          and "ef_bank_steal:" in src and "FUNC_BANK_PRESS" in src)
-    check("clear DEST resets depth/plock params immediately (list YES)",
+          and "ef_dlg_guard" in _block(src, "ef_clear_menu:", "ef_cl_rest:")
+          and "ef_mkwin" not in _block(src, "ecm_open:", "ef_cl_rest:")
+          and "ef_cl_rest:" in src and "ef_mkwin" in _block(src, "ef_cl_rest:", "ef_cl_dest:")
+          and "ef_close" not in _block(src, "ef_clear_menu:", "ef_cl_rest:")
+          and "ef_fb_mki:" in src and "ef_fb_mkii:" in src
+          and "ef_layer_on" in _block(src, "ef_fb_mkii:", "ef_cl_ours:")
+          and "FUNC_BANK_STOCK_MKI" in src and "MKII_TRIG_EDIT_CONT" in src
+          and "0x400bf4a4" in man and "0x4007c0d0" in man
+          and "brain_func_keys" in man
+          and "verify_seq_func_bank.py" in man)
+    keys = _block(src, "EF_KEYS:", "EF_ENCS:")
+    check("EF_KEYS omits BANK (Detour-only FUNC+BANK; no double-fire)",
+          "ef_bank_key" not in src
+          and ".byte   0x2f" not in keys
+          and "ef_fb_mkii:" in src)
+    check("NO over clear LISTPOP: cancel layer closes list and restores SEQ",
+          "ef_cl_cancel:" in src
+          and "EF_CL_NO_LAYER:" in src
+          and "ef_cl_nolayer" in src
+          and "ef_cl_nolayer_off:" in src
+          and "LPUSH" in _block(src, "ecm_do:", "ef_cl_rest:")
+          and "LPOP" in _block(src, "ef_cl_nolayer_off:", "ef_cl_cancel:")
+          and "ef_cl_nolayer_off" in _block(src, "ef_cl_rest:", "ef_cl_dest:")
+          and "ef_cl_cancel" in _block(src, "EF_CL_NO_KEYS:", "L_LEN:")
+          and "ef_cl_rest" in _block(src, "ef_cl_cancel:", "ef_clear_menu:")
+          and "ef_cl_ours" in _block(src, "ef_no:", "ef_yes:")
+          and "ef_cl_rest" in _block(src, "ef_no:", "ef_yes:"))
+    check("clear LISTPOP YES rows restore SEQ via ef_cl_rest",
+          "ef_cl_rest" in _block(src, "ef_cl_done:", "ef_trac_n:")
+          and "M_CLOSE" in _block(src, "ef_cl_done:", "ef_trac_n:")
+          and "ef_cl_done" in _block(src, "ef_cl_dest:", "ef_cl_all:")
+          and "ef_cl_done" in _block(src, "ef_cl_all:", "ef_cl_all_trigs:")
+          and "ef_cl_done:" in src
+          and _block(src, "ef_cl_all_trigs:", "ef_cl_done:").strip() != "")
+    check("clear DEST resets DEPTH/PULSE/ROT to 0 immediately (list YES)",
           "ef_reset_cur_plk:" in src
           and "ef_reset_cur_plk" in _block(src, "ef_clear_cur_dest:", "ef_clear_all_dest:")
+          and "clrl    ef_depth" in _block(src, "ef_reset_cur_plk:", "ef_clear_all_dest:")
+          and "clrl    ef_ppulses" in _block(src, "ef_reset_cur_plk:", "ef_clear_all_dest:")
+          and "clrl    ef_prot" in _block(src, "ef_reset_cur_plk:", "ef_clear_all_dest:")
           and "ef_clear_finish" in _block(src, "ef_clear_cur_dest:", "ef_clear_all_dest:")
           and "LOCK_COLL" in _block(src, "ef_clear_finish:", "EF_LAYER:"))
     check("TRIG reshape keeps other DEST locks (reconcile SETs TL when !thit)",
@@ -724,7 +764,15 @@ def check_ui(src: str) -> None:
     ptch = _block(src, "ef_write_ptch:", "ef_part_flat:")
     check("ef_write_ptch guards SCALE_AT",
           "SCALE_AT" in ptch and "0x4ef9" in ptch)
+    check("ef_write_ptch SCALE OFF / no qz -> base Part PTCH (ep_base)",
+          "ep_base:" in ptch
+          and "ef_part_ptch" in _block(src, "ep_base:", "ep_clear:")
+          and "beq.w   ep_base" in ptch
+          and "bne.w   ep_base" in ptch)
     check("ef_write_ptch writes LOCK_PTCH", "LOCK_PTCH" in ptch)
+    check("ef_is_synth accepts CX with FM/SY",
+          "0x4358" in _block(src, "ef_is_synth:", "ef_bit_addr:")
+          and "0x464d" in _block(src, "ef_is_synth:", "ef_bit_addr:"))
     check("ef_write_ptch rad = max_rad*DEPTH/127",
           "ef_depth" in ptch
           and re.search(r"moveq\s+#127,%d1", ptch) is not None

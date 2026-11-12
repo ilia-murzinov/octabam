@@ -73,8 +73,9 @@ only; writing the pattern is a separate YES.
 **DEPTH** (0..127): at 0, YES clears that DEST's locks for the path in
 use (TRIG: reshape to trig set; PLOCK: clear on hits/misses). Non-zero:
 
-- **DEST = PTCH:** in-scale around Part PLAYBACK PTCH (silent steps /
-  PLCK misses fall back to Part).
+- **DEST = PTCH:** SCALE ON = in-scale around Part PLAYBACK PTCH; SCALE OFF
+  = that Part PTCH on every hit (trigless when PLCK). Silent / PLCK misses
+  fall back to Part.
 - **DEST = AMP VOL:** unipolar below Part AMP VOL.
 - **Any other DEST:** uniform `[Part−DEPTH .. Part+DEPTH]` clamped 0..127.
 
@@ -92,17 +93,34 @@ trigless bits when no other DEST remains on the step.
 YES writes **only** the selected DEST's lock bytes (plus the TRIG mask).
 A later YES with another DEST leaves earlier locks alone.
 
-**FUNC + BANK** while SEQ is open opens a three-row LISTPOP over the SEQ
-window (SEQ stays open; stock PATTERN SETTINGS when SEQ is closed):
+**FUNC + BANK** while SEQ is open opens a three-row LISTPOP for wiping
+pattern data without a new Euclidean fill:
 
-1. **CLEAR DEST** — wipe the focused DEST's locks on this track and reset
-   that DEST's DEPTH / PLOCK PULSE / ROT / free mask to 0.
-2. **CLEAR ALL DEST** — wipe every SEQ DEST on this track; leave sample
-   trigs; reset all per-DEST recipes for the track.
-3. **CLEAR ALL+TRIGS** — row 2, then wipe sample trigs and reset the TRIG
-   recipe (PULSE 5, ROT 0).
+1. **CLEAR DEST** - this DEST's locks only; sample trigs stay; that DEST's
+   DEPTH / PLOCK PULSE / ROT / free mask → 0.
+2. **CLEAR ALL DEST** - every SEQ DEST on the track; sample trigs stay;
+   all per-DEST params → 0.
+3. **CLEAR ALL+TRIGS** - row 2, then wipe sample trigs; TRIG PULSE 5 /
+   ROT 0.
 
-List YES runs the clear immediately (no second SEQ YES). BANK again or NO
-closes the list.
+Class-5 SEQ soft-closes while the list is up (stacking SEQ on top hid the
+menu on hardware). A NO-only layer sits above LISTPOP so one NO closes and
+restores SEQ. List YES runs the clear immediately (no second SEQ YES) and
+restores SEQ. BANK again does the same. Outside SEQ the chord is stock
+**TRACK TRIG EDIT** on MKII (`0x4007c0d0`) / PATTERN SETTINGS on MKI
+(`0x40058a64`).
+
+### FUNC+BANK hook (MKII / BRAIN)
+
+MKII FUNC-held keys live in a table pointed from FUNC's sub-map
+(`PARTS.md` MKI site `0x40058a64` is not the MKII path). On CX, **BRAIN**
+SymbolRefs the MKII FUNC keys pointer (`0x400bfa36`) to a DRAM clone
+`brain_func_keys`, so a ROM press patch at the stock table never runs.
+SEQ Detours TRACK TRIG EDIT entry `0x4007c0d0` instead: SEQ open → clear
+LISTPOP; else stock. MKI still SymbolRefs the ROM FUNC+BANK press field.
+Port (`--mkii`, remix `cx`): CLEAR DEST labels; one NO / list YES / FUNC+BANK
+again restores SEQ. FUNC+BANK is Detour/SymbolRef only (no EF_KEYS BANK) so
+the list does not toggle open/closed on a single chord.
+`verify_seq_func_bank.py` and `verify_seq_scenarios.py` cover the cases.
 
 Manual site: [`docs/site/usage/seq.md`](../../docs/site/usage/seq.md).

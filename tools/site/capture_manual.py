@@ -234,7 +234,10 @@ def capture_drummer(p,r):
 
 def capture_features(p,r):
     p.chord('t1','page')
-    shot(p,'seq','panel','SEQ: ring icon + LEN, stock 3×2 PULSE/ROT / DEST/DEPTH (C/F empty), 4×16 step squares.',r)
+    shot(p,'seq','panel','SEQ: title SEQ, rings icon, A/B PULS/ROT, C=LANE TRIG/PLCK, D=page+param, E=DPTH, step grid, LEN bottom-right.',r)
+    p.chord('func','bank')
+    shot(p,'seq','clear','SEQ clear menu: CLEAR DEST, CLEAR ALL DEST, CLEAR ALL+TRIGS.',r)
+    p.press('no',settle=400)
     close(p)
     p.chord('func','recab');enc(p,3,12);close(p)
     p.chord('func','recab')
