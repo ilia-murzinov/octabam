@@ -1,13 +1,14 @@
 # ilia · octabam
 
-Eight Octatrack remixes for live sampling and sound design: a **base**
-family with Tim Hastie's SYNTH MACHINE, and a **cx** family with
-[Complex Oscillator](reference/modules/cxosc.md) instead. Every image
-keeps [Scope](reference/modules/scope.md),
-[Copy Project](reference/modules/copy-project.md), DARK REV and stock
-COMPRESSOR, then swaps the space and glitch slots:
+Three Octatrack remixes for live sampling and sound design, all with
+[Complex Oscillator](reference/modules/cxosc.md) (panel **CX OSC**). Every
+image keeps [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV, stock
+COMPRESSOR, [SEQ](reference/modules/seq.md),
+[Persistent Buffers](reference/modules/persistent-buffers.md), and
+[Rnd Name](reference/modules/rnd-name.md). The builder matrix swaps the
+space and glitch slots:
 [Void](reference/modules/void.md), [SHATTER](reference/modules/shatter.md),
-[Stuttr](reference/modules/stuttr.md),
 [Resonator](reference/modules/resonator.md).
 
 Built with [octabam](https://sambanks.github.io/octabam/) from your own
@@ -21,34 +22,35 @@ manual, safety and FAQ stay upstream.
 
 Unofficial community firmware. Not made, endorsed or supported by Elektron.
 
-## The two families
+## What the builder offers
 
-| | Machine | What you pick next |
+| Remix | Space | Glitch |
 |---|---|---|
-| **base\*** | Tim's SYNTH MACHINE | Space + glitch: Void / SHATTER / Stuttr / Resonator combinations |
-| **cx\*** | Complex Oscillator (panel **CX OSC**) | Same space + glitch matrix. No SYNTH MACHINE (same machine-list hooks) |
+| **cx** | Void | SHATTER |
+| **cx-reson** | Resonator (+ COMB) | SHATTER |
+| **cx-vres** | Void + Resonator | — |
 
-Always on both: Scope, Copy Project, DARK REV, stock COMPRESSOR. PLATE and
-SPRING are harvested so the inserts fit. Stock compressor stays.
+Always on: Scope, Copy Project, DARK REV, CX OSC, SEQ, Persistent Buffers,
+Rnd Name, stock COMPRESSOR. PLATE and SPRING are harvested so the inserts
+fit.
 
-[Build](web-builder.md) offers **cx** / **cx-reson** / **cx-vres**. Flash
-the `.bin` / `.syx`, or boot an `.RMX` on a unit that already runs
-octabam. The other lettered remixes stay in the repo for local flash.
+[Build](web-builder.md) flashes a `.bin` / `.syx`, or boots an `.RMX` on a
+unit that already runs octabam.
 
-## Why the split exists
+## Why CX OSC
 
 - **Complex Oscillator** is a local two-operator FM machine with a sine
-  wavefolder, derived from Tim's FM SYNTH engine. It takes the same
-  machine-list seat as SYNTH MACHINE, so each image picks one.
+  wavefolder, derived from Tim's FM SYNTH engine. It takes the machine-list
+  seat that SYNTH MACHINE would use, so these images ship CX OSC only.
 - **Scope** overlays TUNER's **`[DOWN]` + `[TEMPO]`** entry when both are
-  present. TUNER remains Tim's.
+  present. TUNER remains Tim's; tip images that ship Scope omit TUNER.
 - Everything else in CORE (Kits, scenes, USB, Kyoti workflow modules,
   and the rest in [Credits](#credits)) is still those authors' work.
 
 ## Credits
 
-Every non-stock module that appears in at least one `base*` / `cx*` image,
-plus the modules documented on this site. Authors and URLs come from each
+Every non-stock module that appears in at least one builder remix, plus
+the modules documented on this site. Authors and URLs come from each
 module's `manifest.py`.
 
 --8<-- "reference/_credits-shipped.md"
