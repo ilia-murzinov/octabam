@@ -31,8 +31,9 @@ Unofficial community firmware. Not made, endorsed or supported by Elektron.
 Always on both: Scope, Copy Project, DARK REV, stock COMPRESSOR. PLATE and
 SPRING are harvested so the inserts fit. Stock compressor stays.
 
-Open [Build](web-builder.md), pick a lettered remix, flash the `.bin` /
-`.syx`, or boot an `.RMX` on a unit that already runs octabam.
+[Build](web-builder.md) offers **cx** / **cx-reson** / **cx-vres**. Flash
+the `.bin` / `.syx`, or boot an `.RMX` on a unit that already runs
+octabam. The other lettered remixes stay in the repo for local flash.
 
 ## Why the split exists
 
