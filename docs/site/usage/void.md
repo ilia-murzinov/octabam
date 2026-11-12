@@ -2,8 +2,8 @@
 audio-rate LFO (or a neighbour track's envelope) chops open. Vinyl crackle
 and AM dirt that rides the beat. Replaces **COMB FILTER**.
 
-Noise gets HPF → COLR → DRV → FDBK → AM. Dry stays clean. **BAL** is the
-blend. SETUP **SRC** picks what opens the noise:
+Noise gets **HPF** → **COLR** → **DRV** → **FDBK** → AM. Dry stays clean.
+**BAL** is the blend. SETUP **SRC** picks what opens the noise:
 
 ![VOID SRC=LFO: RATE/SHPE LFO amplitude-modulates the noise.](../../img/void/path.svg)
 
@@ -11,24 +11,24 @@ blend. SETUP **SRC** picks what opens the noise:
 
 ## Access
 
-Select a track, press FX2, pick **VOID**.
+Select a track, press **`[FX2]`**, pick **VOID**.
 
-- Page 1: BAL, RATE, COLR, HPF, DRV, FDBK
-- Page 2 (SETUP): SHPE, DPTH, WID; **SRC** bottom left
+- Page 1: **BAL**, **RATE**, **COLR**, **HPF**, **DRV**, **FDBK**
+- Page 2 (SETUP): **SHPE**, **DPTH**, **WID**; **SRC** bottom left
 
 ## Operation
 
-- **BAL.** Dry↔noise (**0 = exact dry**, **127 = pure noise**). AM, DRV
-  and FDBK leave the dry alone.
-- **COLR** / **HPF.** Darken or thin the **noise** only. COLR 127 = open.
-  HPF 0 = bypass.
-- **SRC** (SETUP): **LFO** (default) uses RATE/SHPE. **NBR** uses the
-  previous track's **keybus envelope** (level only). Quiet neighbour →
-  noise stops. Dry/BAL is still this track. On track 1, NBR reads T1's
-  own keybus.
-- **DPTH.** How hard the modulator opens the noise (both SRC modes).
-- **WID.** Stereo grit from a second noise through the same HPF/COLR/DRV
-  (no FDBK). **0 = mono**.
+- **BAL.** Dry↔noise (**0 = exact dry**, **127 = pure noise**). AM, **DRV**
+  and **FDBK** leave the dry alone.
+- **COLR** / **HPF.** Darken or thin the **noise** only. **COLR** 127 =
+  open. **HPF** 0 = bypass.
+- **SRC** (SETUP): **LFO** (default) uses **RATE**/**SHPE**. **NBR** uses
+  the previous track's **keybus envelope** (level only). Quiet neighbour →
+  noise stops. Dry/**BAL** is still this track. On track 1, **NBR** reads
+  T1's own keybus.
+- **DPTH.** How hard the modulator opens the noise (both **SRC** modes).
+- **WID.** Stereo grit from a second noise through the same
+  **HPF**/**COLR**/**DRV** (no **FDBK**). **0 = mono**.
 - **FDBK** + **DRV** screams. Feedback is AC-coupled so it keeps scraping.
 
 ## Parameters

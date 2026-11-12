@@ -7,19 +7,19 @@ self-modulates into hash and dropouts. **MIX 0** is exact dry.
 
 ## Access
 
-Select a track, press FX2 (or FX1 when the remix lists it there), pick
-**Shatter**.
+Select a track, press **`[FX2]`** (or **`[FX1]`** when the remix lists it
+there), pick **Shatter**.
 
 ## Operation
 
-Start with MIX up and everything else at 0. Raise **DRV** into the folder,
-**FOLD** for folds, **CLIP** for the brick, **CRSH** for bit/SRR grit.
-**FDBK** recirculates the crush path. **TONE** shelves that loop. MODE
-**CHAOS** flips FDBK polarity at **RATE**.
+Start with **MIX** up and everything else at 0. Raise **DRV** into the
+folder, **FOLD** for folds, **CLIP** for the brick, **CRSH** for bit/SRR
+grit. **FDBK** recirculates the crush path. **TONE** shelves that loop.
+MODE **CHAOS** flips **FDBK** polarity at **RATE**.
 
-DRV 127 clips ordinary input levels. Keep it down, or follow with CLIP,
-when the source is already hot. MODE/TONE/RATE are easiest with CLIP open
-and FDBK up.
+**DRV** 127 clips ordinary input levels. Keep it down, or follow with
+**CLIP**, when the source is already hot. MODE/**TONE**/**RATE** are
+easiest with **CLIP** open and **FDBK** up.
 
 ## Parameters
 

@@ -5,20 +5,21 @@ Stock SAVE TO NEW leaves those extras behind.
 
 ## Access
 
-MAIN MENU → PROJECT → CHANGE → highlight a project → FUNC+BANK → COPY
-(under RENAME / DELETE). Mount the set that holds the source first
-(CHANGE set if needed). Unavailable on `<CREATE EMPTY PROJECT>`.
+MAIN MENU → PROJECT → CHANGE → highlight a project → **`[FUNC]` + `[BANK]`**
+→ **COPY** (under RENAME / DELETE). Mount the set that holds the source
+first (CHANGE set if needed). Unavailable on `<CREATE EMPTY PROJECT>`.
 
 ## Operation
 
 1. Open the CHANGE project list and highlight the source.
-2. FUNC+BANK → COPY.
+2. **`[FUNC]` + `[BANK]`** → **COPY**.
 3. Edit the suggested name (`PROJECT` + date). The name editor caps at 32
    characters.
 4. Confirm `"COPY SRC -> DST?"`.
-5. On success: `"PROJECT COPIED"` / `"OPEN IT?"`. YES loads the copy and
-   closes CHOOSE PROJECT. NO leaves the live project as it was.
-   `"COPY FAILED"` on error. A partial destination folder is removed.
+5. On success: `"PROJECT COPIED"` / `"OPEN IT?"`. **`[YES]`** loads the
+   copy and closes CHOOSE PROJECT. **`[NO]`** leaves the live project as
+   it was. `"COPY FAILED"` on error. A partial destination folder is
+   removed.
 
 ## Disk only. What SAVE is for
 

@@ -1,23 +1,24 @@
 **Chance grain repeater.** Input always writes the stock FX ring. On each
-RATE tick, CHNC may grab a SIZE grain and HOLD-loop it. Miss stays dry.
-Probabilistic stutter / buffer grab. MODE sets 1× / ½× / ¼× / random
-playback rate. REV is reverse chance per repeat. **MIX 0** is exact dry.
+**RATE** tick, **CHNC** may grab a **SIZE** grain and **HOLD**-loop it.
+Miss stays dry. Probabilistic stutter / buffer grab. **MODE** sets 1× /
+½× / ¼× / random playback rate. **REV** is reverse chance per repeat.
+**MIX 0** is exact dry.
 
 ![STUTTR: RATE → CHNC hit/miss → grab+HOLD or dry → MIX.](../../img/stuttr/path.svg)
 
 ## Access
 
-Select a track, press FX2 (or FX1 when the remix lists it there), pick
-**Stuttr**.
+Select a track, press **`[FX2]`** (or **`[FX1]`** when the remix lists it
+there), pick **Stuttr**.
 
 ## Operation
 
-Defaults leave **CHNC** at 0 (never grabs). Raise CHNC so grabs can fire.
-**RATE** sets how often attempts happen. **HOLD** keeps the grain
+Defaults leave **CHNC** at 0 (never grabs). Raise **CHNC** so grabs can
+fire. **RATE** sets how often attempts happen. **HOLD** keeps the grain
 repeating after a hit. Engage/release each crossfade ~2 ms so edges stay
-clean. Try MODE **HALF** or **QUART** for pitched-down repeats. **RND**
-varies rate per wrap. **REV** at 0 is always forward. **SYNC** defaults
-to 8.
+clean. Try **MODE** **HALF** or **QUART** for pitched-down repeats.
+**RND** varies rate per wrap. **REV** at 0 is always forward. **SYNC**
+defaults to 8.
 
 ## Parameters
 

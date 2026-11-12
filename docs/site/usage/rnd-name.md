@@ -1,15 +1,15 @@
 Fills a name editor with a random name from two 64-word pools (4,096
-joins). Hold FUNC and press CUE.
+joins). Hold **`[FUNC]`** and press **`[CUE]`**.
 
 ## Access
 
-In a supported name editor, hold FUNC and press CUE. Stock FUNC + REC,
-PLAY and STOP (PASTE, CLEAR, COPY NAME) stay. Build the test remix
-`rnd-name` to try it.
+In a supported name editor, hold **`[FUNC]`** and press **`[CUE]`**. Stock
+**`[FUNC]` + `[RECORD]`**, **`[PLAY]`** and **`[STOP]`** (PASTE, CLEAR,
+COPY NAME) stay. Build the test remix `rnd-name` to try it.
 
 ## Operation
 
-| Editor | FUNC + CUE writes |
+| Editor | **`[FUNC]` + `[CUE]`** writes |
 |---|---|
 | NAME THE NEW PROJECT | a date `YYMMDD ` and two words, for example `261014 SWEEPPAD` |
 | SAVE PROJECT AS, CHOOSE NEW PROJECT NAME | a date `YYMMDD ` and two words |
