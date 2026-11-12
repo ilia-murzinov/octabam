@@ -1,110 +1,51 @@
-site_name: Octabam
-site_url: https://sambanks.github.io/octabam/
-repo_url: https://github.com/sambanks/octabam
-repo_name: sambanks/octabam
+site_name: ilia · octabam
+site_url: https://ilia-murzinov.github.io/octabam/
+repo_url: https://github.com/ilia-murzinov/octabam
+repo_name: ilia-murzinov/octabam
 docs_dir: .
 site_dir: ../../out/site
 use_directory_urls: false
-# the _remix-*.md fragments are snippet includes, not pages; usage/*.md
-# are included into generated module pages, manual/brain-*.md into the manual's BRAIN pages; img/ holds image assets.
 exclude_docs: |
   reference/_remix-*.md
+  reference/_credits-shipped.md
+  reference/modules.md
   usage/*.md
   manual/*.md
 extra_css:
   - css/fonts.css
   - css/sidebar-spacing.css
   - css/site-tables.css
+  - css/builder.css
   - css/manual.css
+  - css/chassis.css
 theme:
   name: shadcn
-  # The theme follows the system appearance; its header toggle can override it.
   show_title: true
   show_stargazers: false
+  accent: zinc
+  icon: img/mark-icon.svg
+  favicon: img/favicon.png
   pygments_style:
     light: shadcn-light
     dark: github-dark
 nav:
-  - Getting Started:
-      - Overview: index.md
-      - Octabam: remix-octabam.md
-      - Octabam Verbs: remix-octabam-verbs.md
-      - Octabam Bus: remix-octabam-bus.md
-      - Build and Install: web-builder.md
-      - Safety and Recovery: safety.md
-      - About: about.md
-  - Octabam Manual:
-      - Introduction: reference/manual/index.md
-      - Effects:
-          - Character: reference/manual/effects/character.md
-          - Modulation: reference/manual/effects/modulation.md
-          - Resonator: reference/manual/effects/resonator.md
-          - Shatter: reference/manual/effects/shatter.md
-          - Sidechain Compressor: reference/manual/effects/sidechain-compressor.md
-          - Spectrum: reference/manual/effects/spectrum.md
-          - Transient: reference/manual/effects/transient.md
-          - Verberation: reference/manual/effects/verberation.md
-          - Vibrato: reference/manual/effects/vibrato.md
-      - The delay and reverb bus:
-          - Bus Delay: reference/manual/bus/busdelay.md
-          - Bus Reverb: reference/manual/bus/busverb.md
-          - Send: reference/manual/bus/send.md
-          - TEMPO Window: reference/manual/bus/tempo-bus.md
-      - Machines:
-          - OCTA-303: reference/manual/machines/octa303.md
-          - WAVE: reference/manual/machines/wavecf.md
-      - Sequencer and recording:
-          - Bar LED: reference/manual/sequencer/bar-led.md
-          - Direct Jump: reference/manual/sequencer/direct-jump-kyoti.md
-          - Mute Modes: reference/manual/sequencer/mute-modes.md
-          - Pattern Mute: reference/manual/sequencer/pattern-mute.md
-          - Quantize Live Rec Toggle: reference/manual/sequencer/quantize-live-rec-toggle.md
-          - Rec Threshold: reference/manual/sequencer/rec-threshold.md
-          - Recorder Trig Mute: reference/manual/sequencer/rec-trig-mute.md
-          - Reload from Project: reference/manual/sequencer/reload-from-project.md
-          - RLEN PLEN: reference/manual/sequencer/rlen-plen.md
-          - Scale Quantizer: reference/manual/sequencer/quantizer.md
-          - SEQ: reference/manual/sequencer/seq.md
-          - Slow LFO: reference/manual/sequencer/slow-lfo.md
-          - Track Patterns: reference/manual/sequencer/trackpatterns.md
-          - Varispeed: reference/manual/sequencer/varispeed.md
-      - Parts, Kits and scenes:
-          - Kits: reference/manual/parts/kits.md
-          - MIDI Scenes: reference/manual/parts/midi-scenes.md
-          - Morph: reference/manual/parts/morph.md
-          - Page 2 Parameter Locks: reference/manual/parts/plocks-p2.md
-          - Page 2 Scene Locks: reference/manual/parts/scenes-p2.md
-      - MIDI and USB:
-          - CC Feedback: reference/manual/midi-usb/cc-feedback.md
-          - CC Map: reference/manual/midi-usb/cc-map.md
-          - Chords Factory: reference/manual/midi-usb/chords.md
-          - MIDI Loopback: reference/manual/midi-usb/midi-loopback.md
-          - Scales: reference/manual/midi-usb/scales.md
-          - Screen: reference/manual/midi-usb/screen.md
-          - USB: reference/manual/midi-usb/usb.md
-      - BRAIN:
-          - BRAIN: reference/manual/brain/index.md
-          - Templates: reference/manual/brain/templates.md
-          - Remixes: reference/manual/brain/remixes.md
-          - Settings: reference/manual/brain/settings.md
-          - Performance: reference/manual/brain/performance.md
-          - Log: reference/manual/brain/log.md
-          - About: reference/manual/brain/about.md
-          - Files on the card: reference/manual/brain/files.md
-      - Utilities:
-          - Buffer Saver: reference/manual/utilities/buffer-saver.md
-          - Copy Project: reference/manual/utilities/copy-project.md
-          - Mode Defaults: reference/manual/utilities/mode-defaults.md
-          - Remix Switch: reference/manual/utilities/remix-switch.md
-          - SCOPE: reference/manual/utilities/scope.md
-          - TUNER: reference/manual/utilities/tuner.md
-      - Fixes to stock behaviour: reference/manual/fixes.md
-      - Behind the scenes: reference/manual/inside.md
-      - Credits: reference/manual/credits.md
-  - More:
-      - Feature Directory: reference/modules.md
-      - Create a Remix: own-remix.md
-      - Community Remixes: reference/community.md
+  # This site has one job: build a personal image, then read the fork
+  # modules that image carries. Grouped by what they are on the unit.
+  - Home: index.md
+  - Build: web-builder.md
+  - Effects:
+      - Resonator: reference/modules/resonator.md
+      - Shatter: reference/modules/shatter.md
+      - Stuttr: reference/modules/stuttr.md
+      - Void: reference/modules/void.md
+  - Machines:
+      - Complex Oscillator: reference/modules/cxosc.md
+  - Tools:
+      - Copy Project: reference/modules/copy-project.md
+      - SEQ: reference/modules/seq.md
+      - Persistent Buffers: reference/modules/persistent-buffers.md
+      - Random Naming: reference/modules/rnd-name.md
+      - Scope: reference/modules/scope.md
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -114,5 +55,4 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets:
-      # resolved from the repository root: mkdocs runs there, locally and in CI
       base_path: [docs/site]

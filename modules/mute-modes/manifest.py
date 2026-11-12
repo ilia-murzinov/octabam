@@ -26,7 +26,8 @@ MODULE = runpy.run_path(str(_UPSTREAM), run_name="remix_manifest_mute_modes")["M
 # which rebuilds `linked` from the author's own tuple.
 def _adapt_unit(_unit):
     if callable(getattr(_unit, "include", None)):
-        return dataclasses.replace(_unit, include=(lambda modules, remix, _inc=_unit.include: _inc(modules)))
+        # remix=None: Tim's synth remix_include probes mute-modes with include(modules) only.
+        return dataclasses.replace(_unit, include=(lambda modules, remix=None, _inc=_unit.include: _inc(modules)))
     return _unit
 
 _author_variant = MODULE.variant

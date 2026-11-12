@@ -19,3 +19,37 @@
   height: 0;
   padding: 0;
 }
+
+/* Web builder remix feature matrix (page.js). */
+.ob-features-wrap {
+  overflow-x: visible;
+  margin: 1rem 0 1.5rem;
+  width: 100%;
+}
+.ob-features {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  width: 100%;
+  table-layout: fixed;
+}
+.ob-features th,
+.ob-features td {
+  border: 1px solid var(--border, #ccc);
+  padding: 0.35rem 0.55rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.ob-features th[scope="row"],
+.ob-features thead th:first-child {
+  text-align: left;
+  font-weight: 600;
+  width: 7.5rem;
+}
+.ob-features .ob-row-hover > *,
+.ob-features .ob-col-hover {
+  background: color-mix(in srgb, var(--primary, #d4d4d4) 12%, transparent);
+}
+.ob-features .ob-cell-hover {
+  background: color-mix(in srgb, var(--primary, #d4d4d4) 28%, transparent);
+}

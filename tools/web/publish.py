@@ -4,19 +4,12 @@
     make webpatch BUILD=N [OUT=out/web]
     python3 tools/web/publish.py --build N --tree PATH      # build in another checkout, publish into this one
 
-For each published remix (`tools/site/release.py`), and each community remix
-(remixes/community/<name>/) that passes `make check REMIX=<name>` first, it runs `make image`, turns
+For each published remix (`tools/site/release.py`) it runs `make image`, turns
 `out/mainos_bus.bin` into an OBP1 patch against the stock MAIN OS
 (`tools/web/obpatch.py` applies and leak-checks it), and writes
 
     <out>/patches/<remix>.obp
-    <out>/manifest.json          release version, commit, date, and per remix: version, image name, patch,
-                                 and `community` for a community remix
-
-CI's runs leave the community remixes out (tools/verify/reach.py), so this
-run checks each one before it builds a patch; a community remix that does not
-pass, or does not build, is left out of the builder, named, and the run goes on.
-`--no-community` skips them.
+    <out>/manifest.json          release version, commit, date, and per remix: version, image name, patch
     <out>/ref/<remix>/           the files `make image` wrote, for tools/web/test_chain.mjs
 
 `ref/` holds Elektron's OS and stays in <out> (out/ is not tracked).
@@ -51,23 +44,8 @@ def git(*a):
 
 
 def remixes():
-    return [r for r in release.REMIXES if (TREE / "remixes" / r / "remix.py").exists()]
-
-
-def community():
-    """The community remixes of the tree, by name."""
-    return sorted(p.parent.name for p in (TREE / "remixes" / "community").glob("*/remix.py"))
-
-
-def make_quiet(*args):
-    """Run make in TREE with its output in a log under out/web; True when it passes."""
-    log = TREE / "out" / "web" / ("-".join(a.replace("=", "_") for a in args) + ".log")
-    log.parent.mkdir(parents=True, exist_ok=True)
-    with log.open("w") as f:
-        ok = subprocess.run(["make", *args], cwd=TREE, stdout=f, stderr=subprocess.STDOUT).returncode == 0
-    if not ok:
-        print(f"   make {' '.join(args)} failed: {log}")
-    return ok
+    names = getattr(release, "BUILDER_REMIXES", None) or release.REMIXES
+    return [r for r in names if (TREE / "remixes" / r / "remix.py").exists()]
 
 
 def image_name(remix, build):
@@ -83,7 +61,6 @@ def main():
     ap.add_argument("--out", default="out/web")
     ap.add_argument("--tree", help="build in this checkout (default: the one this script is in)")
     ap.add_argument("--dev", action="store_true", help="allow a tree that is not clean at origin/main (manifest says so)")
-    ap.add_argument("--no-community", action="store_true", help="build the release's remixes only")
     args = ap.parse_args()
     global TREE
     if args.tree:
@@ -104,18 +81,10 @@ def main():
     (out / "patches").mkdir(parents=True, exist_ok=True)
     version = f"OCTABAM{args.build}"
     stock = stock_path.read_bytes()
-    rows, refused = [], []
-    jobs = [(r, False) for r in remixes()] + ([] if args.no_community else [(r, True) for r in community()])
-    for remix, contrib in jobs:
-        print(f"== {remix}{' (community)' if contrib else ''}", flush=True)
-        if contrib:
-            # CI does not check a community remix; its patch is built only when its gates pass here
-            if not (make_quiet("check", f"REMIX={remix}")
-                    and make_quiet("image", f"REMIX={remix}", f"BUILD={args.build}")):
-                refused.append(remix)
-                continue
-        else:
-            subprocess.run(["make", "image", f"REMIX={remix}", f"BUILD={args.build}"], cwd=TREE, check=True)
+    rows = []
+    for remix in remixes():
+        print(f"== {remix}", flush=True)
+        subprocess.run(["make", "image", f"REMIX={remix}", f"BUILD={args.build}"], cwd=TREE, check=True)
         name = image_name(remix, args.build)
         ref = out / "ref" / remix
         ref.mkdir(parents=True, exist_ok=True)
@@ -126,18 +95,18 @@ def main():
             shutil.copyfile(TREE / src, ref / dst)
         patch = obpatch.make(stock, (ref / "mainos_bus.bin").read_bytes())
         (out / "patches" / f"{remix}.obp").write_bytes(patch)
-        row = {"name": remix, "title": remix, "version": version, "imageName": name,
-               "patch": f"patches/{remix}.obp", "patchBytes": len(patch),
-               "sha256": hashlib.sha256(patch).hexdigest()}
-        if contrib:
-            row["community"] = True
-        rows.append(row)
+        feats = sorted(release.BUILDER_FEATURES.get(remix, ()))
+        rows.append({"name": remix, "title": remix, "version": version, "imageName": name,
+                     "patch": f"patches/{remix}.obp", "patchBytes": len(patch),
+                     "sha256": hashlib.sha256(patch).hexdigest(),
+                     "features": feats})
         print(f"   patch {len(patch):,} bytes")
-    if refused:
-        print(f"left out of the builder (make check or make image failed): {', '.join(refused)}")
 
     manifest = {"version": release.VERSION, "commit": commit, "dev": dirty or behind, "build": args.build,
-                "date": datetime.date.today().isoformat(), "remixes": rows}
+                "date": datetime.date.today().isoformat(),
+                "featureRows": list(getattr(release, "BUILDER_FEATURE_ROWS", ())),
+                "features": {k: sorted(v) for k, v in getattr(release, "BUILDER_FEATURES", {}).items()},
+                "remixes": rows}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
     print(f"wrote {args.out}/manifest.json for {commit[:8]}")
     if manifest["dev"]:

@@ -1,6 +1,6 @@
 # Remixes
 
-A remix is a named selection of modules; `make image REMIX=<name> BUILD=<n>` builds it into a card-flashable image from your own OS 1.40C. Each remix is a directory here: `remix.py` is the selection, `README.md` says what is in it and how to flash it. This index is rendered from the selections (`make docs`).
+A remix is a named selection of modules; `make image REMIX=<name> BUILD=<n>` builds it into a card-flashable image from your own OS 1.40C. Each remix is a directory here: `remix.py` is the selection, `README.md` says what is in it, where it has run and how to flash it. This index is rendered from the selections (`make docs`).
 
 - What to install first (the Xcode Command Line Tools, Homebrew, Python 3.10+, `cmake`, `uv`) and every step to a flashed unit: [BUILDING.md](../docs/guide/BUILDING.md).
 - Composing your own: [COMPOSING.md](../docs/guide/COMPOSING.md).
@@ -9,15 +9,23 @@ A remix is a named selection of modules; `make image REMIX=<name> BUILD=<n>` bui
 
 ## The delay and reverb bus
 
-| remix | contains |
-|---|---|
-| [`octabam-bus`](octabam-bus/README.md) | CORE + the extra ColdFire modules of octabam + the delay and reverb bus (BusDelay on T1's FX2, BusVerb on T5's FX2, SEND on every other track's FX2, the stock DELAY on T8) + SPECTRUM, CHARACTER and MODULATION on FX1. |
+| remix | contains | proof |
+|---|---|---|
+| [`octabam-bus`](octabam-bus/README.md) | CORE + the extra ColdFire modules of octabam + the delay and reverb bus (BusDelay on T1's FX2, BusVerb on T5's FX2, SEND on every other track's FX2, the stock DELAY on T8) + SPECTRUM, CHARACTER and MODULATION on FX1. | emulator |
 
 ## Firmware mods on the stock effects
 
-| remix | contains |
-|---|---|
-| [`octabam`](octabam/README.md) | The core ColdFire modules, SCOPE and TUNER, every other ColdFire module that fits, all 14 stock effects, and SPECTRUM, CHARACTER and MODULATION, loaded on demand, with COMPRESSOR's side-chain. |
-| [`octabam-verbs`](octabam-verbs/README.md) | octabam with VERBERATION and its PLATE, ROOM and HALL rows in place of PLATE REV, SPRING REV and DARK REV: the core ColdFire modules and every other ColdFire module that fits, the 11 other stock effects, and SPECTRUM, CHARACTER, MODULATION, SHATTER and COMPRESSOR's side-chain loaded on demand, with VIBRATO, TRANSIENT and RESONATOR resident in the reverbs' words. |
+| remix | contains | proof |
+|---|---|---|
+| [`base`](base/README.md) | CORE + STEM REC + SYNTH v2.22 + VOID + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP + USB TRACKS MAIN CUE. | local render: v2.22 synth ML_FM_MAX=4 + VOID + SHATTER + SCOPE + DARK + COPY; stock COMP; no SC / RESONATOR / TAPE / STUTTR. |
+| [`base-reson`](base-reson/README.md) | CORE + STEM REC + SYNTH v2.22 + RESONATOR + SHATTER + SCOPE + DARK REV + COPY PROJECT + stock COMP. | local render: v2.22 synth + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock COMP; no VOID / SC / STUTTR. |
+| [`base-stuttr`](base-stuttr/README.md) | CORE + STEM REC + SYNTH v2.22 + VOID + STUTTR + SCOPE + DARK REV + COPY PROJECT + stock COMP. | local render: v2.22 synth + VOID + STUTTR + SCOPE + DARK + COPY; stock COMP; no SHATTER / SC / RESONATOR. |
+| [`base-vres`](base-vres/README.md) | CORE + STEM REC + SYNTH v2.22 + VOID + RESONATOR + SCOPE + DARK REV + COPY PROJECT + stock COMP. | local render: v2.22 synth + VOID + RESONATOR + SCOPE + DARK + COPY; stock COMP; no SHATTER / STUTTR / SC. |
+| [`cx`](cx/README.md) | CORE + STEM REC + CX OSC + SHATTER + VOID + SCOPE + SCREEN + DARK REV + DELAY + COPY PROJECT + stock COMP. | local render: CX OSC + SHATTER + VOID + SCOPE + SCREEN + DARK + COPY; stock DELAY; stock COMP; no SC / RESONATOR / SYNTH / STUTTR. |
+| [`cx-reson`](cx-reson/README.md) | CORE + STEM REC + CX OSC + RESONATOR + SHATTER + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP. | local render: CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock DELAY; stock COMP; no VOID / SC / STUTTR / SYNTH. |
+| [`cx-stuttr`](cx-stuttr/README.md) | CORE + STEM REC + CX OSC + VOID + STUTTR + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP. | local render: CX OSC + VOID + STUTTR + SCOPE + DARK + COPY; stock DELAY; stock COMP; no SHATTER / SC / RESONATOR / SYNTH. |
+| [`cx-vres`](cx-vres/README.md) | CORE + STEM REC + CX OSC + VOID + RESONATOR + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP. | local render: CX OSC + VOID + RESONATOR + SCOPE + DARK + COPY; stock DELAY; stock COMP; no SHATTER / STUTTR / SC / SYNTH. |
+| [`octabam`](octabam/README.md) | The core ColdFire modules, SCOPE and TUNER, every other ColdFire module that fits, all 14 stock effects, and SPECTRUM, CHARACTER and MODULATION, loaded on demand, with COMPRESSOR's side-chain. | measured on a unit (OCTA S2, 2026-11-15): Flashed S2 image. With SCOPE closed/open, 30 loader transitions per state had zero bad records. Median CF window peak 537.36/544.96 us, steady 355.77/359.37 us; median DSP window max 49/48%, steady max 49/48%; median audio gap 340/340 ms. Maximum gap 1,480/360 ms. The 40 ms GAP flag appeared on all transitions because the loader silence is about 340 ms. These results cover this flashed image and transition set. |
+| [`octabam-verbs`](octabam-verbs/README.md) | octabam with VERBERATION and its PLATE, ROOM and HALL rows in place of PLATE REV, SPRING REV and DARK REV: the core ColdFire modules and every other ColdFire module that fits, the 11 other stock effects, and SPECTRUM, CHARACTER, MODULATION, SHATTER and COMPRESSOR's side-chain loaded on demand, with VIBRATO, TRANSIENT and RESONATOR resident in the reverbs' words. | emulator: not flashed; `make check` (CI) |
 
 Never share a built image: it contains Elektron's OS.

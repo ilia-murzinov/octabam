@@ -5,8 +5,7 @@
 
 Writes the generated pages (gitignored, so the deploy builds them fresh):
 
-  manual/...          the manual of the published remixes, one for all of them (gen_manual.py)
-  community.md         the community remixes (remixes/community/), one section each
+  manual/<remix>/...   the manual of each published remix (gen_manual.py)
   _remix-<name>.md     the module table of each published remix's overview page
 
 Only the remixes in release.REMIXES are published. The pages are rendered at
@@ -34,7 +33,10 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1])); import too
 from remix import index, registry  # noqa: E402
 from remix.schema import CATEGORY_TITLE, Category  # noqa: E402
 
-GH = "https://github.com/sambanks/octabam"
+GH_UPSTREAM = "https://github.com/sambanks/octabam"
+GH_FORK = "https://github.com/ilia-murzinov/octabam"
+# Back-compat for any leftover GH uses in this file / tests.
+GH = GH_UPSTREAM
 
 _SMALL = {"a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "of", "on", "or", "the", "to", "with", "over"}
 _UPPER = {"os", "din", "dj", "eq", "bd", "usb", "midi", "cc", "cpu", "dsp", "cf", "lfo", "ata", "txtr", "amf",
@@ -74,18 +76,15 @@ def _label(m) -> str:
     names = {
         "analog-bassdrum": "Analog BD",
         "ata-write-guard": "ATA write guard",
-        "bar-led": "Bar LED",
         "bbd": "BBD delay",
-        "busdelay": "Bus delay",
-        "busverb": "Bus reverb",
         "blackpyramids-303": "BlackPyramids 303",
         "character-txtr": "Character TXTR",
+        "cxosc": "Complex oscillator",
         "devilish": "dEVILish",
         "dlcopy": "Effect loader (copier)",
         "dlpump": "Effect loader (sender)",
         "direct-jump-kyoti": "Direct jump (Kyoti)",
         "distorx": "DisTorX",
-        "fet76": "FET76",
         "lofi-amf-fix": "Lo-Fi AMF fix",
         "octa303": "OCTA-303",
         "wavecf": "WAVE",
@@ -95,15 +94,8 @@ def _label(m) -> str:
         "rlen-plen": "RLEN PLEN",
         "rnd-name": "Random naming",
         "scenes-p2": "Page 2 scene locks",
-        "seq": "SEQ",
-        "cxosc": "CX OSC",
-        "sc-keybus-bridge": "Side-chain and Keybus bridge",
-        "sc-loadmeter-bridge": "Side-chain and Load Meter bridge",
-        "scope": "SCOPE",
-        "tuner": "TUNER",
         "stems": "Stem recording",
-        "tempo-bus": "TEMPO window",
-        "vca160": "VCA160",
+        "tempo-bus": "Tempo controls",
     }
     if m.name in names:
         return title_case(names[m.name])
@@ -112,52 +104,15 @@ def _label(m) -> str:
     return title_case(" ".join(word if word in acronyms else word.lower() for word in words))
 
 
-def _account(url: str | None) -> str | None:
-    """The GitHub account of an author link, whether it names the account or one of its repositories."""
-    mt = re.match(r"https://github\.com/([^/]+)", url or "")
-    return mt.group(1).lower() if mt else None
-
-
-def _clean(name: str) -> str:
-    return re.sub(r",\s*ported here$", "", name.strip())
-
-
-_NAMES: dict[str, str] = {}
-
-
-def who(m) -> tuple[str, str | None, tuple[str, str] | None]:
-    """An author as one person however their modules spell them: (name, profile link, (repository, link)
-    when the module names a repository rather than the account). The name is the one of the account's
-    spellings that reads as a name (holds a space), else the handle; never "account/repository"."""
-    acc = _account(m.author_url)
-    if acc is None:
-        return (_clean(m.author or "?"), m.author_url, None)
-    if not _NAMES:
-        spellings: dict[str, set] = {}
-        for x in registry.modules().values():
-            a = _account(x.author_url)
-            if a and x.author and not x.is_stock:
-                spellings.setdefault(a, set()).add(_clean(x.author))
-        for a, names in spellings.items():
-            plain = sorted(n for n in names if "/" not in n)
-            _NAMES[a] = next((n for n in plain if " " in n), plain[0] if plain else a)
-    handle = re.match(r"https://github\.com/([^/]+)", m.author_url).group(1)
-    name = _NAMES.get(acc, handle)
-    profile = f"https://github.com/{handle}"
-    rest = m.author_url[len(profile):].strip("/")
-    repo = (rest.split("/")[0], m.author_url) if rest else None
-    return (name, profile, repo)
-
-
 def _author(m) -> str:
     if m.is_stock:
         return "stock"
-    name, url, repo = who(m)
-    text = f"[{name}]({url})" if url else name
-    if repo:
-        verb = "ported from" if "ported here" in (m.author or "") else "from"
-        text += f", {verb} [{repo[0]}]({repo[1]})"
-    return text
+    return f"[{m.author}]({m.author_url})" if m.author_url else (m.author or "?")
+
+
+def _site_keys():
+    import release
+    return set(getattr(release, "SITE_MODULES", ()) or ())
 
 
 def _records(m) -> dict:
@@ -175,10 +130,12 @@ def _page_records(m) -> dict:
 
 
 def _module_url(m) -> str:
+    """Canonical tree for the module: fork for SITE_MODULES, upstream otherwise."""
     d = pathlib.Path("modules") / m.name
+    base = GH_FORK if m.key in _site_keys() else GH_UPSTREAM
     if (ROOT / d / "README.md").exists():
-        return f"{GH}/blob/main/{d}/README.md"
-    return f"{GH}/tree/main/{d}"
+        return f"{base}/blob/main/{d}/README.md"
+    return f"{base}/tree/main/{d}"
 
 
 def _figure(record: dict) -> list[str]:
@@ -212,30 +169,16 @@ def screen_reference(m) -> list[str]:
     return lines
 
 
-def directory_page(mods, book) -> str:
-    """The feature directory: first what is in the release, by the manual's sections, each linked to its
-    manual page with the remixes that have it; then every other contributed module by category, each
-    linked to its page here."""
-    import gen_manual
-    import release
-    v = release.VERSION
-    manual_page = gen_manual.published_pages(book)
-    names = [n for n, _ in book.official]
-    lines = ["# Feature Directory", "",
-             f"Every feature the project has. The first part is what is in the {v} release, with a page in the "
-             "[manual](manual/index.md) for each; the second part is the rest, with a page here for each. "
-             "The stock effects are described in Elektron's own manual.", "",
-             f"## In {v}", "",
-             "| Section | Feature | Author | In |", "|---|---|---|---|"]
-    last = None
-    for sec, m, _ in gen_manual._feature_rows(book, lambda n, m: None):
-        ins = [gen_manual.title(n) for n in names if n in book.has.get(m.key, [])]
-        lines.append(f"| {sec if sec != last else ''} | [{gen_manual.label(m)}](manual/{manual_page[m.key]}) "
-                     f"| {_author(m)} | {', '.join(ins)} |")
-        last = sec
-    lines += ["", f"## Not in {v}", ""]
+def directory_page(mods, manual_page: dict) -> str:
+    """Directory of Ilia's modules documented on this site."""
+    site_keys = _site_keys()
+    lines = ["# Modules", "",
+             "Modules developed on this fork, with usage notes on this site. "
+             "The rest of each `base*` / `cx*` image is credited on "
+             "[Home](../index.md#credits). "
+             "Build an image on [Build and Install](../web-builder.md).", ""]
     for cat, ms in index.by_category(mods).items():
-        ms = [m for m in ms if not m.is_stock and m.key not in manual_page]
+        ms = [m for m in ms if m.key in site_keys]
         if not ms:
             continue
         lines += [f"### {CATEGORY_TITLE[cat]}", "", "| Feature | Author |", "|---|---|"]
@@ -243,80 +186,88 @@ def directory_page(mods, book) -> str:
     return "\n".join(lines) + "\n"
 
 
-def community_page(mods, book) -> str:
-    """Community remixes: contributors' own selections (the community root of the remixes), one section
-    each from its remix.py: what it carries and how to build it, in the web builder when its
-    manifest (docs/site/builder/manifest.json) has a patch for it; each feature links to its manual
-    page, or to its page in the directory."""
-    import gen_manual
-    manual_page = gen_manual.published_pages(book)
-    tree = f"{GH}/tree/main/remixes/community"
-    built = OUT.parent / "builder" / "manifest.json"
-    patched = {r["name"] for r in json.loads(built.read_text()).get("remixes", []) if r.get("community")} \
-        if built.is_file() else set()
-    lines = ["# Community Remixes", "",
-             "A community remix is a contributor's own selection of modules. Its contributor keeps it "
-             "working, and the [web builder](../web-builder.md) offers it while it passes the project's "
-             "checks. Read its notes on GitHub before flashing it.", ""]
-    names = sorted(n for n in registry.remix_names() if registry.is_community(n))
-    if not names:
-        lines += ["None yet.", ""]
-    for n in names:
-        r = registry.remix(n)
-        feats, stock = [], []
-        for k in r.modules:
-            m = mods.get(k)
-            if m is None:
-                continue
+def _display_author(m) -> tuple[str, str]:
+    """(sort_key, markdown author cell) — normalize known author spellings."""
+    if m.is_stock:
+        return ("Elektron", "Elektron (stock)")
+    raw = (m.author or "?").strip()
+    url = (m.author_url or "").strip()
+    # Collapse alternate spellings used across manifests.
+    aliases = {
+        "sambanks": ("Sam Banks", "https://github.com/sambanks"),
+        "Sam Banks": ("Sam Banks", "https://github.com/sambanks"),
+        "iliamurzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "ilia-murzinov": ("ilia-murzinov", "https://github.com/ilia-murzinov"),
+        "timhastie/octatrick-modules": (
+            "Tim Hastie (octatrick)", "https://github.com/timhastie/octatrick-modules"),
+        "Zac Kyoti": ("Zac Kyoti", "https://github.com/Zac-Kyoti"),
+        "markandrus/octemu": ("markandrus", "https://github.com/markandrus/octemu"),
+        "bkkbrls-del/midisc": ("bkkbrls-del", "https://github.com/bkkbrls-del/midisc"),
+        "bryantysinger/octa-bt-pt": (
+            "bryantysinger", "https://github.com/bryantysinger/octa-bt-pt"),
+        "sanderlegit": ("sanderlegit", "https://github.com/sanderlegit"),
+        "radiohagen": ("radiohagen", "https://github.com/radiohagen"),
+        "yvesrosius": ("yvesrosius", "https://github.com/yvesrosius"),
+    }
+    name, href = aliases.get(raw, (raw, url))
+    if href:
+        return (name, f"[{name}]({href})")
+    return (name, name)
+
+
+def shipped_credits_page(mods) -> str:
+    """Author → modules as plain linked lists for BUILDER_REMIXES (+ SITE_MODULES)."""
+    import release
+    keys = set(getattr(release, "SITE_MODULES", ()) or ())
+    for n in getattr(release, "BUILDER_REMIXES", ()) or ():
+        keys |= set(registry.remix(n).modules)
+    by: dict[str, list] = {}
+    author_md: dict[str, str] = {}
+    for key in keys:
+        m = mods[key]
+        sort_name, md = _display_author(m)
+        author_md[sort_name] = md
+        by.setdefault(sort_name, []).append(m)
+    lines = [
+        "<!-- generated by tools/site/gen_pages.py — do not edit -->",
+        "",
+    ]
+    site_keys = _site_keys()
+    for author in sorted(by, key=lambda a: (a == "Elektron", a.lower())):
+        ms = sorted(by[author], key=lambda m: _label(m).lower())
+        items = []
+        for m in ms:
+            name = _label(m)
             if m.is_stock:
-                stock.append(k)
-            elif manual_page.get(m.key, "").startswith("inside.md"):
-                continue                        # a service other features use: nothing to operate
-            elif m.key in manual_page:
-                feats.append(f"[{gen_manual.label(m)}](manual/{manual_page[m.key]})")
+                items.append(name)
+            elif m.key in site_keys:
+                # Paths are from docs/site/ (index.md includes this fragment).
+                items.append(f"[{name}](reference/modules/{m.name}.md)")
             else:
-                feats.append(f"[{_label(m)}](modules/{m.name}.md)")
-        lines += [f"## {n}", "", r.doc, ""]
-        if feats:
-            lines += [f"**Features:** {', '.join(feats)}.", ""]
-        if stock:
-            lines += ["**Stock effects:** all 14." if len(stock) == 14 else
-                      f"**Stock effects:** {', '.join(stock)}.", ""]
-        if n in patched:
-            lines += [f"**Build it:** in the [web builder](../web-builder.md), choose `{n}` under Community, "
-                      "or from source:", ""]
-        else:
-            lines += ["**Build it** from source, as in [Create a Remix](../own-remix.md) (the web builder "
-                      "does not have it yet):", ""]
-        lines += ["```bash", f"make image REMIX={n} BUILD=1", "```", "",
-                  f"Its selection and notes: [{n} on GitHub]({tree}/{n}).", ""]
-    lines += ["## Share yours", "",
-              "Add your remix under the community remixes on GitHub and open a pull request: [Create a Remix](../own-remix.md) has the steps and the "
-              f"[community remixes]({tree}) the others.", ""]
-    return "\n".join(lines)
+                items.append(f"[{name}]({_module_url(m)})")
+        lines += [f"**{author_md[author]}** — {', '.join(items)}.", ""]
+    return "\n".join(lines) + "\n"
 
 
-def module_page(m, mods, book) -> str:
+def module_page(m, mods, manual_page: dict) -> str:
     """One page per contributed module: the usage fragment (docs/site/usage/<name>.md) when one is written,
     else the manifest's line, then where the module is and its facts."""
     fragment = OUT.parent / pathlib.Path("usage") / f"{m.name}.md"
-    name, url, _ = who(m)
-    byline = html.escape(name)
-    if url:
-        byline = f'<a href="{html.escape(url)}">{byline}</a>'
-    lines = ["---", "not_in_nav: true", "---", "", f"# {_label(m)}", "", f'<p class="byline">By {byline}</p>', ""]
-    import gen_manual
+    who = html.escape(m.author or "?")
+    if m.author_url:
+        who = f'<a href="{html.escape(m.author_url)}">{who}</a>'
+    lines = ["---", "not_in_nav: true", "---", "", f"# {_label(m)}", "", f'<p class="byline">By {who}</p>', ""]
     import release
-    v = release.VERSION
-    target = gen_manual.published_pages(book).get(m.key)
-    if target:
-        ins = ", ".join(gen_manual.title(n) for n, _ in book.official if n in book.has.get(m.key, []))
-        lines += [f"This feature is in the {v} release ({ins}): see its [manual page](../manual/{target}).", ""]
-    else:
-        lines += [f'!!! note "Not in {v}"', f"    This feature is not in any {v} remix.", ""]
+    builder = getattr(release, "BUILDER_REMIXES", ()) or ()
+    in_builder = sorted(
+        n for n in builder
+        if m.key in set(registry.remix(n).modules))
+    if in_builder:
+        listed = ", ".join(f"`{n}`" for n in in_builder)
+        lines += [f"Ships in: {listed}.", ""]
     # Usage that leads with architecture diagrams: prose + path first, LCD
     # shots under ## Screens. Everyone else keeps a hero screen under the title.
-    _DIAGRAM_FIRST = frozenset({"void", "resonator", "shatter", "stuttr"})
+    _DIAGRAM_FIRST = frozenset({"cxosc", "void", "resonator", "shatter", "stuttr"})
     if m.name in _DIAGRAM_FIRST and fragment.is_file():
         lines += [f'--8<-- "usage/{m.name}.md"', ""]
         recs = _page_records(m)
@@ -335,37 +286,31 @@ def module_page(m, mods, book) -> str:
         else:
             lines += [m.doc, ""]
         lines += screen_reference(m)
-    rows = [f"| Author | {_author(m)} |",
-            f"| Category | {CATEGORY_TITLE[m.category or Category.REFERENCE]} |"]
-    if m.requires:
-        rows.append("| Requires | " + ", ".join(
-            f"[{k}]({mods[k].name}.md)" if k in mods and not mods[k].is_stock else k for k in m.requires) + " |")
-    if m.conflicts:
-        rows.append("| Conflicts | " + "; ".join(
-            (f"[{o}]({mods[o].name}.md)" if o in mods and not mods[o].is_stock else o) + f" — {why}"
-            for o, why in m.conflicts) + " |")
-    lines += ['??? note "Module facts"', ""]
-    lines += ["    " + line if line else "" for line in [m.doc, "", "| Detail | Value |", "|---|---|"] + rows + ["", f"On GitHub: {_module_url(m)}"]]
-    lines += ["", "[Feature directory](../modules.md)"]
     return "\n".join(lines) + "\n"
 
 
 def main(quiet: bool = False) -> int:
     import gen_manual
     import release
+    import shutil
     mods = registry.modules()
     official = [(n, registry.remix(n)) for n in release.REMIXES]
+    if OUT.exists():
+        shutil.rmtree(OUT)
     OUT.mkdir(parents=True, exist_ok=True)
     jobs = {}
-    book = gen_manual.Book(mods, official)
-    jobs["modules.md"] = directory_page(mods, book)
-    jobs["community.md"] = community_page(mods, book)
+    manual_page = gen_manual.published_pages(mods, official)
+    site_keys = _site_keys()
+    jobs["modules.md"] = directory_page(mods, manual_page)
+    jobs["_credits-shipped.md"] = shipped_credits_page(mods)
     for m in mods.values():
-        if not m.is_stock:
-            jobs[f"modules/{m.name}.md"] = module_page(m, mods, book)
+        if m.key not in site_keys:
+            continue
+        jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
     for name, r in official:
-        jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, book)) + "\n"
-    jobs.update(gen_manual.main(mods, official))
+        jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, r, mods)) + "\n"
+    if official:
+        jobs.update(gen_manual.main(mods, official))
     for name, text in sorted(jobs.items()):
         (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUT / name).write_text(text)
