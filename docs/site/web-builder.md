@@ -12,9 +12,7 @@ Every build includes [Scope](reference/modules/scope.md),
 [Persistent Buffers](reference/modules/persistent-buffers.md),
 [Rnd Name](reference/modules/rnd-name.md), and stock COMPRESSOR. PLATE and
 SPRING are harvested so the inserts fit. The matrix below only shows what
-differs: VOID / SHATTER / RESONATOR. Other lettered remixes (`base*`,
-`cx-stuttr`, …) stay in the repo for local flash; this page does not offer
-them.
+differs: VOID / SHATTER / RESONATOR.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),
