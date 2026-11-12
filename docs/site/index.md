@@ -1,40 +1,54 @@
-# Octabam
+# ilia · octabam
 
-*A love letter to the Octatrack*
+Eight Octatrack remixes for live sampling and sound design: a **base**
+family with Tim Hastie’s SYNTH MACHINE, and a **cx** family with
+[Complex Oscillator](reference/modules/cxosc.md) instead. Every image
+keeps [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV and stock
+COMPRESSOR, then swaps the space and glitch slots —
+[Void](reference/modules/void.md), [Shatter](reference/modules/shatter.md),
+[Stuttr](reference/modules/stuttr.md),
+[Resonator](reference/modules/resonator.md).
 
-Octabam adds community features to the Elektron Octatrack's operating
-system (OS 1.40C): Kits, templates, expanded scenes and parameter locks, USB
-audio and MIDI, and new effects. You build it in your browser from your own
-copy of OS 1.40C and install it from a CF card or over MIDI. This is
-**version 0.4**. Octabam is unofficial community software; see [About](about.md).
+Built with [octabam](https://sambanks.github.io/octabam/) from your own
+OS 1.40C. This site is the builder and the fork-module notes; the general
+manual, safety and FAQ stay upstream.
 
-## Unofficial firmware
+[**Build an image →**](web-builder.md)
+· [Credits](#credits)
+· [Upstream manual](https://sambanks.github.io/octabam/)
+· [Safety & FAQ](https://sambanks.github.io/octabam/safety.html)
 
-Octabam is unofficial firmware, not made, endorsed or supported by Elektron.
-Installing it is generally safe and can be reverted by reinstalling stock OS
-([Safety and Recovery](safety.md)). Elektron is not responsible for any
-damage to your Octatrack.
+Unofficial community firmware; not made, endorsed or supported by Elektron.
 
-## Get started
+## The two families
 
-1. Read [what is in Octabam](remix-octabam.md).
-2. [Build and install](web-builder.md) it.
-3. Use the [Octabam Remix Manual](reference/manual/octabam/index.md).
+| | Machine | What you pick next |
+|---|---|---|
+| **base\*** | Tim’s SYNTH MACHINE | Space + glitch: Void / Shatter / Stuttr / Resonator combinations |
+| **cx\*** | Complex Oscillator (panel **CX OSC**) | Same space + glitch matrix; no SYNTH MACHINE (same machine-list hooks) |
 
-## Everyday use
+Always on both: Scope, Copy Project, DARK REV, stock COMPRESSOR. PLATE and
+SPRING are harvested so the inserts fit. No tape echo, no sidechain — stock
+compressor stays.
 
-- Save templates or change defaults: [BRAIN](reference/manual/octabam/brain/index.md)
-- Assign a saved sound setup to a pattern: [Kits and patterns](reference/manual/octabam/parts/kits.md)
-- Lock parameters on an effect's second page: [Page 2 parameter locks](reference/manual/octabam/parts/plocks-p2.md)
-- Control MIDI tracks with scenes: [MIDI scenes](reference/manual/octabam/parts/midi-scenes.md)
-- Record MAIN and CUE on a computer: [USB audio and MIDI](reference/manual/octabam/midi-usb/usb.md)
-- Look up an effect or a feature: the [manual](reference/manual/octabam/index.md)
+Open [Build](web-builder.md), pick a lettered remix, flash the `.bin` /
+`.syx`, or boot an `.RMX` on a unit that already runs octabam.
 
-## Reading this manual
+## Why the split exists
 
-This manual describes the additions to stock OS and assumes you know tracks,
-Parts, patterns, scenes and the front panel. **Bold labels** are controls and
-menu items. An arrow is a menu path: **PROJ → BRAIN → TEMPLATES**. A plus
-sign is a key combination: hold **FUNC** while pressing the other key.
-Commands and filenames are in `monospace`. Screen illustrations are captured
-firmware screens; their values are examples.
+- **Complex Oscillator** is a local two-operator FM machine with a sine
+  wavefolder, derived from Tim’s FM SYNTH engine. It is not an edit of the
+  SYNTH MACHINE submodule, and it cannot share an image with it.
+- **Scope** overlays TUNER’s **DOWN+TEMPO** entry when both are present.
+  TUNER remains Tim’s.
+- Everything else in CORE — Kits, scenes, USB, Kyoti workflow modules,
+  and the rest in [Credits](#credits) — is still those authors’ work.
+
+## Credits
+
+Every non-stock module that appears in at least one `base*` / `cx*` image,
+plus the modules documented on this site. Authors and URLs come from each
+module's `manifest.py`.
+
+--8<-- "reference/_credits-shipped.md"
