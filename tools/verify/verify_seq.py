@@ -605,6 +605,26 @@ def check_ui(src: str) -> None:
           and "ef_tl_reconcile" in _block(src, "wm_mtl:", "9:")
           and "ef_cx_bits" in _block(src, "ef_tl_reconcile:", "ef_write_dest:")
           and "moveq   #31,%d1" in _block(src, "ef_tl_reconcile:", "ef_write_dest:"))
+    check("PULSE 0 shares ef_clear_dest_step with DEPTH 0 / miss (ignore stale pfree)",
+          "ef_clear_dest_step:" in src
+          and "ef_clear_dest_step" in _block(src, "wm_dest_clr:", "wm_mtl:")
+          and "bra.w   ef_clear_dest_step" in _block(src, "ed_clear:", "ed_store:")
+          and "tstl    ef_ppulses" in _block(src, "wm0b:", "wm_on:")
+          and "beq.s   wm_off" in _block(src, "wm0b:", "wm_on:")
+          and "ef_pfree" not in _block(src, "wm0b:", "wm_on:"))
+    check("FUNC+BANK clear LISTPOP over SEQ (no WDESTROY / ef_close)",
+          "ef_clear_menu:" in src
+          and "M_OPEN" in src and "EF_CL_CBS" in src
+          and "ef_cl_dest:" in src and "ef_cl_all:" in src
+          and "ef_cl_all_trigs:" in src
+          and "WDESTROY" not in _block(src, "ef_clear_menu:", "ef_cl_dest:")
+          and "ef_close" not in _block(src, "ef_clear_menu:", "ef_cl_dest:")
+          and "ef_bank_steal:" in src and "FUNC_BANK_PRESS" in src)
+    check("clear DEST resets depth/plock params immediately (list YES)",
+          "ef_reset_cur_plk:" in src
+          and "ef_reset_cur_plk" in _block(src, "ef_clear_cur_dest:", "ef_clear_all_dest:")
+          and "ef_clear_finish" in _block(src, "ef_clear_cur_dest:", "ef_clear_all_dest:")
+          and "LOCK_COLL" in _block(src, "ef_clear_finish:", "EF_LAYER:"))
     check("TRIG reshape keeps other DEST locks (reconcile SETs TL when !thit)",
           "tr_keep:" in _block(src, "ef_tl_reconcile:", "ef_write_dest:")
           and "ef_tl_set" in _block(src, "tr_keep:", "ef_write_dest:")
@@ -689,7 +709,8 @@ def check_ui(src: str) -> None:
           and "ef_rng" in dest
           and "subi.l  #64,%d0" not in dest)
     check("sequential: page-1 lock or ef_cx_store (CX SETUP stacks)",
-          "ef_cx_store" in dest and "ef_cx_clear" in dest
+          "ef_cx_store" in dest
+          and ("ef_cx_clear" in dest or "ef_clear_dest_step" in dest)
           and "LOCK_PTCH" not in dest)
     vol = _block(src, "ef_write_vol:", "ef_write_ptch:")
     check("ef_write_vol unipolar below Part VOL (r*DEPTH/127)",

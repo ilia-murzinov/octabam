@@ -38,6 +38,7 @@ comes from pattern length (not a knob).
 | E | DEPTH — 0..127, lock span around Part |
 | F | empty |
 | CUE | random placement of exactly PULSE hits on the focused lane |
+| FUNC + BANK | clear menu (LISTPOP over SEQ): CLEAR DEST / CLEAR ALL DEST / CLEAR ALL+TRIGS |
 | YES | write TRIG mask + current DEST locks (trigless where needed) |
 | NO | close |
 
@@ -84,10 +85,24 @@ still holds another DEST, it becomes trigless so those locks remain
 audible. **LANE = PLCK:** independent plock rhythm; plock-only → trigless
 (+0x10); miss / PULSE 0 clears this DEST on every step in range —
 including note trigs — so a PLCK YES **overwrites** locks previously placed
-from TRIG for that DEST (other DEST locks stay). PULSE 0 also drops orphan
+from TRIG for that DEST (other DEST locks stay). PULSE 0 uses the same
+clear helper as DEPTH 0 (stale free/CUE masks ignored) and drops orphan
 trigless bits when no other DEST remains on the step.
 
 YES writes **only** the selected DEST's lock bytes (plus the TRIG mask).
 A later YES with another DEST leaves earlier locks alone.
+
+**FUNC + BANK** while SEQ is open opens a three-row LISTPOP over the SEQ
+window (SEQ stays open; stock PATTERN SETTINGS when SEQ is closed):
+
+1. **CLEAR DEST** — wipe the focused DEST's locks on this track and reset
+   that DEST's DEPTH / PLOCK PULSE / ROT / free mask to 0.
+2. **CLEAR ALL DEST** — wipe every SEQ DEST on this track; leave sample
+   trigs; reset all per-DEST recipes for the track.
+3. **CLEAR ALL+TRIGS** — row 2, then wipe sample trigs and reset the TRIG
+   recipe (PULSE 5, ROT 0).
+
+List YES runs the clear immediately (no second SEQ YES). BANK again or NO
+closes the list.
 
 Manual site: [`docs/site/usage/seq.md`](../../docs/site/usage/seq.md).
