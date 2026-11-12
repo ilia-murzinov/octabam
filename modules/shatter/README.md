@@ -31,9 +31,9 @@ when the source is already hot.
 Page-2 MODE/TONE/RATE are easiest to hear with CLIP open and FDBK up
 (CLIP 100 bricks the path so HARD≈SOFT and CHAOS is easy to miss).
 
-Live icons (`ui.s`): FOLD and FDBK match CX OSC; CLIP squareizes; CRSH
-drops plateau count 8→2; MODE is brick / blob / shards; TONE is a shelf
-wedge; RATE is tick density. DRV, MIX, and LIM stay stock dials.
+Live icons (`ui.s`): FOLD and FDBK match CX OSC; CLIP sine→square; CRSH
+sample-hold steps; MODE is brick / blob / shards; TONE is a shelf wedge
+(flat at 64); RATE is tick density. DRV, MIX, and LIM stay stock dials.
 
 ## Storage and stock firmware
 
@@ -70,7 +70,7 @@ CRSH 40, FDBK 40, MIX 127, MODE HARD, TONE 64, RATE 64, LIM 0):
 | `cycle_count.py` (static) | 213 cycles/sample | 852 cycles/sample |
 
 Four FX2 slots per core; 852 ≪ 3120 usable (`cycle_count` USABLE). All four
-slots fit at those settings. LIM on adds the after-MIX envelope and `div`
+slots fit at those settings. LIM on is a hard ceiling (no `div`).
 (still well under the budget at four instances).
 
 ## On the unit
