@@ -281,10 +281,28 @@ def module_page(m, mods, manual_page: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _ensure_site_stock_stub() -> None:
+    """Tim manifests call stock_guard at import; Pages CI has no MAIN OS.
+
+    When OCTABAM_SITE_GEN=1 and the recon section is missing, write an
+    ephemeral zero-filled stub so credits can load author metadata. Never
+    for real builds. SITE_MODULES themselves do not need it.
+    """
+    import os
+    if os.environ.get("OCTABAM_SITE_GEN") != "1":
+        return
+    section = ROOT / "out" / "raw" / "section_3_MAIN_OS.bin"
+    if section.exists():
+        return
+    section.parent.mkdir(parents=True, exist_ok=True)
+    section.write_bytes(b"\0" * (8 * 1024 * 1024))
+
+
 def main(quiet: bool = False) -> int:
     import gen_manual
     import release
     import shutil
+    _ensure_site_stock_stub()
     mods = registry.modules()
     official = [(n, registry.remix(n)) for n in release.REMIXES]
     if OUT.exists():
