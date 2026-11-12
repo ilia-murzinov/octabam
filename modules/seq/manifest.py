@@ -4,8 +4,9 @@ Hold a track key and press PAGE: title SEQ, LEN gutter, stock 3x2 grid
 A=PULSE B=ROT C=LANE / D=DEST E=DEPTH (F empty). LANE focuses TRIG or
 PLOCK; YES writes sample trigs and DEST locks (write-only - never
 re-reads live trigs). Per-track / per-DEST params in euclid.work (STORE).
-CUE places a random k-subset with density PULSE. NO closes; bare PAGE
-does not.
+CUE places a random k-subset with density PULSE. FUNC+BANK opens a clear
+LISTPOP over SEQ (CLEAR DEST / ALL DEST / ALL+TRIGS). NO closes; bare
+PAGE does not.
 
 Independent of PROJECT > SEQUENCER (SCALE QUANTIZER) and of the EUCLID
 DSP effect. FUNC + PAGE (SCALE SETUP) stays stock.

@@ -35,6 +35,7 @@ grid, then write.
 | **`[NO]`** | Close the window |
 | Bare **`[PAGE]`** | Stock pattern pages / step banks; SEQ stays open |
 | Another **`[TRACK]`** while open | Switch SEQ to that track |
+| **`[FUNC]`** + **`[BANK]`** | Clear menu over SEQ (see below) |
 
 ## Lanes
 
@@ -97,8 +98,21 @@ destination, it becomes a **trigless trig**.
 
 **PLCK write.** Sample trigs stay. This destination clears on every miss,
 including on sample-trig steps, then writes on PLCK hits. **PULS 0** clears
-this destination across the pattern. Empty trigless steps drop when nothing
-else remains on them.
+this destination across the pattern the same way **DPTH 0** does (no need
+to zero depth). Empty trigless steps drop when nothing else remains on them.
+
+## Clear menu
+
+**`[FUNC]`** + **`[BANK]`** while SEQ is open opens a list on top of SEQ
+(SEQ stays open). Outside SEQ that chord is still stock PATTERN SETTINGS.
+
+| Row | Immediate result (list **`[YES]`**) |
+|---|---|
+| **CLEAR DEST** | Wipe the current destination's locks on this track. Reset that destination's **DPTH** / PLCK **PULS** / **ROT** to 0. |
+| **CLEAR ALL DEST** | Wipe every SEQ destination on this track. Leave sample trigs. Reset all destination recipes for the track. |
+| **CLEAR ALL+TRIGS** | Clear all destinations, then wipe sample trigs and reset the TRIG recipe (**PULS** 5). |
+
+No second SEQ **`[YES]`**. **`[NO]`** or **`[BANK]`** again closes the list.
 
 ## Examples
 
