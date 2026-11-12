@@ -6,7 +6,10 @@
 name: 📖 Pages
 on:
   push:
-    branches: [main]
+    # Fork Pages source is branch `ilia` (repo Settings → Pages). Upstream
+    # keeps `main` only; without `ilia` here, pushes to the stable tip never
+    # deploy and need a manual workflow_dispatch.
+    branches: [main, ilia]
   workflow_dispatch:
 permissions:
   contents: read
