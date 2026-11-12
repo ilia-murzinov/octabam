@@ -37,7 +37,7 @@
 <text class="kn-val-inv" x="636.0" y="58" text-anchor="middle">PLCK</text>
 <text class="kn-inv" x="668" y="64" text-anchor="end">C</text>
 <rect x="424" y="77" width="80" height="48" fill="#111" stroke="#111" stroke-width="2"/>
-<text class="kn-inv" x="430" y="92">DEST</text>
+<text class="kn-inv" x="430" y="92">SRC</text>
 <text class="kn-val-inv" x="464.0" y="112" text-anchor="middle">PTCH</text>
 <text class="kn-inv" x="496" y="118" text-anchor="end">D</text>
 <rect x="510" y="77" width="80" height="48" fill="#fff" stroke="#111" stroke-width="2"/>
@@ -46,9 +46,9 @@
 <text class="t-xs" x="582" y="118" text-anchor="end">E</text>
 <rect x="596" y="77" width="80" height="48" fill="#fff" stroke="#111" stroke-width="2"/>
 <text class="t-xs" x="668" y="118" text-anchor="end">F</text>
-<text class="t" x="550.0" y="162" text-anchor="middle">PLCK PULS=0 clears this DEST over the pattern length.</text>
+<text class="t" x="550.0" y="162" text-anchor="middle">PLCK with PULS 0 clears this destination over the pattern length.</text>
 <text class="t" x="262.0" y="200" text-anchor="middle">BEFORE</text>
-<text class="lab" x="86" y="251.12" text-anchor="end">note</text>
+<text class="lab" x="86" y="251.12" text-anchor="end">trig</text>
 <rect x="98" y="228" width="34" height="34" fill="#111" stroke="#111" stroke-width="2"/>
 <rect x="140" y="228" width="34" height="34" fill="#fff" stroke="#111" stroke-width="2"/>
 <rect x="182" y="228" width="34" height="34" fill="#111" stroke="#111" stroke-width="2"/>
@@ -84,7 +84,7 @@
 <text class="t-xs" x="367.0" y="402" text-anchor="middle">7</text>
 <text class="t-xs" x="409.0" y="402" text-anchor="middle">8</text>
 <text class="t" x="866.0" y="200" text-anchor="middle">AFTER</text>
-<text class="lab" x="690" y="251.12" text-anchor="end">note</text>
+<text class="lab" x="690" y="251.12" text-anchor="end">trig</text>
 <rect x="702" y="228" width="34" height="34" fill="#111" stroke="#111" stroke-width="2"/>
 <rect x="744" y="228" width="34" height="34" fill="#fff" stroke="#111" stroke-width="2"/>
 <rect x="786" y="228" width="34" height="34" fill="#111" stroke="#111" stroke-width="2"/>
@@ -121,13 +121,13 @@
 <text class="t-xs" x="1013.0" y="402" text-anchor="middle">8</text>
 <text class="t" x="533.0" y="279.0" text-anchor="middle">YES</text>
 <line class="arr" x1="480" y1="297.0" x2="586" y2="297.0"/>
-<text class="t-sm" x="702" y="428">PTCH gone everywhere in range</text>
-<text class="t-sm" x="702" y="446">notes and VOL still there</text>
-<text class="t-sm" x="550.0" y="504" text-anchor="middle">PULSE 0 + YES on PLCK is a DEST eraser. Notes stay.</text>
+<text class="t-sm" x="702" y="428">PTCH cleared across the pattern</text>
+<text class="t-sm" x="702" y="446">sample trigs and VOL stay</text>
+<text class="t-sm" x="550.0" y="504" text-anchor="middle">PLCK with PULS 0 clears this destination. Sample trigs stay.</text>
 <rect x="36" y="528" width="22" height="22" fill="#111" stroke="#111" stroke-width="2"/>
-<text class="t-sm" x="66" y="544">lock on a note</text>
+<text class="t-sm" x="66" y="544">lock on a sample trig</text>
 <rect x="286" y="528" width="22" height="22" fill="url(#hatch)" stroke="#111" stroke-width="2"/>
-<text class="t-sm" x="316" y="544">trigless lock</text>
+<text class="t-sm" x="316" y="544">trigless trig</text>
 <rect x="536" y="528" width="22" height="22" fill="#fff" stroke="#111" stroke-width="2"/>
 <text class="t-sm" x="566" y="544">no lock</text>
 </svg>

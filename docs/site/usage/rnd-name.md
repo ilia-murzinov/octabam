@@ -4,8 +4,8 @@ joins). Hold FUNC and press CUE.
 ## Access
 
 In a supported name editor, hold FUNC and press CUE. Stock FUNC + REC,
-PLAY and STOP (PASTE, CLEAR, COPY NAME) stay. Not in an official remix;
-build the test remix `rnd-name`.
+PLAY and STOP (PASTE, CLEAR, COPY NAME) stay. Build the test remix
+`rnd-name` to try it.
 
 ## Operation
 
@@ -22,6 +22,6 @@ build the test remix `rnd-name`.
 - Stock still seeds a new project's name with `PROJECT DDMMYY` until the
   chord runs. The date comes from the clock chip.
 - Pressing the chord again changes the words.
-- Measured on the port: FUNC+CUE on CREATE, SAVE PROJECT AS, and CHOOSE
-  NEW PROJECT NAME (`verify_rnd_name`). Sample, directory, set, Kit and
-  COPY PROJECT paths are not gated under the port.
+- CREATE, SAVE PROJECT AS, and CHOOSE NEW PROJECT NAME are proven under
+  the port. Sample, directory, set, Kit and COPY PROJECT paths follow the
+  same chord on the unit.

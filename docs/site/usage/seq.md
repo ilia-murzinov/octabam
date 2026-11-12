@@ -1,147 +1,163 @@
-**Euclidean sample trigs and p-locks.** The name **SEQ** is from the SEQ
-submenu on Digitakt II and Digitone II — same idea here as a dedicated
-TRACK+PAGE window, not a new PROJECT menu.
+**SEQ** places Euclidean **sample trigs** and **parameter locks** on one
+audio track. Named after the SEQ submenu on Digitakt II / Digitone II. On
+Octatrack it is its own window on the track.
 
-Hold a **TRACK** key and press **PAGE**: SEQ opens for that track. Stock
-3×2 knobs (PULSE / ROT / LANE / DEST / DEPTH; F empty), LEN on the left,
-and a 4×16 step grid (hollow = off, solid = on) for every step up to 64.
+Hold a **`[TRACK]`** key and press **`[PAGE]`**. SEQ opens for that track:
+title **SEQ**, the rings icon, a stock 3x2 DATA ENTRY grid, a step grid
+(hollow = off, solid = on; up to 4 rows of 16 for length 64), and **LEN**
+with the **pattern** step count at the bottom right.
 
-Edits sequencer trigs only. Not the DSP **EUCLID** effect. Leaves
-`PROJECT > CONTROL > SEQUENCER` alone, so it coexists with SCALE QUANTIZER.
+It writes **pattern** sequencer data.
 
 ## Access
 
-Hold a **TRACK** key and press **PAGE** — SEQ opens on that track.
-
-- **NO** closes the window.
-- Bare **PAGE** stays stock (step banks) and does not close SEQ.
-- Hold another **TRACK** while SEQ is open: YES retargets that track and
-  the panel loads its saved SEQ params from `euclid.work`.
-
-## Operation
-
-**LANE** (C) picks what A / B and the grid edit:
-
-| LANE | A / B / grid | YES |
-|---|---|---|
-| **TRIG** | sample-trig PULSE / ROT | Rewrites note trigs; reshapes **only the current DEST** onto those notes; syncs that DEST's PLCK recipe to the TRIG rhythm |
-| **PLCK** | this DEST's PLOCK PULSE / ROT | Leaves the note pattern; rewrites **only this DEST's** locks (trigless where there is no note); clears this DEST on misses — including on notes |
-
-DEST and DEPTH always apply on YES, even while LANE is TRIG. Scroll DEST
-to load that DEST's plock recipe into A/B when LANE is PLCK. Each DEST
-keeps its own PULSE / ROT / DEPTH (and free mask).
-
-The grid is **write-only**. Open and track-switch load the bank SEQ recipe
-only — they never pull live sample trigs into the grid. **YES** writes from
-PULSE / ROT (or a CUE mask) and overwrites the track.
-
-On TRIG, if the track already has sample trigs, PULSE / ROT / CUE first
-open **ARE YOU SURE?**. Dialog YES only unlocks the knobs — writing the
-pattern is a separate YES.
-
-## DEST and DEPTH
-
-DEST matches LFO SETUP PMTR (PAGE / PARAM). **0..29** page-1 flats
-(**AMP XVOL** skipped); on CX OSC also **30..34** SETUP slots (CAR / MOD /
-SYMM / FDBK / PWM).
-
-**DEPTH** (0..127): at 0, YES clears that DEST for the path in use.
-Non-zero:
-
-- **PTCH** — in-scale around Part PLAYBACK PTCH (misses fall back to Part).
-- **AMP VOL** — unipolar below Part AMP VOL.
-- **Any other DEST** — uniform `[Part±DEPTH]` clamped 0..127.
-
-## Persistence
-
-PULSE / ROT / DEST / LANE / free mask / per-DEST DEPTH and PLOCK rhythms
-persist in `euclid.work` (STORE client). Defaults: TRIG PULSE 5, DEST =
-AMP VOL, ROT / DEPTH / PLOCK PULSE 0, LANE = TRIG.
-
-CUE randomizes the focused lane only (density = PULSE).
-
-When a step's last lock is cleared, orphan trigless bits drop and the
-plock LED bitmap refreshes.
-
-## Controls
-
-| Control | Does |
+| Gesture | Result |
 |---|---|
-| TRACK + PAGE | open SEQ on that track |
-| TRACK (while open) | switch to that track's params / YES target |
-| A | PULSE of the focused lane |
-| B | ROT of the focused lane |
-| C | LANE — TRIG / PLCK |
-| D | DEST |
-| E | DEPTH |
-| F | empty |
-| CUE | random placement of exactly PULSE hits on the focused lane |
-| YES | write TRIG mask + current DEST locks (and trigless where needed) |
-| NO | close |
+| **`[TRACK]`** + **`[PAGE]`** | Open SEQ on that track |
+| **`[NO]`** | Close the window |
+| Bare **`[PAGE]`** | Stock pattern pages / step banks; SEQ stays open |
+| Another **`[TRACK]`** while open | Switch SEQ to that track |
+
+SEQ settings save with the **project** / bank.
+
+## DATA ENTRY map
+
+What the window shows (same cells as stock SETUP pages):
+
+| Knob | Label | Role |
+|---|---|---|
+| **A** | **PULS** | Hit count of the focused lane |
+| **B** | **ROT** | Rotation of the focused lane |
+| **C** | **LANE** | **TRIG** or **PLCK** |
+| **D** | page + param | Which parameter lock to write. Two lines, LFO SETUP **PMTR** style (**AMP** / **VOL**, **SRC** / **PTCH**, …). On **CX OSC** also **SRC** / **CAR** **MOD** **SYMM** **FDBK** **PWM** |
+| **E** | **DPTH** | How far locks swing from the Part value (**0** clears that destination) |
+| **F** | | Empty |
+
+**LEN** shows the active **pattern** length.
+
+## Lanes
+
+**LANE** (**C**) chooses what **A** / **B** and the step grid edit:
+
+| **LANE** | Grid / A / B | **`[YES]`** |
+|---|---|---|
+| **TRIG** | Sample-trig Euclidean | Rewrites **sample trigs**; places / reshapes locks for **only the current destination** on those steps; matches that destination's PLCK **PULS** / **ROT** to the TRIG rhythm |
+| **PLCK** | That destination's lock Euclidean | Leaves the sample-trig pattern; rewrites **only this destination's** locks (**trigless trigs** where there is no sample trig); clears this destination on misses, including on steps that still have a sample trig |
+
+Knob **D** / **E** stay live on **`[YES]`** even when **LANE** is **TRIG**.
+Scroll **D** while **LANE** is **PLCK** to load that destination's saved
+**PULS** / **ROT** into **A** / **B**. Each destination keeps its own
+**PULS**, **ROT**, **DPTH**, and free mask on the track.
+
+## Write-only grid
+
+Open and track-switch load the track's saved SEQ settings. The grid shows
+those.
+
+**`[YES]`** overwrites from **PULS** / **ROT** (or a **`[CUE]`** mask).
+
+If **LANE** is **TRIG** and the track already has sample trigs, changing
+**PULS** / **ROT** / **`[CUE]`** first opens stock **`"ARE YOU SURE?"`**
+with **`"EXISTING TRIGS IN THE PATTERN"`** / **`"WILL BE CLEARED ON NEXT FILL"`**.
+Dialog **`[YES]`** only unlocks the knobs. Writing the pattern is a second
+**`[YES]`**.
+
+**`[CUE]`** keeps **PULS** as density on the focused lane and only picks
+*which* steps are on. Editing **PULS** after a free **`[CUE]`** mask
+returns to Euclidean.
+
+## Destination and DPTH
+
+Knob **D** picks the lock target. **DPTH**:
+
+- **0.** **`[YES]`** clears that destination
+- **SRC** / **PTCH.** Locks stay in scale around the Part's **PLAYBACK** **PTCH**
+- **AMP** / **VOL.** Locks sit at or below the Part's **AMP** **VOL**
+- Anything else. Locks swing around the Part value by ± **DPTH**
+
+## What YES writes
+
+**LANE = TRIG.** Sample trigs follow **PULS** / **ROT**. Locks for **this
+destination** land on those steps (**DPTH** 0 clears them). Other
+destination locks stay. If a step loses its sample trig but still holds
+another destination, it becomes a **trigless trig** so those locks stay
+audible.
+
+**LANE = PLCK.** Sample trigs stay. This destination clears on every miss,
+including on sample-trig steps, then writes on PLCK hits (plock-only steps
+become **trigless trigs**). **PULS 0** clears this destination across the
+pattern. Empty trigless steps drop when nothing else remains on them.
+
+## Defaults
+
+TRIG **PULS** 5, destination **AMP** / **VOL**, **ROT** / **DPTH** / PLCK
+**PULS** 0, **LANE** = **TRIG**.
 
 ## Examples
 
-Black = lock on a note. Hatched = trigless lock. White = no lock.
+In the figures: black = lock on a sample trig; hatch = **trigless trig**;
+white = no lock.
 
-### Notes only (no DEST locks)
+### Sample trigs only
 
-Empty track. LANE = **TRIG**, DEST = **PTCH**, **DEPTH = 0**, set PULSE,
-**YES**:
+Empty track. **LANE** = **TRIG**, **D** = **SRC** / **PTCH**, **DPTH** = 0,
+set **PULS**, **`[YES]`**:
 
-![TRIG DEPTH 0 writes notes and clears PTCH.](../../img/seq/notes-only.png)
+![TRIG with DPTH 0 places sample trigs and clears PTCH.](../../img/seq/notes-only.png)
 
-Notes land. Current DEST locks are cleared because DEPTH is 0.
+Sample trigs land. Current destination locks clear because **DPTH** is 0.
 
-### Notes with pitch on the same steps
+### Sample trigs with pitch on the same steps
 
-LANE = **TRIG**, set PULSE / ROT, DEST = **PTCH**, DEPTH non-zero, **YES**.
-Notes land; PTCH locks sit on those same steps; this DEST's PLCK recipe is
-synced to the TRIG rhythm.
+**LANE** = **TRIG**, set **PULS** / **ROT**, **D** = **SRC** / **PTCH**,
+**DPTH** non-zero, **`[YES]`**. Sample trigs land; **PTCH** locks sit on
+those steps; that destination's PLCK **PULS** / **ROT** match the TRIG
+rhythm.
 
-### Stack a second DEST without touching the notes
+### Stack a second destination
 
-You already have notes + PTCH. Switch to LANE = **PLCK**, DEST =
-**AMP VOL**, set a different PULSE / ROT, **YES**:
+You already have sample trigs + **PTCH**. Switch to **LANE** = **PLCK**,
+**D** = **AMP** / **VOL**, set a different **PULS** / **ROT**, **`[YES]`**:
 
-![PLCK writes only VOL; notes and PTCH stay.](../../img/seq/stack-vol.png)
+![PLCK writes only VOL. Sample trigs and PTCH stay.](../../img/seq/stack-vol.png)
 
-VOL locks write on that plock rhythm (trigless where there is no note).
-Notes and PTCH stay.
+**VOL** locks follow the plock rhythm (**trigless trigs** where there is no
+sample trig). Sample trigs and **PTCH** stay.
 
-### Regenerate trigs — keep other DEST locks
+### Regenerate trigs, keep other destination locks
 
-You have notes with PTCH + VOL. Keep DEST = **PTCH**, change TRIG PULSE,
-**YES**:
+Sample trigs with **PTCH** + **VOL**. Keep **D** = **SRC** / **PTCH**,
+change TRIG **PULS**, **`[YES]`**:
 
-![TRIG YES reshapes only PTCH; VOL survives as trigless where notes drop.](../../img/seq/trig-reshape.png)
+![TRIG YES reshapes PTCH. VOL stays as trigless where sample trigs drop.](../../img/seq/trig-reshape.png)
 
-- **PTCH** (current DEST) is cleared on silent steps and rewritten on the
-  new notes.
-- **VOL** (other DEST) is **kept**. Where a note disappears but VOL remains,
-  the step becomes **trigless** so VOL stays audible.
+- **PTCH** (current destination) clears on silent steps and rewrites on the
+  new sample trigs.
+- **VOL** (other destination) is kept. Where a sample trig disappears but
+  **VOL** remains, the step becomes a **trigless trig**.
 
-### Overwrite one DEST from PLCK
+### Overwrite one destination from PLCK
 
-You placed PTCH on the notes from TRIG. Switch to LANE = **PLCK**, DEST =
-**PTCH**, change ROT, **YES**:
+**PTCH** was placed from **TRIG**. Switch to **LANE** = **PLCK**, **D** =
+**SRC** / **PTCH**, change **ROT**, **`[YES]`**:
 
-![PLCK YES clears PTCH on note misses; other DEST stacks stay.](../../img/seq/plck-overwrite.png)
+![PLCK YES rewrites PTCH. Other destination stacks stay.](../../img/seq/plck-overwrite.png)
 
-- **PTCH** is cleared on every miss — including on notes that still fire —
-  then written on the new PLCK hits (trigless if no note).
-- Other DEST stacks (VOL, FILTER, …) are untouched.
+- **PTCH** clears on every miss, including on sample trigs that still fire,
+  then writes on the new PLCK hits (**trigless trig** if no sample trig).
+- Other destination stacks (**VOL**, filter, …) stay.
 
-### Clear one DEST
+### Clear one destination
 
-LANE = **PLCK**, that DEST's **PULSE = 0**, **YES**:
+**LANE** = **PLCK**, that destination's **PULS** = 0, **`[YES]`**:
 
-![PLCK PULSE 0 clears PTCH; notes and other stacks stay.](../../img/seq/clear-dest.png)
+![PLCK with PULS 0 clears PTCH. Sample trigs and other stacks stay.](../../img/seq/clear-dest.png)
 
-Clears this DEST over the pattern length. Notes stay. Orphan trigless bits
-drop when nothing else remains on the step.
+Clears this destination over the pattern length. Sample trigs stay. Orphan
+trigless bits drop when nothing else remains on the step.
 
 ### CUE then YES
 
-Focus the lane (TRIG or PLCK), set **PULSE** to the hit count you want,
-press **CUE** (places exactly that many hits at random on that lane only),
-then **YES** to write.
+Focus the lane (**TRIG** or **PLCK**), set **PULS** to the hit count you
+want, press **`[CUE]`** (exactly that many hits at random on that lane),
+then **`[YES]`** to write.

@@ -1,13 +1,13 @@
 # Build
 
 Build a **base** / **cx** remix from your own Octatrack OS 1.40C in this
-browser tab. The OS file is read locally; nothing is uploaded. See
+browser tab. The OS file is read locally. Nothing is uploaded. See
 [who wrote what](index.md#credits) before you credit a feature.
 
 Always on: [Scope](reference/modules/scope.md),
 [Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
 PLATE and SPRING are harvested so the inserts fit.
-**base\*** includes Tim Hastie’s SYNTH MACHINE;
+**base\*** includes Tim Hastie's SYNTH MACHINE.
 **cx\*** includes [Complex Oscillator](reference/modules/cxosc.md) instead.
 
 General install, safety and FAQ:
@@ -44,7 +44,7 @@ The files contain Elektron's OS, so keep them to yourself.
 
 ## Install
 
-Card, MIDI and RMX steps match upstream —
+Card, MIDI and RMX steps match upstream:
 [Build and Install](https://sambanks.github.io/octabam/web-builder.html).
 Recovery and FAQ:
 [Safety & FAQ](https://sambanks.github.io/octabam/safety.html).
