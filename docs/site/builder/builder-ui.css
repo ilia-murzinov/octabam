@@ -197,6 +197,12 @@
   margin: 0;
 }
 
+#octabam-builder .ob-always-on {
+  margin: 0 0 0.55rem;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
 #octabam-builder .ob-features {
   font: inherit;
   font-size: 0.8em;
