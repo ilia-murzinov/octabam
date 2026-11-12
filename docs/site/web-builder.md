@@ -1,14 +1,16 @@
 # Build
 
-Build a **base** / **cx** remix from your own Octatrack OS 1.40C in this
-browser tab. The OS file is read locally. Nothing is uploaded. See
-[who wrote what](index.md#credits) before you credit a feature.
+Build a **cx** / **cx-reson** / **cx-vres** image from your own Octatrack
+OS 1.40C in this browser tab. The OS file is read locally. Nothing is
+uploaded. See [who wrote what](index.md#credits) before you credit a
+feature.
 
 Always on: [Scope](reference/modules/scope.md),
-[Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR.
-PLATE and SPRING are harvested so the inserts fit.
-**base\*** includes Tim Hastie's SYNTH MACHINE.
-**cx\*** includes [Complex Oscillator](reference/modules/cxosc.md) instead.
+[Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR,
+[Complex Oscillator](reference/modules/cxosc.md). PLATE and SPRING are
+harvested so the inserts fit. The three builds swap VOID / SHATTER /
+RESONATOR. Other lettered remixes (`base*`, `cx-stuttr`, …) stay in the
+repo for local flash; this page does not offer them.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),

@@ -8,60 +8,18 @@
   "SCOPE",
   "COPY PROJECT",
   "DARK REV",
-  "SYNTH",
   "CX OSC",
   "VOID",
   "RESONATOR",
-  "SHATTER",
-  "STUTTR"
+  "SHATTER"
  ],
  "features": {
-  "base": [
-   "COPY PROJECT",
-   "DARK REV",
-   "SCOPE",
-   "SHATTER",
-   "SYNTH",
-   "VOID"
-  ],
-  "base-stuttr": [
-   "COPY PROJECT",
-   "DARK REV",
-   "SCOPE",
-   "STUTTR",
-   "SYNTH",
-   "VOID"
-  ],
-  "base-reson": [
-   "COPY PROJECT",
-   "DARK REV",
-   "RESONATOR",
-   "SCOPE",
-   "SHATTER",
-   "SYNTH"
-  ],
-  "base-vres": [
-   "COPY PROJECT",
-   "DARK REV",
-   "RESONATOR",
-   "SCOPE",
-   "SYNTH",
-   "VOID"
-  ],
   "cx": [
    "COPY PROJECT",
    "CX OSC",
    "DARK REV",
    "SCOPE",
    "SHATTER",
-   "VOID"
-  ],
-  "cx-stuttr": [
-   "COPY PROJECT",
-   "CX OSC",
-   "DARK REV",
-   "SCOPE",
-   "STUTTR",
    "VOID"
   ],
   "cx-reson": [
@@ -83,74 +41,6 @@
  },
  "remixes": [
   {
-   "name": "base",
-   "title": "base",
-   "version": "OCTABAMJ3",
-   "imageName": "BASE J3",
-   "patch": "patches/base.obp",
-   "patchBytes": 140783,
-   "sha256": "4e7903986cafb4c959f19fd088cae3ecaabaebfdd3bca11530dabeaffa041b82",
-   "features": [
-    "COPY PROJECT",
-    "DARK REV",
-    "SCOPE",
-    "SHATTER",
-    "SYNTH",
-    "VOID"
-   ]
-  },
-  {
-   "name": "base-stuttr",
-   "title": "base-stuttr",
-   "version": "OCTABAMJ3",
-   "imageName": "BASE-STUTTR J3",
-   "patch": "patches/base-stuttr.obp",
-   "patchBytes": 140437,
-   "sha256": "ca418bdfad0ce13b399e87b5ba5e67bac21261da4de36af8db390709f5d25b8a",
-   "features": [
-    "COPY PROJECT",
-    "DARK REV",
-    "SCOPE",
-    "STUTTR",
-    "SYNTH",
-    "VOID"
-   ]
-  },
-  {
-   "name": "base-reson",
-   "title": "base-reson",
-   "version": "OCTABAMJ3",
-   "imageName": "BASE-RESON J3",
-   "patch": "patches/base-reson.obp",
-   "patchBytes": 139853,
-   "sha256": "dd3519105a0157da152db801717b2827f01e6e496e765a801f2d1ad359b3d455",
-   "features": [
-    "COPY PROJECT",
-    "DARK REV",
-    "RESONATOR",
-    "SCOPE",
-    "SHATTER",
-    "SYNTH"
-   ]
-  },
-  {
-   "name": "base-vres",
-   "title": "base-vres",
-   "version": "OCTABAMJ3",
-   "imageName": "BASE-VRES J3",
-   "patch": "patches/base-vres.obp",
-   "patchBytes": 140410,
-   "sha256": "68bbe59f4c2a6affa14133819d324ec49767033c0f864d9c908a752522e11dc2",
-   "features": [
-    "COPY PROJECT",
-    "DARK REV",
-    "RESONATOR",
-    "SCOPE",
-    "SYNTH",
-    "VOID"
-   ]
-  },
-  {
    "name": "cx",
    "title": "cx",
    "version": "OCTABAMJ3",
@@ -164,23 +54,6 @@
     "DARK REV",
     "SCOPE",
     "SHATTER",
-    "VOID"
-   ]
-  },
-  {
-   "name": "cx-stuttr",
-   "title": "cx-stuttr",
-   "version": "OCTABAMJ3",
-   "imageName": "CX-STUTTR J3",
-   "patch": "patches/cx-stuttr.obp",
-   "patchBytes": 124810,
-   "sha256": "b559841ee08a04a587d308862985ae8f644c41289a9b9cd2dc10cf8bf4417545",
-   "features": [
-    "COPY PROJECT",
-    "CX OSC",
-    "DARK REV",
-    "SCOPE",
-    "STUTTR",
     "VOID"
    ]
   },
