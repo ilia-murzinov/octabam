@@ -77,7 +77,7 @@ MODULE = Module(
         Param(b"SCAL", 8, 128, active=True, formatter=_PLAIN,
               doc="gain scale: 8 is tame, 127 is a smash"),
         Param(b"LIM", 0, 128, active=True, formatter=_PLAIN,
-              doc="brickwall after MIX; 0 off, 1..127 ≈ -2.5..-12 dB ceiling"),
+              doc="brickwall after MIX; 0 off, 1..127 ≈ -2.5..-18 dB ceiling"),
     ),
     dsp=DspSection(
         asm="modules/resonator/resonator.asm",
