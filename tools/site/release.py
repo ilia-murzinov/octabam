@@ -8,9 +8,9 @@ module pages this Pages site generates.
 VERSION = "v0.4"
 REMIXES = ()
 
+# Web builder offers these only. base* / cx-stuttr stay in remixes/ for local flash.
 BUILDER_REMIXES = (
-    "base", "base-stuttr", "base-reson", "base-vres",
-    "cx", "cx-stuttr", "cx-reson", "cx-vres",
+    "cx", "cx-reson", "cx-vres",
 )
 
 # Module keys authored by Ilia — documented on this site.
@@ -31,21 +31,14 @@ BUILDER_FEATURE_ROWS = (
     "SCOPE",
     "COPY PROJECT",
     "DARK REV",
-    "SYNTH",
     "CX OSC",
     "VOID",
     "RESONATOR",
     "SHATTER",
-    "STUTTR",
 )
 
 BUILDER_FEATURES = {
-    "base":        {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "SHATTER"},
-    "base-stuttr": {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "STUTTR"},
-    "base-reson":  {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "RESONATOR", "SHATTER"},
-    "base-vres":   {"SCOPE", "COPY PROJECT", "DARK REV", "SYNTH", "VOID", "RESONATOR"},
-    "cx":          {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "SHATTER"},
-    "cx-stuttr":   {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "STUTTR"},
-    "cx-reson":    {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "RESONATOR", "SHATTER"},
-    "cx-vres":     {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "RESONATOR"},
+    "cx":       {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "SHATTER"},
+    "cx-reson": {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "RESONATOR", "SHATTER"},
+    "cx-vres":  {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "RESONATOR"},
 }
