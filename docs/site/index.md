@@ -6,7 +6,7 @@ family with Tim Hastie's SYNTH MACHINE, and a **cx** family with
 keeps [Scope](reference/modules/scope.md),
 [Copy Project](reference/modules/copy-project.md), DARK REV and stock
 COMPRESSOR, then swaps the space and glitch slots:
-[Void](reference/modules/void.md), [Shatter](reference/modules/shatter.md),
+[Void](reference/modules/void.md), [SHATTER](reference/modules/shatter.md),
 [Stuttr](reference/modules/stuttr.md),
 [Resonator](reference/modules/resonator.md).
 
@@ -25,7 +25,7 @@ Unofficial community firmware. Not made, endorsed or supported by Elektron.
 
 | | Machine | What you pick next |
 |---|---|---|
-| **base\*** | Tim's SYNTH MACHINE | Space + glitch: Void / Shatter / Stuttr / Resonator combinations |
+| **base\*** | Tim's SYNTH MACHINE | Space + glitch: Void / SHATTER / Stuttr / Resonator combinations |
 | **cx\*** | Complex Oscillator (panel **CX OSC**) | Same space + glitch matrix. No SYNTH MACHINE (same machine-list hooks) |
 
 Always on both: Scope, Copy Project, DARK REV, stock COMPRESSOR. PLATE and
