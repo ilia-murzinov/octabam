@@ -458,12 +458,22 @@ def run_scenarios() -> int:
         port.press("cue", settle=700)
         check("CUE while baked opens ARE YOU SURE? (ef_ask)",
               port.long(s.ask) != 0, f"ask={port.long(s.ask)}")
+        check("CUE while baked soft-hides SEQ (dialog not under SEQ)",
+              port.long(s.ef) == 0, f"ef_win={port.long(s.ef):#x}")
         check("CUE while baked does not change trigs yet", mask_of(port) == baked)
         check("CUE while baked leaves from_cue clear", port.long(s.from_cue) == 0)
+        # Knob poll must not recreate SEQ on top of the dialog.
+        port.proc.command(f"knob {0x30:#x} 1", "ok")
+        port.run(200)
+        check("knob while dialog keeps SEQ soft-hidden",
+              port.long(s.ask) != 0 and port.long(s.ef) == 0,
+              f"ask={port.long(s.ask)} win={port.long(s.ef):#x}")
         # Dialog YES unlocks only.
         port.press("yes", settle=700)
         check("dialog YES clears ef_ask", port.long(s.ask) == 0)
         check("dialog YES sets ef_unlocked", port.long(s.unlocked) != 0)
+        check("dialog YES restores SEQ", port.long(s.ef) != 0,
+              f"ef_win={port.long(s.ef):#x}")
         check("dialog YES leaves sample trigs untouched", mask_of(port) == baked)
         # Second CUE now randomizes free mask.
         port.press("cue", settle=700)

@@ -379,6 +379,7 @@ def check_ui(src: str) -> None:
           "ef_rhythm_gate" in nudge and "ARE YOU SURE?" in src)
     check("CUE gates through ef_rhythm_gate when baked",
           "ef_rhythm_gate" in _block(src, "ef_cue:", "cue_go:"))
+    gate = _block(src, "\nef_rhythm_gate:", "\nef_dlg_answer:")
     check("ARE YOU SURE? stock DIALOG; YES unlocks only; soft-restore",
           "DIALOG" in src and "ef_dlg_answer" in src and "ef_unlocked" in src
           and "ef_dlg_guard" in src and "ef_need_restore" in src
@@ -390,6 +391,13 @@ def check_ui(src: str) -> None:
           and "ef_clr_trigs" not in src
           and "ef_soft_layer" not in src
           and "ef_fill" not in _block(src, "ef_dlg_answer:", "ef_trk_baked:"))
+    check("ARE YOU SURE? soft-hides SEQ before DIALOG (not under SEQ)",
+          "jsr     WDESTROY" in gate and "ef_need_restore" in gate
+          and "jsr     DIALOG" in gate
+          and gate.find("jsr     WDESTROY") < gate.find("jsr     DIALOG"))
+    poll = _block(src, "\nef_cl_poll:", "\nef_cl_close:")
+    check("ef_cl_poll skips restore while ARE YOU SURE? (ef_ask)",
+          "ef_ask" in poll and poll.find("ef_ask") < poll.find("ef_cl_ours"))
     close = _block(src, "ef_close:", "ef_no:")
     soft = re.search(
         r"tstl\s+ef_dlg_guard\s*\n\s*beq\.s\s+close_nosoft\n(.*?)close_nosoft:",
