@@ -58,9 +58,9 @@ the Part.
 - Render gates in `tools/verify/verify_resonator.py` (SCAL 8 max-knob rail
   fraction < 5%, SCAL 127 + LIM 1 peak under ~0.8 FS with rail fraction
   < 5%, no-runaway, two FX1 instances).
-- LIM curve: thresh `0.75 - LIM*0.25/128` (floor 0.5, ≈ -2.5..-6 dB).
-  Keeps SCAL smash loud at max LIM. LIM 0 skips GR so MIX 0 stays
-  bit-exact dry.
+- LIM curve: thresh `0.75 - LIM*0.5/128` (floor 0.25, ≈ -2.5..-12 dB).
+  Mid between the too-quiet -18 and too-hot -6 floors. LIM 0 skips GR
+  so MIX 0 stays bit-exact dry.
 - Earlier hardware (pre-LIM): Ilia's MKII, tip of PR #806 as **`RESON RR`**
   / BUILD RR, 19 Oct 2026. Page-1 GN1–4, DECY low and high, MIX; page-2
   PIT1–4; SCAL 8 and 127; FX2 dry-pass; two FX1 instances. This tip is
