@@ -17,9 +17,11 @@
 | PART / AED / ARR in EF_KEYS (a 0 swallows; a -1 still writes
 | aux/sub-map 0 and can break DOWN / step-bank PAGE). Bare PAGE never
 | closes Euclid (stock step banks while open); only TRACK+PAGE toggles
-| and NO closes. Soft dialog KEEPS EF_LAYER so ef_ask still locks
-| knobs; user/orphan close LPOPs. LEVEL encoder dead; no cursor
-| invert. CUE = free random k-subset.
+| and NO closes. ARE YOU SURE? soft-hides the SEQ window (WDESTROY)
+| but KEEPS EF_LAYER so ef_ask still locks knobs; answer restores.
+| ef_cl_poll must not recreate SEQ while ef_ask (dialog behind).
+| User/orphan close LPOPs. LEVEL encoder dead; no cursor invert.
+| CUE = free random k-subset.
 |
 | DEST = LFO SETUP PMTR targets that Euclid can drive:
 |   0..29 page-1 lock flats (skip AMP XVOL=17). Labels PAGE+PARAM.
@@ -2677,8 +2679,9 @@ ef_bit_addr:
 
 | ef_rhythm_gate: for PULSE/ROT/CUE. d0 := 1 if blocked (baked, not
 | unlocked) - stock ARE YOU SURE? dialog. YES unlocks knobs/CUE only;
-| NO cancels. Trig rewrite stays on fill YES. Class-1 dialog evicts
-| this window; ef_close soft-restores after the answer.
+| NO cancels. Trig rewrite stays on fill YES. Soft-hide SEQ before
+| DIALOG (class-1 alone left SEQ on top / dialog behind on HW). Keep
+| EF_LAYER; answer restores via ef_mkwin.
 ef_rhythm_gate:
         tstl    ef_unlocked
         bne.s   erg_ok
@@ -2691,8 +2694,14 @@ ef_rhythm_gate:
         bne.s   erg_block
         moveq   #1,%d0
         movel   %d0,ef_ask
-        movel   %d0,ef_dlg_guard        | soft-close if class-5 is evicted
-        pea     ef_dlg_answer
+        movel   %d0,ef_dlg_guard        | soft-close keeps EF_LAYER
+        tstl    ef_win
+        beq.s   erg_dlg
+        movel   %d0,ef_need_restore
+        pea     ef_win
+        jsr     WDESTROY                | hide SEQ under ARE YOU SURE?
+        addql   #4,%sp
+erg_dlg: pea     ef_dlg_answer
         pea     3
         pea     ef_clr_lines
         pea     2                       | two body lines (no YES/NO crib)
@@ -2814,10 +2823,15 @@ eco_no: moveq   #0,%d0
         rts
 
 | Safety net: LISTPOP NO without our cancel layer. If dlg_guard is set
-| and our list is gone, recreate SEQ.
+| and our CLEAR list is gone, recreate SEQ. Do NOT treat ARE YOU SURE?
+| the same way: ef_enc polls every knob turn, and restoring SEQ while
+| ef_ask is set stacked the window on top of the dialog (HW: dialog
+| behind SEQ).
 ef_cl_poll:
         tstl    ef_dlg_guard
         beq.s   ecp_rts
+        tstl    ef_ask                  | stock dialog still owns the screen
+        bne.s   ecp_rts
         bsr.w   ef_cl_ours
         tstl    %d0
         bne.s   ecp_rts
