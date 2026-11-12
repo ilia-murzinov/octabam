@@ -5,12 +5,13 @@ OS 1.40C in this browser tab. The OS file is read locally. Nothing is
 uploaded. See [who wrote what](index.md#credits) before you credit a
 feature.
 
-Always on: [Scope](reference/modules/scope.md),
-[Copy Project](reference/modules/copy-project.md), DARK REV, stock COMPRESSOR,
-[Complex Oscillator](reference/modules/cxosc.md). PLATE and SPRING are
-harvested so the inserts fit. The three builds swap VOID / SHATTER /
-RESONATOR. Other lettered remixes (`base*`, `cx-stuttr`, …) stay in the
-repo for local flash; this page does not offer them.
+Every build includes [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV, stock
+COMPRESSOR, and [Complex Oscillator](reference/modules/cxosc.md). PLATE
+and SPRING are harvested so the inserts fit. The matrix below only shows
+what differs: VOID / SHATTER / RESONATOR. Other lettered remixes
+(`base*`, `cx-stuttr`, …) stay in the repo for local flash; this page
+does not offer them.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),
