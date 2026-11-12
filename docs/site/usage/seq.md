@@ -10,6 +10,23 @@ with the **pattern** step count at the bottom right.
 It writes **pattern** sequencer data. Settings save with the **project** /
 bank.
 
+## Mental model
+
+Think of the track as stacked rhythms, not one step grid.
+
+**Sample trigs** are one rhythm: when the machine plays. Each **parameter
+lock** destination is its own rhythm: when pitch moves, when volume ducks,
+when a filter opens. Those rhythms live side by side on the same track.
+They can line up, or they can disagree.
+
+SEQ is how you paint those layers with Euclidean density and rotation.
+Focus the sample-trig layer when you want hits. Focus a destination when
+you want that parameter's motion. Other layers stay put until you choose
+them.
+
+Nothing hits the **pattern** until **`[YES]`**. Dial the shape, watch the
+grid, then write.
+
 ## Open and leave
 
 | Gesture | Result |
@@ -31,9 +48,6 @@ On each track SEQ keeps:
 **LANE** (**C**) chooses which lane **A** / **B** and the step grid edit.
 Scroll **D** on **PLCK** to load that destination's **PULS** / **ROT** into
 **A** / **B**.
-
-One track can hold sample trigs on one Euclidean, **PTCH** locks on another,
-**VOL** locks on a third.
 
 | **LANE** | What you edit | What **`[YES]`** does |
 |---|---|---|
@@ -85,11 +99,6 @@ destination, it becomes a **trigless trig**.
 including on sample-trig steps, then writes on PLCK hits. **PULS 0** clears
 this destination across the pattern. Empty trigless steps drop when nothing
 else remains on them.
-
-## Defaults
-
-TRIG **PULS** 5, destination **AMP** / **VOL**, **ROT** / **DPTH** / PLCK
-**PULS** 0, **LANE** = **TRIG**.
 
 ## Examples
 
