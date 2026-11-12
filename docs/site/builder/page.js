@@ -87,6 +87,9 @@ const FEAT_SHORT = {
   "RESONATOR": "RESON",
   "SHATTER": "SHTR",
   "STUTTR": "STUT",
+  "SEQ": "SEQ",
+  "PERSISTENT BUFFERS": "PBUF",
+  "RND NAME": "RND",
 };
 
 function featureTable(manifest, rows) {
