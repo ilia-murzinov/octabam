@@ -39,8 +39,8 @@ Open [Build](web-builder.md), pick a lettered remix, flash the `.bin` /
 - **Complex Oscillator** is a local two-operator FM machine with a sine
   wavefolder, derived from Tim's FM SYNTH engine. It takes the same
   machine-list seat as SYNTH MACHINE, so each image picks one.
-- **Scope** overlays TUNER's **DOWN+TEMPO** entry when both are present.
-  TUNER remains Tim's.
+- **Scope** overlays TUNER's **`[DOWN]` + `[TEMPO]`** entry when both are
+  present. TUNER remains Tim's.
 - Everything else in CORE (Kits, scenes, USB, Kyoti workflow modules,
   and the rest in [Credits](#credits)) is still those authors' work.
 
