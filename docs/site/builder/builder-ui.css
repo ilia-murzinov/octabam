@@ -203,6 +203,13 @@
   opacity: 0.85;
 }
 
+#octabam-builder .ob-always-on a,
+#octabam-builder .ob-features th a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 #octabam-builder .ob-features {
   font: inherit;
   font-size: 0.8em;

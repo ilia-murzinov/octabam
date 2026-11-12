@@ -92,6 +92,27 @@ const FEAT_SHORT = {
   "RND NAME": "RND",
 };
 
+/** Module key → docs/site/reference/modules/<slug>.html (mkdocs). */
+const FEAT_HREF = {
+  "SCOPE": "../reference/modules/scope/",
+  "COPY PROJECT": "../reference/modules/copy-project/",
+  "CX OSC": "../reference/modules/cxosc/",
+  "VOID": "../reference/modules/void/",
+  "RESONATOR": "../reference/modules/resonator/",
+  "SHATTER": "../reference/modules/shatter/",
+  "STUTTR": "../reference/modules/stuttr/",
+  "SEQ": "../reference/modules/seq/",
+  "PERSISTENT BUFFERS": "../reference/modules/persistent-buffers/",
+  "RND NAME": "../reference/modules/rnd-name/",
+};
+
+function featLabel(feat, { link = true } = {}) {
+  const text = FEAT_SHORT[feat] || feat;
+  const href = link ? FEAT_HREF[feat] : null;
+  if (!href) return document.createTextNode(text);
+  return el("a", { href, title: feat }, text);
+}
+
 function featureTable(manifest, rows) {
   const featureRows = manifest.featureRows || [];
   const alwaysOn = manifest.alwaysOn || [];
@@ -102,11 +123,7 @@ function featureTable(manifest, rows) {
   const table = el("table", { className: "ob-features" });
   const head = el("tr", {}, el("th", { scope: "col", className: "ob-corner" }, "REMIX"));
   for (const feat of featureRows) {
-    head.append(el("th", {
-      scope: "col",
-      title: feat,
-      textContent: FEAT_SHORT[feat] || feat,
-    }));
+    head.append(el("th", { scope: "col", title: feat }, featLabel(feat)));
   }
   table.append(el("thead", {}, head));
 
@@ -148,11 +165,13 @@ function featureTable(manifest, rows) {
 
   const kids = [];
   if (alwaysOn.length) {
-    const labels = alwaysOn.map((f) => FEAT_SHORT[f] || f).join(" · ");
-    kids.push(el("p", {
-      className: "ob-always-on",
-      textContent: `Every build includes ${labels}.`,
-    }));
+    const line = el("p", { className: "ob-always-on" }, "Every build includes ");
+    alwaysOn.forEach((f, i) => {
+      if (i) line.append(document.createTextNode(" · "));
+      line.append(featLabel(f));
+    });
+    line.append(document.createTextNode("."));
+    kids.push(line);
   }
   kids.push(table);
   return el("div", { className: "ob-features-wrap" }, ...kids);
