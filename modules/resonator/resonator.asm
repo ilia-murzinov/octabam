@@ -21,8 +21,9 @@
 ; DECY high → low damp.
 ;
 ; LIM (slot 11): stereo-linked peak GR after MIX. Instant attack, release
-; ~63 ms. thresh = 0.75 - LIM*0.625/128 (floor 0.125) into $29 (0 = off).
-; LIM 1 ≈ -2.5 dB, LIM 127 ≈ -18 dB. Block-rate g = thresh/max(level,thresh)
+; ~63 ms. thresh = 0.75 - LIM*0.4/128 (floor 0.35) into $29 (0 = off).
+; LIM 1 ≈ -2.5 dB, LIM 127 ≈ -9 dB. Milder than SHATTER's -18 dB floor —
+; SCAL smash needs catch, not a mute. Block-rate g = thresh/max(level,thresh)
 ; into $2b. Nested do+div inside the sample DO is forbidden; no rep in proc.
 ; MIX 0 is bit-exact dry when LIM is 0.
 ;
@@ -154,11 +155,11 @@ proc:
         beq     rslim0
         asl     #$8,a,a                 ; LIM<<16
         move    a,x0
-        move    #>$500000,y1            ; 0.625
-        mpy     x0,y1,a                 ; LIM*0.625/128
+        move    #>$333333,y1            ; 0.4
+        mpy     x0,y1,a                 ; LIM*0.4/128
         move    #>$600000,b             ; 0.75
-        sub     a,b                     ; 0.75 - LIM*0.625/128
-        move    #>$100000,x0            ; floor 0.125 (~-18 dB)
+        sub     a,b                     ; 0.75 - LIM*0.4/128
+        move    #>$2ccccd,x0            ; floor 0.35 (~-9 dB)
         cmp     x0,b
         tlt     x0,b
         move    b,x:(r7+$29)            ; thresh

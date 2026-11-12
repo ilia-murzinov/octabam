@@ -34,4 +34,4 @@ Select a track, press **`[FX1]`**, pick **RESONATOR**.
 | PIT3 | 0..127 | 64 | band 3 centre |
 | PIT4 | 0..127 | 80 | band 4 centre |
 | SCAL | 0..127 | 8 | gain scale; 8=tame, 127≈smash |
-| LIM | 0..127 | 0 | brickwall after MIX; 0 off, 1..127 ≈ -2.5..-18 dB |
+| LIM | 0..127 | 0 | brickwall after MIX; 0 off, 1..127 ≈ -2.5..-9 dB |
