@@ -104,6 +104,7 @@ def main():
 
     manifest = {"version": release.VERSION, "commit": commit, "dev": dirty or behind, "build": args.build,
                 "date": datetime.date.today().isoformat(),
+                "alwaysOn": list(getattr(release, "BUILDER_ALWAYS_ON", ())),
                 "featureRows": list(getattr(release, "BUILDER_FEATURE_ROWS", ())),
                 "features": {k: sorted(v) for k, v in getattr(release, "BUILDER_FEATURES", {}).items()},
                 "remixes": rows}

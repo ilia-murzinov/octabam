@@ -91,6 +91,7 @@ const FEAT_SHORT = {
 
 function featureTable(manifest, rows) {
   const featureRows = manifest.featureRows || [];
+  const alwaysOn = manifest.alwaysOn || [];
   const byRemix = manifest.features || Object.fromEntries(
     rows.map((r) => [r.name, r.features || []]));
   if (!featureRows.length || !rows.length) return null;
@@ -142,7 +143,16 @@ function featureTable(manifest, rows) {
     cell.classList.add("ob-cell-hover");
   });
 
-  return el("div", { className: "ob-features-wrap" }, table);
+  const kids = [];
+  if (alwaysOn.length) {
+    const labels = alwaysOn.map((f) => FEAT_SHORT[f] || f).join(" · ");
+    kids.push(el("p", {
+      className: "ob-always-on",
+      textContent: `Every build includes ${labels}.`,
+    }));
+  }
+  kids.push(table);
+  return el("div", { className: "ob-features-wrap" }, ...kids);
 }
 
 /** Custom dropdown — theme nukes native <select> chrome. */

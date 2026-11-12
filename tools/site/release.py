@@ -27,10 +27,16 @@ SITE_MODULES = (
     "RND NAME",
 )
 
-BUILDER_FEATURE_ROWS = (
+# Every BUILDER_REMIXES image has these; the matrix does not repeat them.
+BUILDER_ALWAYS_ON = (
     "SCOPE",
     "COPY PROJECT",
     "DARK REV",
+)
+
+# Differentiating columns only (CX OSC is on every offered remix too, but
+# it stays in the matrix as the machine seat).
+BUILDER_FEATURE_ROWS = (
     "CX OSC",
     "VOID",
     "RESONATOR",
@@ -38,7 +44,7 @@ BUILDER_FEATURE_ROWS = (
 )
 
 BUILDER_FEATURES = {
-    "cx":       {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "SHATTER"},
-    "cx-reson": {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "RESONATOR", "SHATTER"},
-    "cx-vres":  {"SCOPE", "COPY PROJECT", "DARK REV", "CX OSC", "VOID", "RESONATOR"},
+    "cx":       {"CX OSC", "VOID", "SHATTER"},
+    "cx-reson": {"CX OSC", "RESONATOR", "SHATTER"},
+    "cx-vres":  {"CX OSC", "VOID", "RESONATOR"},
 }
