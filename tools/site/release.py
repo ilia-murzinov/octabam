@@ -32,19 +32,21 @@ BUILDER_ALWAYS_ON = (
     "SCOPE",
     "COPY PROJECT",
     "DARK REV",
+    "CX OSC",
+    "SEQ",
+    "PERSISTENT BUFFERS",
+    "RND NAME",
 )
 
-# Differentiating columns only (CX OSC is on every offered remix too, but
-# it stays in the matrix as the machine seat).
+# What differs across the three offered remixes.
 BUILDER_FEATURE_ROWS = (
-    "CX OSC",
     "VOID",
     "RESONATOR",
     "SHATTER",
 )
 
 BUILDER_FEATURES = {
-    "cx":       {"CX OSC", "VOID", "SHATTER"},
-    "cx-reson": {"CX OSC", "RESONATOR", "SHATTER"},
-    "cx-vres":  {"CX OSC", "VOID", "RESONATOR"},
+    "cx":       {"VOID", "SHATTER"},
+    "cx-reson": {"RESONATOR", "SHATTER"},
+    "cx-vres":  {"VOID", "RESONATOR"},
 }
