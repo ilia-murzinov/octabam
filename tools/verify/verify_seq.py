@@ -505,6 +505,20 @@ def check_ui(src: str) -> None:
           "ef_trkkey:" in src
           and "ef_pending" in _block(src, "ef_trkkey:", "ef_dest_label:")
           and "ef_load_slot" not in _block(src, "ef_trkkey:", "ef_dest_label:"))
+    check("ef_trkkey forwards to stock TRACK + CUE overlay",
+          ("TRK_STOCK" in _block(src, "ef_trkkey:", "ef_dest_label:")
+           or "0x40040250" in _block(src, "ef_trkkey:", "ef_dest_label:"))
+          and ("CUE_TRK" in _block(src, "ef_trkkey:", "ef_dest_label:")
+               or "0x40083dc4" in _block(src, "ef_trkkey:", "ef_dest_label:"))
+          and "ef_cue_chord" in _block(src, "ef_trkkey:", "ef_dest_label:")
+          and ("CUE_HELD" in _block(src, "ef_trkkey:", "ef_dest_label:")
+               or "0x460d168c" in _block(src, "ef_trkkey:", "ef_dest_label:")))
+    check("ef_trkkey skips SEQ redraw when stock stole UI_WINDOW",
+          "UI_WINDOW" in _block(src, "ef_trkkey:", "ef_dest_label:")
+          or "0x460d175c" in _block(src, "ef_trkkey:", "ef_dest_label:"))
+    check("EF_KEYS CUE/TRACK wire press and release (not swallow release)",
+          re.search(r"\.byte\s+0x2a,.*?\n\s*\.long\s+ef_cue,\s*ef_cue\b", keys, re.S)
+          and re.search(r"\.byte\s+0x10,.*?\n\s*\.long\s+ef_trkkey,\s*ef_trkkey\b", keys, re.S))
     check("ef_trkkey calls stock SEL_TRACK (sequencer view)",
           ("0x40083bf8" in _block(src, "ef_trkkey:", "ef_dest_label:")
            or "SEL_TRACK" in _block(src, "ef_trkkey:", "ef_dest_label:")))
@@ -519,11 +533,18 @@ def check_ui(src: str) -> None:
           and "ef_load_slot" in _block(src, "ef_follow_ui:", "ef_sync_len:"))
 
     cue = _block(src, "ef_cue:", "ef_rng:")
-    check("ef_cue fills focused mask", "ef_mask" in cue and "ef_pmask" in cue)
-    check("ef_cue sets focused free", "ef_free" in cue and "ef_pfree" in cue)
-    check("ef_cue uses LCG (ef_rng)", "ef_rng" in cue)
+    check("ef_cue press/release poke CUE_HELD (stock modifier byte)",
+          "CUE_HELD" in cue or "0x460d168c" in cue)
+    check("ef_cue random on bare release (ef_cue_random)",
+          "ef_cue_random:" in src
+          and "ef_cue_chord" in cue
+          and ("ef_cue_snap" in cue or "MUTE_CUE" in cue))
+    rnd = _block(src, "ef_cue_random:", "ef_rng:")
+    check("ef_cue fills focused mask", "ef_mask" in rnd and "ef_pmask" in rnd)
+    check("ef_cue sets focused free", "ef_free" in rnd and "ef_pfree" in rnd)
+    check("ef_cue uses LCG (ef_rng)", "ef_rng" in rnd)
     check("ef_cue respects ef_pulses (k-subset)",
-          "ef_pulses" in cue and "clrl    ef_pulses" not in cue)
+          "ef_pulses" in rnd and "clrl    ef_pulses" not in rnd)
     check("ef_hit serves free + Euclid",
           "ef_hit:" in src and "ef_free" in _block(src, "ef_hit:", "ef_enc:"))
 

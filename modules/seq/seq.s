@@ -21,7 +21,10 @@
 | but KEEPS EF_LAYER so ef_ask still locks knobs; answer restores.
 | ef_cl_poll must not recreate SEQ while ef_ask (dialog behind).
 | User/orphan close LPOPs. LEVEL encoder dead; no cursor invert.
-| CUE = free random k-subset.
+| CUE: press = stock hold; release without a TRACK chord = free
+| random k-subset. TRACK keys forward to stock (double-tap QUICK
+| ASSIGN, FUNC+TRACK mute, TRACK+PLAY/STOP/BANK) then SEQ retarget;
+| CUE+TRACK = stock cue-a-track.
 |
 | DEST = LFO SETUP PMTR targets that Euclid can drive:
 |   0..29 page-1 lock flats (skip AMP XVOL=17). Labels PAGE+PARAM.
@@ -57,6 +60,11 @@
         .set    CUR_TRACK, 0x80000000   | UI-selected track 0..7
         .set    UI_TRACK,  0x100b14cc   | setup mirror of CUR_TRACK
         .set    SEL_TRACK, 0x40083bf8   | (track 0..7) CUR/UI + sequencer view
+        .set    TRK_STOCK, 0x40040250   | base TRACK press/release (QA/mute/…)
+        .set    CUE_TRK,   0x40083dc4   | CUE overlay TRACK → cue-a-track
+        .set    CUE_HELD,  0x460d168c   | stock CUE modifier byte (press=1)
+        .set    MUTE_CUE,  0x80000008   | mute bit8+t / cue bit16+t
+        .set    UI_WINDOW, 0x460d175c   | current top window handle
         .set    SLOT_B,    28           | per-track: 5 longs + 8-byte mask
         .set    UI_PTN,    0x100b14d0
         .set    DBPTR,     0x46c82456
@@ -288,6 +296,8 @@ op_go:
         clrl    ef_need_restore
         bsr.w   ef_cl_nolayer_off       | drop stuck CLEAR cancel layer
         clrl    ef_from_cue
+        clrl    ef_cue_chord
+        clrl    ef_cue_snap
         clrl    ef_cursor
         clrl    ef_pat_off              | scroll unused (4×16 shows all)
         bsr.w   ef_mkwin
@@ -751,13 +761,43 @@ ef_yes:
         bra.w   ef_draw
 9:      rts
 
-| ---- CUE: free random k-subset on the focused lane (TRIG or PLOCK) ----
-| PULSE unchanged; ROT still applies. Press only. TRIG lane + baked:
-| ARE YOU SURE? first. PLOCK lane skips that prompt.
+| ---- CUE: stock hold + SEQ random on bare release ----------------------
+| Press: stock CUE (hold / cue LED). Release with no TRACK while held:
+| free random k-subset on the focused lane (TRIG: ARE YOU SURE? when
+| baked; PLOCK: no prompt). CUE+TRACK sets ef_cue_chord so release
+| skips random and only runs stock CUE release.
 ef_cue:
         moveq   #1,%d0
         cmpl    8(%sp),%d0
-        bne.w   ef_cue_rts
+        beq.s   cue_down
+        | release: drop modifier; skip random if cue bits moved
+        | (CUE+TRACK). Stock's CUE sub-map often owns TRACK while CUE
+        | is held, so ef_trkkey may never see the chord - compare the
+        | cue mask snapshot from press instead.
+        clrl    CUE_HELD
+        movel   MUTE_CUE,%d0
+        swap    %d0                     | cue bits in low 16
+        andil   #0xff,%d0
+        cmpl    ef_cue_snap,%d0
+        bne.s   cue_rel_done            | CUE+TRACK changed a cue bit
+        tstl    ef_cue_chord
+        bne.s   cue_rel_done            | layer saw the chord
+        bsr.w   ef_cue_random
+cue_rel_done:
+        clrl    ef_cue_chord
+        rts
+cue_down:
+        clrl    ef_cue_chord
+        moveq   #1,%d0
+        moveb   %d0,CUE_HELD            | same byte stock CUE press writes
+        movel   MUTE_CUE,%d0
+        swap    %d0
+        andil   #0xff,%d0
+        movel   %d0,ef_cue_snap         | cue mask before possible TRACK
+        rts
+
+| SEQ random k-subset (former bare-CUE press body). Clobbers many regs.
+ef_cue_random:
         bsr.w   ef_sync_len
         tstl    ef_lane
         bne.s   cue_go                  | PLOCK cue: no trig-clear prompt
@@ -1415,30 +1455,60 @@ ef_fmt_len:
         lea     %sp@(12),%sp
         rts
 
-| Track key T1..T8 while open: retarget our bank/badge, then call stock's
-| select-track. Poking CUR/UI alone left the sequencer grid on the
-| pre-open track (EUCL13); SEL_TRACK refreshes the grid/LEDs too.
+| Track key T1..T8 while open: forward every edge to stock (press and
+| release share 0x40040250), so double-tap QUICK ASSIGN, FUNC+TRACK
+| mute, TRACK+PLAY/STOP/BANK keep working. CUE held -> CUE overlay
+| TRACK handler (cue-a-track) and mark ef_cue_chord. On press also
+| retarget SEQ (ef_pending + SEL_TRACK + draw); poking CUR/UI alone
+| left the sequencer grid on the pre-open track (EUCL13).
 ef_trkkey:
-        moveq   #1,%d0
-        cmpl    8(%sp),%d0
-        bne.s   tk_rts                  | press only
-        movel   4(%sp),%d0              | keycode
-        andil   #0xff,%d0
-        subi.l  #0x10,%d0               | T1..T8 -> 0..7
-        bmi.s   tk_rts
-        moveq   #7,%d1
-        cmpl    %d1,%d0
-        bhi.s   tk_rts
-        movel   %d0,ef_pending
         lea     -44(%sp),%sp            | ColdFire: no predec movem
         movem.l %d2-%d7/%a2-%a6,(%sp)
-        movel   ef_pending,-(%sp)
+        movel   44+4(%sp),%d2           | keycode
+        movel   44+8(%sp),%d3           | event
+        | CUE_HELD byte: our ef_cue press sets it (stock CUE modifier).
+        tstb    CUE_HELD
+        beq.s   tk_base
+        moveq   #1,%d0
+        movel   %d0,ef_cue_chord        | bare CUE release: skip random
+        clrl    ef_from_cue             | never randomize after a cue chord
+        movel   %d3,-(%sp)
+        movel   %d2,-(%sp)
+        jsr     CUE_TRK
+        addql   #8,%sp
+        bra.s   tk_after
+tk_base:
+        movel   %d3,-(%sp)
+        movel   %d2,-(%sp)
+        jsr     TRK_STOCK
+        addql   #8,%sp
+tk_after:
+        moveq   #1,%d0
+        cmpl    %d3,%d0
+        bne.s   tk_done                 | release: stock only
+        | Stock stole the UI (QUICK ASSIGN, audio editor, …): do not
+        | SEL_TRACK / redraw SEQ over it.
+        movel   UI_WINDOW,%d0
+        cmpl    ef_win,%d0
+        bne.s   tk_done
+        movel   %d2,%d0
+        andil   #0xff,%d0
+        subi.l  #0x10,%d0               | T1..T8 -> 0..7
+        bmi.s   tk_done
+        moveq   #7,%d1
+        cmpl    %d1,%d0
+        bhi.s   tk_done
+        movel   %d0,ef_pending
+        movel   %d0,-(%sp)
         jsr     SEL_TRACK
         addql   #4,%sp
         movem.l (%sp),%d2-%d7/%a2-%a6
         lea     44(%sp),%sp
         bra.w   ef_draw
-tk_rts: rts
+tk_done:
+        movem.l (%sp),%d2-%d7/%a2-%a6
+        lea     44(%sp),%sp
+        rts
 
 
 | ef_dest_label: LFO SETUP PMTR style PAGE\0PARAM\0 into ef_buf
@@ -3172,36 +3242,35 @@ EF_KEYS:
         | UP/DOWN/LEFT/RIGHT / PROJ/PART/AED/ARR: omit (do not list).
         | Listing with 0 swallows; listing with -1 still stores aux=0
         | and has been seen to break DOWN after Euclid → PROJECT.
-        .byte   0x2a, 0                 | CUE = random PULSE
-        .long   ef_cue, 0, 0, 0, 0
+        .byte   0x2a, 0                 | CUE: press+release (0 swallows release)
+        .long   ef_cue, ef_cue, 0, 0, 0
         .word   0, 0
         | BANK (0x2f): omit - FUNC+BANK is Detour / MKI SymbolRef only.
-| T1..T8: layer owns them while open (stock never updates UI_TRACK, and
-| without a redraw follow_ui never runs). Handler only stashes ef_pending;
-| store/load happens in draw. Safe without dest_label (EUCL9/10 brick).
+| T1..T8: press+release both ef_trkkey (stock needs release to clear
+| HELD). On press, retarget SEQ only if UI_WINDOW still ef_win.
         .byte   0x10, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x11, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x12, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x13, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x14, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x15, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x16, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0x17, 0
-        .long   ef_trkkey, 0, 0, 0, 0
+        .long   ef_trkkey, ef_trkkey, 0, 0, 0
         .word   0, 0
         .byte   0xff, 0
         .long   0, 0, 0, 0, 0
@@ -3669,7 +3738,7 @@ ea_rts: rts
         .globl  ef_win, ef_steps, ef_pulses, ef_rot, ef_dest, ef_depth
         .globl  ef_cursor, ef_targets, ef_focus, ef_bank, ef_dep_mem
         .globl  ef_plk_mem, ef_lane_mem, ef_lane, ef_ppulses, ef_prot
-        .globl  ef_ask, ef_unlocked, ef_from_cue, ef_free
+        .globl  ef_ask, ef_unlocked, ef_from_cue, ef_cue_chord, ef_cue_snap, ef_free
         .globl  ef_cx_bank, ef_cx_bits  | CX OSC SETUP fills (stackable)
 ef_win:     .long 0
 ef_steps:   .long 16
@@ -3694,6 +3763,8 @@ ef_fill_tgts:  .long 0                  | scratch: targets across ef_fill
 ef_rng_state: .long 0                   | LCG; 0 -> seed from tempo/clock
 ef_free:    .long 0                     | nonzero: draw/write ef_mask + ROT
 ef_from_cue: .long 0                    | 1: free/pmask from CUE (bake may use)
+ef_cue_chord: .long 0                   | 1: layer saw CUE+TRACK (no random)
+ef_cue_snap: .long 0                    | cue-byte snapshot at CUE press
 ef_mask:    .space 8                    | TRIG free pattern bits 0..63
 ef_pmask:   .space 8                    | PLOCK free pattern bits 0..63
 ef_trk:     .long 0                     | current fill target track (0..7)

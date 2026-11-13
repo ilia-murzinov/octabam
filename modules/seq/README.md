@@ -37,7 +37,8 @@ comes from pattern length (not a knob).
 | D | DEST — page-1 flat; same name as LFO PMTR |
 | E | DEPTH — 0..127, lock span around Part |
 | F | empty |
-| CUE | random placement of exactly PULSE hits on the focused lane |
+| CUE | hold = stock cue; release alone = random PULSE hits on the focused lane; CUE+TRACK = cue that track |
+| TRACK (stock) | double-tap QUICK ASSIGN; FUNC+TRACK mute; TRACK+PLAY/STOP/BANK as stock |
 | FUNC + BANK | clear menu (LISTPOP over SEQ): CLEAR DEST / CLEAR ALL DEST / CLEAR ALL+TRIGS |
 | YES | write TRIG mask + current DEST locks (trigless where needed) |
 | NO | close |

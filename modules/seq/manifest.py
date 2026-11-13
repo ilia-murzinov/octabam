@@ -4,7 +4,9 @@ Hold a track key and press PAGE: title SEQ, LEN gutter, stock 3x2 grid
 A=PULSE B=ROT C=LANE / D=DEST E=DEPTH (F empty). LANE focuses TRIG or
 PLOCK; YES writes sample trigs and DEST locks (write-only - never
 re-reads live trigs). Per-track / per-DEST params in euclid.work (STORE).
-CUE places a random k-subset with density PULSE. FUNC+BANK opens a clear
+CUE hold is stock; bare CUE release places a random k-subset with density
+PULSE; CUE+TRACK cues that track. TRACK keys forward to stock (QUICK
+ASSIGN, mute, PLAY/STOP/BANK) then retarget SEQ. FUNC+BANK opens a clear
 LISTPOP over SEQ (CLEAR DEST / ALL DEST / ALL+TRIGS). NO closes and
 restores SEQ; bare PAGE does not.
 

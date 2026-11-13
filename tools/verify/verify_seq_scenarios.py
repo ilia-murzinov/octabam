@@ -24,6 +24,7 @@ TEMPLATE = ROOT / "template_project"
 
 DBPTR_ADDR = 0x46c82456
 UI_PTN = 0x100b14d0
+UI_TRACK = 0x100b14cc
 PTN_STR = 0x8ed8
 TRK_STR = 0x91a
 LOCK0 = 0x59
@@ -37,6 +38,9 @@ NV_ROOT = 0x100b14ee
 DIALOG_OPEN = 0x460e5cd0
 UI_WINDOW = 0x460d175c
 POPUP = 0x46c7d34c
+HELD = 0x460fab40          # stock track-held bitmask (TRK_STOCK press)
+MUTE_CUE = 0x80000008      # mute bit 8+t, cue bit 16+t (MIDI.md)
+POOL = 0x460e70e0          # machine / sample chooser pool (double-tap QA)
 
 FAILS = 0
 
@@ -153,8 +157,11 @@ class SeqPort:
         self.unlocked = sym_opt("ef_unlocked") or (self.lane_mem + 16)
         self.free = sym_opt("ef_free") or (self.ef + 0x54)
         self.from_cue = sym_opt("ef_from_cue") or (self.ef + 0x58)
-        self.ef_mask = self.ef + 0x5C
-        self.ef_pmask = self.ef + 0x64
+        self.cue_chord = sym_opt("ef_cue_chord") or (self.from_cue + 4)
+        self.cue_snap = sym_opt("ef_cue_snap") or (self.cue_chord + 4)
+        # ef_mask follows ef_cue_snap.
+        self.ef_mask = sym_opt("ef_mask") or (self.cue_snap + 4)
+        self.ef_pmask = sym_opt("ef_pmask") or (self.ef_mask + 8)
 
     def open_seq(self, track: str = "t1") -> None:
         self.p.chord(track, "page", settle=500)
@@ -572,6 +579,72 @@ def run_scenarios() -> int:
         labs = s.clear_labels()
         check("FUNC+BANK outside SEQ is not CLEAR list",
               "CLEAR DEST" not in labs, str(labs))
+
+        # --- Stock TRACK / CUE chords while SEQ is open ---
+        if port.long(s.ef) == 0:
+            s.open_seq("t1")
+        # TRK_STOCK sets HELD on press (needed for TRACK+PLAY/STOP/BANK).
+        port.key("t1", True)
+        port.run(120)
+        held = port.long(HELD)
+        check("TRACK press while SEQ sets stock HELD bit",
+              held & 1, f"HELD={held:#x}")
+        port.key("t1", False)
+        port.run(120)
+
+        # FUNC+TRACK mute (bit 8+t of 0x80000008).
+        before = port.long(MUTE_CUE)
+        port.chord("func", "t2", settle=500)
+        after = port.long(MUTE_CUE)
+        check("FUNC+TRACK while SEQ mutes that track",
+              (after ^ before) & (1 << (8 + 1)),
+              f"before={before:#x} after={after:#x}")
+
+        # CUE+TRACK cues without SEQ random.
+        poke32(port, s.from_cue, 0)
+        poke32(port, s.cue_chord, 0)
+        before = port.long(MUTE_CUE)
+        port.chord("cue", "t1", settle=500)
+        after = port.long(MUTE_CUE)
+        check("CUE+TRACK while SEQ sets cue bit",
+              (after ^ before) & (1 << 16),
+              f"before={before:#x} after={after:#x}")
+        check("CUE+TRACK leaves from_cue clear (no random)",
+              port.long(s.from_cue) == 0)
+
+        # Bare CUE release still randomizes when unlocked.
+        poke32(port, s.unlocked, 1)
+        poke32(port, s.ask, 0)
+        poke32(port, s.from_cue, 0)
+        poke32(port, s.free, 0)
+        s.prime(lane=0, dest=0, depth=0, pulses=5, trig_pulses=5)
+        poke32(port, s.unlocked, 1)
+        port.press("cue", settle=700)
+        check("bare CUE release sets from_cue", port.long(s.from_cue) != 0)
+        check("bare CUE release sets free", port.long(s.free) != 0)
+
+        # Double-tap TRACK → QUICK ASSIGN (stock steals UI_WINDOW).
+        seq_win = port.long(s.ef)
+        port.key("t2", True)
+        port.run(50)
+        port.key("t2", False)
+        port.run(160)
+        port.key("t2", True)
+        port.run(50)
+        port.key("t2", False)
+        port.run(600)
+        ui = port.long(UI_WINDOW)
+        pool = port.long(POOL)
+        check("double-tap TRACK while SEQ opens QUICK ASSIGN",
+              ui != seq_win or pool != 0 or port.long(M_OBJ) != 0,
+              f"ui={ui:#x} seq={seq_win:#x} pool={pool:#x} m_obj={port.long(M_OBJ):#x}")
+        # Leave chooser; SEQ should still retarget to T2.
+        port.press("no", settle=400)
+        if port.long(s.ef) == 0:
+            s.open_seq("t1")
+        port.press("t2", settle=400)
+        check("TRACK tap while SEQ still retargets UI_TRACK",
+              u8(port, UI_TRACK) == 1, f"UI_TRACK={u8(port, UI_TRACK)}")
 
     print(f"SEQ scenarios: {FAILS} failed checks")
     return FAILS
