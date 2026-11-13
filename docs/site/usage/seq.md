@@ -38,6 +38,11 @@ grid, then write.
 | **`[NO]`** | Close the window |
 | Bare **`[PAGE]`** | Stock pattern pages / step banks; SEQ stays open |
 | Another **`[TRACK]`** while open | Switch SEQ to that track |
+| Double-tap **`[TRACK]`** | Stock **QUICK ASSIGN** |
+| **`[FUNC]`** + **`[TRACK]`** | Stock mute |
+| **`[TRACK]`** + **`[PLAY]`** / **`[STOP]`** / **`[BANK]`** | Stock preview / stop / audio editor |
+| **`[CUE]`** + **`[TRACK]`** | Stock cue that track |
+| Bare **`[CUE]`** (tap) | Random **PULS** hits on the focused lane |
 
 ## Lanes
 
@@ -90,9 +95,10 @@ mask.
 **`"WILL BE CLEARED ON NEXT FILL"`**. Dialog **`[YES]`** only unlocks the
 knobs. Writing the pattern is a second **`[YES]`**.
 
-**`[CUE]`.** Keeps **PULS** as the hit count and picks *which* steps are on
-at random on the focused lane. Editing **PULS** after that returns to
-Euclidean.
+**`[CUE]`** tap (release with no **`[TRACK]`**). Keeps **PULS** as the hit
+count and picks *which* steps are on at random on the focused lane.
+**`[CUE]`** + **`[TRACK]`** is stock cue. Editing **PULS** after a random
+tap returns to Euclidean.
 
 **TRIG write.** Sample trigs follow the TRIG lane. Locks for the current
 destination land on those steps (**DPTH** 0 clears them). Other destination
@@ -170,5 +176,5 @@ trigless bits drop when nothing else remains on the step.
 ### Place random trigs
 
 Focus the lane (**TRIG** or **PLCK**), set **PULS** to the hit count you
-want, press **`[CUE]`** (exactly that many hits at random on that lane),
+want, tap **`[CUE]`** (exactly that many hits at random on that lane),
 then **`[YES]`** to write.
