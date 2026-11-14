@@ -1,18 +1,76 @@
 {
  "version": "v0.4",
- "commit": "9e2545bc951c5379649b61f0a7577e05cd8e9d25",
- "dev": false,
- "build": "04",
- "date": "2026-11-04",
+ "commit": "fc0f2c8b17a4b31df3be65231215b1b9f0e98699",
+ "dev": true,
+ "build": "J6",
+ "date": "2026-11-14",
+ "alwaysOn": [
+  "SCOPE",
+  "COPY PROJECT",
+  "DARK REV",
+  "CX OSC",
+  "SEQ",
+  "PERSISTENT BUFFERS",
+  "RND NAME"
+ ],
+ "featureRows": [
+  "VOID",
+  "RESONATOR",
+  "SHATTER"
+ ],
+ "features": {
+  "cx": [
+   "SHATTER",
+   "VOID"
+  ],
+  "cx-reson": [
+   "RESONATOR",
+   "SHATTER"
+  ],
+  "cx-vres": [
+   "RESONATOR",
+   "VOID"
+  ]
+ },
  "remixes": [
   {
-   "name": "octabam",
-   "title": "octabam",
-   "version": "OCTABAM04",
-   "imageName": "OCTABAM 04",
-   "patch": "patches/octabam.obp",
-   "patchBytes": 203074,
-   "sha256": "9159aca19b927478c9be8ebe5f86028c0f1a6f43c80d54d69fc739d753362977"
+   "name": "cx",
+   "title": "cx",
+   "version": "OCTABAMJ6",
+   "imageName": "CX J6",
+   "patch": "patches/cx.obp",
+   "patchBytes": 126268,
+   "sha256": "93baa285d73dcb56ac592457ef449915e453b5db40d02af6503e2e766d356aa1",
+   "features": [
+    "SHATTER",
+    "VOID"
+   ]
+  },
+  {
+   "name": "cx-reson",
+   "title": "cx-reson",
+   "version": "OCTABAMJ6",
+   "imageName": "CX-RESON J6",
+   "patch": "patches/cx-reson.obp",
+   "patchBytes": 124860,
+   "sha256": "e7f5d7fd9a20485dc67e597c891f4e15070a2020d1d5bddd0f043742eec53181",
+   "features": [
+    "RESONATOR",
+    "SHATTER"
+   ]
+  },
+  {
+   "name": "cx-vres",
+   "title": "cx-vres",
+   "version": "OCTABAMJ6",
+   "imageName": "CX-VRES J6",
+   "patch": "patches/cx-vres.obp",
+   "patchBytes": 125580,
+   "sha256": "bf978dbf588e5e10875912c564f23e00b0536e99234c322a9d034f9f54ec3c69",
+   "features": [
+    "RESONATOR",
+    "VOID"
+   ]
   }
  ]
 }

@@ -1,40 +1,56 @@
-# Octabam
+# ilia · octabam
 
-*A love letter to the Octatrack*
+Three Octatrack remixes for live sampling and sound design, all with
+[Complex Oscillator](reference/modules/cxosc.md) (panel **CX OSC**). Every
+image keeps [Scope](reference/modules/scope.md),
+[Copy Project](reference/modules/copy-project.md), DARK REV, stock
+COMPRESSOR, [SEQ](reference/modules/seq.md),
+[Persistent Buffers](reference/modules/persistent-buffers.md), and
+[Rnd Name](reference/modules/rnd-name.md). The builder matrix swaps the
+space and glitch slots:
+[Void](reference/modules/void.md), [SHATTER](reference/modules/shatter.md),
+[Resonator](reference/modules/resonator.md).
 
-Octabam adds community features to the Elektron Octatrack's operating
-system (OS 1.40C): Kits, templates, expanded scenes and parameter locks, USB
-audio and MIDI, and new effects. You build it in your browser from your own
-copy of OS 1.40C and install it from a CF card or over MIDI. This is
-**version 0.4**. Octabam is unofficial community software; see [About](about.md).
+Built with [octabam](https://sambanks.github.io/octabam/) from your own
+OS 1.40C. This site is the builder and the fork-module notes. The general
+manual, safety and FAQ stay upstream.
 
-## Unofficial firmware
+[**Build an image →**](web-builder.md)
+· [Credits](#credits)
+· [Upstream manual](https://sambanks.github.io/octabam/)
+· [Safety & FAQ](https://sambanks.github.io/octabam/safety.html)
 
-Octabam is unofficial firmware, not made, endorsed or supported by Elektron.
-Installing it is generally safe and can be reverted by reinstalling stock OS
-([Safety and Recovery](safety.md)). Elektron is not responsible for any
-damage to your Octatrack.
+Unofficial community firmware. Not made, endorsed or supported by Elektron.
 
-## Get started
+## What the builder offers
 
-1. Read [what is in Octabam](remix-octabam.md).
-2. [Build and install](web-builder.md) it.
-3. Use the [Octabam Remix Manual](reference/manual/octabam/index.md).
+| Remix | Space | Glitch |
+|---|---|---|
+| **cx** | Void | SHATTER |
+| **cx-reson** | Resonator (+ COMB) | SHATTER |
+| **cx-vres** | Void + Resonator | — |
 
-## Everyday use
+Always on: Scope, Copy Project, DARK REV, CX OSC, SEQ, Persistent Buffers,
+Rnd Name, stock COMPRESSOR. PLATE and SPRING are harvested so the inserts
+fit.
 
-- Save templates or change defaults: [BRAIN](reference/manual/octabam/brain/index.md)
-- Assign a saved sound setup to a pattern: [Kits and patterns](reference/manual/octabam/parts/kits.md)
-- Lock parameters on an effect's second page: [Page 2 parameter locks](reference/manual/octabam/parts/plocks-p2.md)
-- Control MIDI tracks with scenes: [MIDI scenes](reference/manual/octabam/parts/midi-scenes.md)
-- Record MAIN and CUE on a computer: [USB audio and MIDI](reference/manual/octabam/midi-usb/usb.md)
-- Look up an effect or a feature: the [manual](reference/manual/octabam/index.md)
+[Build](web-builder.md) flashes a `.bin` / `.syx`, or boots an `.RMX` on a
+unit that already runs octabam.
 
-## Reading this manual
+## Why CX OSC
 
-This manual describes the additions to stock OS and assumes you know tracks,
-Parts, patterns, scenes and the front panel. **Bold labels** are controls and
-menu items. An arrow is a menu path: **PROJ → BRAIN → TEMPLATES**. A plus
-sign is a key combination: hold **FUNC** while pressing the other key.
-Commands and filenames are in `monospace`. Screen illustrations are captured
-firmware screens; their values are examples.
+- **Complex Oscillator** is a local two-operator FM machine with a sine
+  wavefolder, derived from Tim's FM SYNTH engine. It takes the machine-list
+  seat that SYNTH MACHINE would use, so these images ship CX OSC only.
+- **Scope** overlays TUNER's **`[DOWN]` + `[TEMPO]`** entry when both are
+  present. TUNER remains Tim's; tip images that ship Scope omit TUNER.
+- Everything else in CORE (Kits, scenes, USB, Kyoti workflow modules,
+  and the rest in [Credits](#credits)) is still those authors' work.
+
+## Credits
+
+Every non-stock module that appears in at least one builder remix, plus
+the modules documented on this site. Authors and URLs come from each
+module's `manifest.py`.
+
+--8<-- "reference/_credits-shipped.md"
