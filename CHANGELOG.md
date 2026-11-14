@@ -27,6 +27,20 @@ The full text before this rewrite: `git show 666b6154:CHANGELOG.md`.
 - Artifact SHA-256:
   `c5efe642cab1de0d71d5ba8f5abb619147c8ea13877cc506bf21ad6bf14e086b`.
 
+## CX M8, 14 Nov 2026, CX remix
+
+- SEQ edits MIDI note trigs and parameter locks with separate TRIG/PLOCK
+  settings. NOTE, NOT2-4, velocity, length, LFO, ARP, pitch bend, channel
+  pressure and CC destinations are available. Confirmation YES unlocks
+  the preview; the next explicit YES writes the selected destination.
+- MIDI FUNC+BANK offers CLEAR DEST, CLEAR ALL DEST and CLEAR ALL+TRIGS.
+  Actions update the focused track and its battery mirror. Panel gates
+  verify other destinations, tracks, steps beyond LEN and adjacent patterns.
+- The author confirmed MIDI behavior on his MKII. USB MIDI captures showed
+  channel-2 notes and note-offs. An initially fixed C3 was caused by an
+  unwritten NOTE fill; the author confirmed variation after explicit YES.
+  Artifact SHA-256: `b6722704137567abf1ac82a6d71e3d6faaf7de915c8b3357d837675ef330f3c3`.
+
 ## Unreleased
 
 - **CX OSC: C28 remix handoff** (`cxosc-core`, built from `f4b11964`, 17 Nov 2026). On an MKII, Ilia reports CX OSC sounds good. The image contains the DEC envelope and startup waveform fixes. The ColdFire emulator booted the image to the RTOS handoff; `verify_cxosc.py` could not run because Unicorn raised an illegal instruction while initializing its M68K engine.

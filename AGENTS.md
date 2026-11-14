@@ -278,3 +278,11 @@ git show <sha>:dsp/baseprobe.asm
 Leave those citations alone — rewriting one to remove a filename erases
 how the number was obtained. A citation of a removed file uses the form
 `git show <sha>:<path>` (`docs/history/` records: sha `3ceba41`).
+
+- [A byte read from a saved long takes the high byte](docs/contributing/TRAPS.md#trap-midi-stack-byte). Restore the long before storing a MIDI lock byte.
+
+- [The free-rhythm reader overwrites the MIDI writer's destination](docs/contributing/TRAPS.md#trap-midi-free-mask-pointer). Preserve the record pointer across the rhythm reader.
+
+- [MIDI confirmation filled the pattern and immediately relocked editing](docs/contributing/TRAPS.md#trap-midi-confirmation-fill). Confirmation unlocks the preview; explicit fill writes only the selected destination.
+
+- [SEQ's MIDI clear menu was explicitly disabled](docs/contributing/TRAPS.md#trap-midi-seq-clear-menu). MIDI clear actions use their own records and recipe tables.

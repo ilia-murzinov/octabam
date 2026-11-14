@@ -1841,3 +1841,84 @@ the maximum, silently omitting the gain pass. Mark such modules with
 The original limiter also used the previous block's level, allowing the
 first transient through. The shared render gates now inject signed impulses
 at and around block boundaries and check the actual first-block peak.
+
+<a name="trap-midi-stack-byte"></a>
+### A byte read from a saved long takes the high byte
+
+**Symptom:** SEQ MIDI locks all became zero, displaying NOTE C-1 and VEL OFF.
+
+**Cause:** the MIDI writer pushed d0 as a long, then loaded a byte from sp.
+ColdFire is big endian, so this read the zero high byte of values 0..127.
+It also changed a requested clear value into zero when the stored value was
+not restored correctly.
+
+**Fix:** restore the full long into d0, then store its low byte to both the
+pattern and battery mirror. Preserve the step register through Part reads.
+
+**Gate:** `verify_seq.py` checks the restore. `verify_seq_scenarios.py`
+checks nonzero NOTE, VEL, NOT2-4 and CC values in the pattern and mirror,
+with different UI and MIDI playing Parts. CX M4 built and copied to the
+card on 14 Nov 2026. The author subsequently confirmed MIDI behavior
+on his MKII with CX M8; see the SEQ README for the evidence.
+
+<a name="trap-midi-free-mask-pointer"></a>
+### The free-rhythm reader overwrites the MIDI writer's destination
+
+**Symptom:** MIDI SEQ previews random hits, then YES says TRIGS CREATED
+while the track stays empty, at both zero and nonzero depth.
+
+**Cause:** `ef_hit` uses a0 to read `ef_mask` in free mode. The MIDI mask
+writer also kept the track record in a0 across that call. It wrote into
+the preview mask instead of the pattern and copied that mask to CS1.
+
+**Fix:** save and restore the MIDI record pointer around `ef_hit`.
+
+**Proof:** reproduced on the M4 image under the port using a copy of
+261114 BONELOCK and actual panel CUE then YES, yielding an empty MIDI
+note mask. The deterministic Euclidean path did not overwrite a0, so the
+previous mask-only fixtures passed. `verify_seq_scenarios.py` now checks
+panel CUE then YES at depths 0 and 4, including preview preservation and
+battery-mirror writes. The author subsequently confirmed MIDI behavior
+on his MKII with CX M8.
+
+<a name="trap-midi-confirmation-fill"></a>
+### MIDI confirmation filled the pattern and immediately relocked editing
+
+**Symptom:** ARE YOU SURE? followed by YES did not unlock the MIDI rhythm
+controls. The confirmation also regenerated locks before the next explicit
+fill, rather than letting the user finish editing the preview.
+
+**Cause:** the MIDI-only dialog callback called `ef_fill` and cleared
+`ef_unlocked` again. The rhythm gesture that opened the dialog was discarded.
+
+**Fix:** confirmation YES unlocks editing and resumes the pending MIDI
+encoder or CUE gesture in the preview. Only a subsequent explicit fill writes
+the pattern. NO discards the pending gesture. The callback preserves the C
+caller's d2-d7/a2-a6 while the editor uses those registers.
+
+**Gate:** `verify_seq_midi_edit.py` uses real encoder and key gestures on T2,
+with all 30 destinations populated. It requires confirmation to preserve all
+pattern and CS1 bytes, then checks that an explicit fill changes its selected
+destination while preserving all 29 other destinations, other tracks, steps
+outside the track length and the next pattern. It also checks CUE confirmation,
+NO cancellation, zero-depth clearing, PLOCK and MIDI parameter-page boundaries.
+
+<a name="trap-midi-seq-clear-menu"></a>
+### SEQ's MIDI clear menu was explicitly disabled
+
+**Symptom:** FUNC+BANK did nothing while MIDI SEQ was open.
+
+**Cause:** the opener returned immediately in MIDI mode because the clear
+callbacks addressed audio TRAC records. Opening the menu alone would have
+exposed unsafe audio-only actions.
+
+**Fix:** MIDI-specific clear callbacks write only the focused track's lock
+bytes and note mask through the MIDI bank/CS1 writers. Recipe resets use
+the separate MIDI depth and PLOCK tables. Audio actions keep their existing
+TRAC code.
+
+**Gate:** `verify_seq_midi_edit.py` drives FUNC+BANK, NO, toggle, and all
+three YES rows on T2. It verifies exact preservation outside each action's
+scope in RAM and CS1, including audio data, other MIDI tracks, steps beyond
+LEN, the next pattern, and other tracks' MIDI recipes. CLEAR ALL+TRIGS
+checks the remaining outside-LEN trig and TRIG recipe defaults.
