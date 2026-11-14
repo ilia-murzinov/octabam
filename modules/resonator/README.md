@@ -60,10 +60,18 @@ the Part.
   < 5%, no-runaway, two FX1 instances).
 - LIM curve: thresh `0.75 - LIM*0.625/128` (floor 0.125, ≈ -2.5..-18 dB).
   Same as SHATTER. LIM 0 skips GR so MIX 0 stays bit-exact dry.
+- Hardware: Ilia's MKII, **`RESO LM4.RMX`**, built from PR tip `0808651e`,
+  14 Nov 2026. Low SCAL settings stayed clean and LIM reduced hot output;
+  the check does not measure the exact hardware ceiling.
+- LIM curve: ceiling `0.75 - LIM*0.5/128` (≈ -2.5..-12 dB).
+  Same as SHATTER. LIM 0 bypasses attenuation so MIX 0 stays bit-exact dry.
+- SCAL 127 may overload the filter-bank sum before the output limiter. Lower
+  SCAL or band gains to avoid that pre-limiter distortion.
+- Hardware: Ilia's MKII, **`RESO LM4.RMX`**, built from PR tip `0808651e`,
+  14 Nov 2026. Low SCAL settings stayed clean and LIM reduced hot output.
 - Earlier hardware (pre-LIM): Ilia's MKII, tip of PR #806 as **`RESON RR`**
   / BUILD RR, 19 Oct 2026. Page-1 GN1–4, DECY low and high, MIX; page-2
-  PIT1–4; SCAL 8 and 127; FX2 dry-pass; two FX1 instances. This tip is
-  Proof.CHECK until LIM is confirmed on a unit.
+  PIT1–4; SCAL 8 and 127; FX2 dry-pass; two FX1 instances.
 
 ## Gates
 
@@ -73,3 +81,17 @@ the Part.
 
 - Torso S-4 RING — behaviour target (filterbank, not modal reverb).
 - JOS two-zero constant-peak bandpass / Spectrum VOWL form (MIT).
+
+## Current limiter
+
+The shared implementation in `tools/remix/peak_limiter.py` measures both
+channels of the current mixed block, then applies one attenuation in a
+second pass. This catches the first transient, including at block boundaries.
+No makeup gain is applied. Below the ceiling, dry input stays bit-exact
+unless a preceding hot block is still releasing. LIM 0 bypasses attenuation
+and clears the release state. LIM 1..127 sets a ceiling from about -2.5 to -12 dBFS.
+The release is approximately 63 ms at 15 frames per block.
+
+Regression renders cover signed transients at block boundaries, quiet unity
+gain, stereo balance, and bypass. The LM4 hardware check confirms the limiter
+works in the tested RESONATOR setup; it does not measure its exact ceiling.

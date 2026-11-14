@@ -40,10 +40,10 @@ MODULE = Module(
     category=Category.TRACK,
     author="ilia-murzinov",
     author_url="https://github.com/ilia-murzinov",
-    proof=Proof.CHECK,
-    proof_note="LIM post-MIX GR gated in verify_resonator; earlier HW "
-               "(PR #806 BUILD RR, 19 Oct 2026) was pre-LIM. "
-               "Await unit confirm of LIM catch on SCAL smash.",
+    proof=Proof.HARDWARE,
+    proof_note="Ilia's MKII, RESO LM4.RMX from PR tip 0808651e, 14 Nov 2026: "
+               "low SCAL settings stayed clean and LIM reduced hot output; "
+               "verify_resonator passed. Exact ceiling not measured.",
     doc="FX1 Torso S-4 RING-style filter bank: 4 pitched BPs, SCAL makeup, DECY, LIM.",
     menu=MenuEntry(
         # Custom id 0x1e (BBD 0x1b). Selftest fixtures use DELAY 0x08.

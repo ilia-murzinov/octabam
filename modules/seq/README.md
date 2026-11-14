@@ -14,9 +14,20 @@ rhythm for the current DEST. **YES** writes TRIG → sample-trig mask 0 and
 PLOCK → locks on the chosen DEST (trigless on plock-only steps). **NO**
 closes. Bare **PAGE** stays stock and does not close SEQ.
 
-**Proof.HARDWARE** on author's MKII (CX EUCL93, 11 Nov 2026): dual LANE /
-write-only YES / LOCK_COLL + floor / PLCK overwrite / TRIG reshape keeps
-other DEST (TL promote).
+**Proof.HARDWARE:** author's MKII, `CX CJ.RMX`, 14 Nov 2026. Six reported
+device checks passed: PLCK **PULS** 0 clears only that destination; all three
+**[FUNC]** + **[BANK]** clear rows act immediately and return to SEQ, and
+**[NO]** cancels; **"ARE YOU SURE?"** stays above SEQ with knobs locked until
+answered; stock TRACK shortcuts work; **[CUE]** + **[TRACK]** cues without
+randomizing while bare **[CUE]** randomizes the focused lane; and with SCALE
+off, pitch locks match the Part's PLAYBACK PTCH. This report covers those
+interactions on MKII; it does not claim audio testing or MKI behavior. The
+port gates also pass: `verify_seq`, `verify_seq_func_bank` and
+`verify_seq_scenarios`.
+
+Historical hardware report: author's MKII, CX EUCL93, 11 Nov 2026, dual LANE,
+write-only YES, LOCK_COLL + floor, PLCK overwrite and TRIG reshape preserving
+other destinations.
 
 Not the DSP [EUCLID](../euclid/README.md) effect (filter/amp modulation).
 This module only edits sequencer trigs. It does not grow

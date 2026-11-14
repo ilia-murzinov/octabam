@@ -75,9 +75,12 @@ slots fit at those settings. LIM on is a hard ceiling (no `div`).
 
 ## On the unit
 
+Ilia's MKII, **`SHTR LM4.RMX`**, built from PR tip `366e1bcd`, 14 Nov 2026:
+LIM confirmed working. This check confirms limiter operation on the tested
+setup; it does not measure the exact ceiling.
+
 Pre-LIM tip: Ilia's MKII, 21 Oct 2026, remix `shatter` **BUILD S6**
 (`SHATTER S6.RMX`): every page-1/page-2 knob then present exercised.
-This tip adds LIM and is not yet hardware-confirmed.
 
 No build tag on the panel.
 

@@ -21,9 +21,9 @@ MODULE = Module(
     kind=Kind.DSP_EFFECT,
     category=Category.TRACK, author="ilia-murzinov",
     author_url="https://github.com/ilia-murzinov",
-    proof=Proof.CHECK,
-    proof_note="verify_shatter (incl. LIM peak/rail). Pre-LIM tip SHATTER S6 was "
-               "HW on Ilia's MKII 21 Oct 2026; this tip not yet on hardware.",
+    proof=Proof.HARDWARE,
+    proof_note="Ilia's MKII, SHTR LM4.RMX from PR tip 366e1bcd, 14 Nov 2026: "
+               "LIM confirmed working; verify_shatter passed. The report does not measure the exact ceiling.",
     doc="Crush insert: fold, clip, crush, chaotic FDBK, hard ceiling after MIX.",
     menu=MenuEntry(
         fx2_id=0x0a,
