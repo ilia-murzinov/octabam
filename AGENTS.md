@@ -2,17 +2,14 @@
 
 octabam is a remixer for the Octatrack's OS: it composes modules, each
 credited to its author, into one image built from the user's own 1.40C.
-`README.md` is the front door; `modules/README.md` lists every module and
-`remixes/README.md` every remix; `CHANGELOG.md` records each release. The musicians' manual,
-[sambanks.github.io/octabam](https://sambanks.github.io/octabam/), is built from
-`docs/site/` by `tools/site/` (its README) for the release in
-`tools/site/release.py`, with the web builder. `docs/README.md` lists every doc
+`README.md` says what each module and remix is and where it has run;
+`CHANGELOG.md` records each flashed image. `docs/README.md` lists every doc
 by reader; `docs/contributing/PLACEMENT.md` is the architecture record for
 where code goes and what is measured about the memory.
 
 The repo is organised as **modules** (`modules/<name>/manifest.py` declares one
 contribution) composed into **remixes** (`remixes/<name>/remix.py` selects a
-set, `README.md` beside it says what is in it; `remixes/test/<name>/`
+set, `README.md` beside it says where it has run; `remixes/test/<name>/`
 carries one module for its gates).
 `make modules` lists them, with the compatibility matrix.
 `docs/contributing/MODULES.md` is the contributor guide and
@@ -42,8 +39,9 @@ rewriting; run their build against the shared stock image first.
 bit-identical against the baseline of your branch's merge-base with
 origin/main (`tools/verify/refhash_store.py` saves it once per merge-base for
 every worktree; `REFHASH_LOCAL=1` compares against a `save` of this tree).
-The report prints tool paths, so a path change is a report change and needs
-a re-save after the artifacts are shown identical.
+(Since 10 Sep 2026 the report
+prints tool paths; a path change is a report change and needs a re-save
+after the artifacts are shown identical.)
 
 **Never an Elektron byte in the repo** — no image, no slice, no `.syx`, in a
 commit or on an issue. `.incbin` from the user's stock image at build time
@@ -70,8 +68,9 @@ merge, and only when main has moved under it since its last green run: a
 file both changed (`git diff --name-only $(git merge-base origin/main
 HEAD) origin/main` against the PR's files), or a module, hook, cave or
 remix its gates build with. Otherwise merge it as it stands. Updating every
-open PR after every merge costs a full CI run each, which re-proves what
-no merge touched. CI's reach job runs the gates the diff reaches, and the
+open PR after every merge is a full CI run each (`check-remix octabam`
+took 72 min on sambanks/octabam#1087, 12 Nov 2026) that re-proves what no
+merge touched (owner's rule, 13 Nov 2026). CI's reach job runs the gates the diff reaches, and the
 `refhash` bit-identity pass for a build change, on every push to `main` and every
 PR, fork PRs included, on a runner that downloads the 1.40C for that run
 (`CONTRIBUTING.md` "Before you open a PR" is the rule and the reason); the
@@ -81,25 +80,12 @@ and no reach or refhash pass locally before a PR: they take hours and CI runs
 them.** Locally, run only the one gate script for the change
 (`python3 tools/verify/verify_<name>.py <remix>`), push, and read
 `gh pr checks`; a local whole-remix run is for a failure CI has reported that
-the one script cannot reproduce. **A community remix is the exception**
-(below). A change to
+the one script cannot reproduce. A change to
 `.github/`, `scripts/` or the Makefile runs every CI job. Passes whose image
 and inputs did not move are reported `cached`.
 
-**A community remix** (`remixes/community/<name>/`, a contributor's own
-selection) is its author's to keep working: CI's runs leave it out
-(`tools/verify/reach.py`), so run `make check REMIX=<name>` locally before
-its PR and list the result in the PR body. The web builder offers it when it
-passes `make check` in the publish run (`tools/web/publish.py`); one that
-stops passing drops out of the builder at the next publish. Its name on the
-unit is `<image_name or name> <BUILD>`, upper case, cut at 15 characters:
-set `image_name` (at most 12) when the name is longer. The manual's
-Community Remixes page is generated from `remix.py` (its `doc` line and
-modules), so write a good `doc` and a `README.md` and edit nothing under
-`docs/site/`. `CONTRIBUTING.md` "Remixes" is the rule.
-
-**A change that alters what a remix does — its modules, effects, menus
-or costs — updates the hand-written manual site pages under
+**A change that alters what a remix does — its modules, effects, menus,
+costs or proof status — updates the hand-written manual site pages under
 `docs/site/` in the same PR.** The generated reference pages update
 themselves from the manifests (`tools/site/gen_pages.py`).
 
@@ -114,15 +100,18 @@ sessions share this repository at once; the main checkout's working tree,
 index and stash list are theirs as much as yours. Start every task with
 `git worktree add .claude/worktrees/<name> -b <branch> origin/main`, work
 and run the gates there, and open the PR from it. Never `git stash` or
-`git stash pop` in the main checkout: a pop there can take another
-session's stash instead of yours. In a worktree:
+`git stash pop` in the main checkout: on 13 Sep 2026 a pop there took
+another session's stash (`o14 port edits`) instead of the caller's own
+and a `stash drop` removed it from the list -- restored by commit SHA,
+but only because the dangling commits were still there. In a worktree:
 `vendor/` and `.venv/` are symlinks to the main checkout's (gitignored,
 and excluded in `.git/info/exclude`); `out/raw/section_3_MAIN_OS.bin`
 must be there too (`make os && make recon`, or copy it); without them the
 selftest reports "remix X does not build" and every gate fails before it
 starts. `git submodule update --init` in the worktree as well. **Do NOT
 symlink `out/emu`**: its CMake cache names the main checkout's sources,
-so `cmake --build` there compiles THEIR `tools/emu/ot_emu`, not yours.
+so `cmake --build` there compiles THEIR `tools/emu/ot_emu`, not yours
+(14 Sep 2026: a port edit "built" fine and the binary did not have it).
 Build the port into the worktree: `make emu-cf` (a fresh cache, ~1 min).
 `out/cache/` is the build's memo (the packed runtimes, keyed by the sha256
 of their inputs; `tools/remix/pack.py`), per worktree and safe to
@@ -130,8 +119,10 @@ delete; `OCTABAM_NO_CACHE=1` builds cold when a build result is in doubt.
 **The same holds for `dsp_host` and `dsp_asm`:** `scripts/setup.sh` builds
 them from a COPY staged into `vendor/dsp56300/source/dsp_host/`, so in a
 worktree the shared binary is the main checkout's, whatever the branch's
-`tools/harness/dsp_host/dsp_host.cpp` says, and `dsp_host` silently ignores an
-option it does not know, so a new option renders with default knobs. A branch that changes `dsp_host.cpp` is built
+`tools/harness/dsp_host/dsp_host.cpp` says, and `dsp_host` ignores an
+option it does not know (PR #356 was reviewed twice, 21–22 Sep 2026, as
+"MOD has no effect, residual 0.000": its `-paramfile` never ran and every
+render used default knobs). A branch that changes `dsp_host.cpp` is built
 in an isolated tree, never into `vendor/` — the CMake recipe is
 `docs/contributing/TOOLING.md` section 1 — then point the harness at it
 (`benchmark_reverbs.HOST`, `send_probe`'s host path) for that run.
@@ -139,8 +130,8 @@ in an isolated tree, never into `vendor/` — the CMake recipe is
 ## The trap register
 
 The traps that have already cost real work live in
-[`docs/contributing/TRAPS.md`](docs/contributing/TRAPS.md): the symptom,
-the cause, the fix, and the gate that now catches each one. Add a new trap there the
+[`docs/contributing/TRAPS.md`](docs/contributing/TRAPS.md): symptom, what
+it cost, the fix, and what now gates each one. Add a new trap there the
 moment it costs real work, and add its line here.
 
 **DSP side**
@@ -186,7 +177,7 @@ moment it costs real work, and add its line here.
 - [A slot can draw a knob and publish nothing](docs/contributing/TRAPS.md#trap-knob-publish) — panel and DSP are separate; `docs/firmware/PARAM_PAGES.md`.
 - [Flash cycles are expensive](docs/contributing/TRAPS.md#trap-flash) — render locally and measure first.
 - [The unit misbehaves](docs/contributing/TRAPS.md#trap-failure-modes) — `docs/contributing/FAILURE_MODES.md` first; add new failures the moment they are seen.
-- [Window code above `0x37f00` is wiped at boot; below `0x33da3` DARK REV can write it](docs/contributing/TRAPS.md#trap-window-zero) — resident code in `0x33da3..0x33fff` and `0x37da3..0x37eff`; the build refuses the rest, and a record inside a guarded reverb's slot extent.
+- [Window code above `0x37f00` is wiped at boot; below `0x33da3` DARK REV can write it](docs/contributing/TRAPS.md#trap-window-zero) — resident code in `0x33da3..0x37eff`; the build refuses the rest.
 - [A host write at the frame interrupt's entry is lost on every other frame](docs/contributing/TRAPS.md#trap-host-mask) — send to core B on ping-0 frames; never to core A.
 - [`dsp_asm` does not assemble a backward `bra`](docs/contributing/TRAPS.md#trap-bra-back) — trampolines go before their target.
 - [A persistent slot init doesn't clear holds the previous effect's state](docs/contributing/TRAPS.md#trap-dirty-state) — zero every slot the sample loop reads; `verify_dirty_state` refuses.
@@ -237,6 +228,7 @@ moment it costs real work, and add its line here.
 - [`--watch-mem` is one string](docs/contributing/TRAPS.md#trap-watchmem) — a second flag replaces the first; comma-join the ranges.
 - [A completion IRQ in the first-sector write window polls DRQ on the stale count](docs/contributing/TRAPS.md#trap-first-sector-irq) — the guard keeps the sector and its bookkeeping inside the existing mask; `verify_ata_write` gates it.
 - [The stock Part validator clamps a stored FX2 id to 31](docs/contributing/TRAPS.md#trap-id-clamp) — a poke bypasses it, a project does not; `idspace.convert` raises the two immediates to 63; `verify_ids64_load` loads a project.
+- [A byte read from a long track index selects T1](docs/contributing/TRAPS.md#trap-seq-fx-context) — SEQ reads the full track index and passes the bank and Part separately.
 - [A floating cave rounded past the clone window landed on the chooser list](docs/contributing/TRAPS.md#trap-cave-round) — `… not free` names the victim; the overflow fallback takes any floating cave ending past the limit, starting past DELAY's kept bytes.
 - [A DRAM clone's `CLONE_<key>` export is its staging address](docs/contributing/TRAPS.md#trap-dram-clone-stage) — repointed only at the end; compare runtime addresses from `_psyms`.
 - [A runtime's own bytes can spell the clones' staging range](docs/contributing/TRAPS.md#trap-staging-coincidence) — the build moves staging and re-checks; a word that moves with it is stale.
@@ -264,39 +256,42 @@ moment it costs real work, and add its line here.
 - [A frame interrupt entering about 150 µs late stops the DSP's frame exchange](docs/contributing/TRAPS.md#trap-late-frame) — START and program changes; ColdFire time added to the frame interrupt moves it on or off the window; FRAME GUARD holds a late entry to 190 µs.
 - [Dropping a stock hold to keep a window open can drop the hold's release bookkeeping](docs/contributing/TRAPS.md#trap-hold-release-toggle) — LOCK EDIT's re-hold audition lost the step trig until `le_trighold` cleared stock's `0x460d1a9e` itself.
 
-- [A machine's own code compared the list's cursor with row 5](docs/contributing/TRAPS.md#trap-machine-row-constant) — a MACHINES client reads `<prefix>_mc_row`, never 5, even against stock's cursor `0x460e738e`.
-
 - [PLAYBACK slot A depends on the machine](docs/contributing/TRAPS.md#trap-pitch-destination): THRU has INAB where FLEX has PTCH; resolve the parameter before offering pitch controls.
 
-## How docs are written here
+## How claims are written here
 
-Nothing reaches `main` without CI's full gates, so a doc never has to prove
-what it says. Write what the code does now, for the person reading.
+The project has been burned by stale confident numbers more than once — a
+cycle budget of 1080 that was never a ceiling, a burn probe that measured an
+engine we do not ship, a blocker our own bisect had already falsified.
 
-- **No proof levels or run histories.** No "on a unit", "under the port
-  only", "not flashed", which image or whose unit it ran on, run tallies,
-  dates, PR numbers or build numbers in a doc. The gates are the proof; git
-  and `CHANGELOG.md` are the history.
-- **No retractions kept beside the fact.** When a fact changes, change it
-  everywhere it is repeated and delete the old one.
-- **Numbers a reader needs stay** (a cost, a limit, a range, a timing a
-  musician hears), stated plainly, without how they were measured.
-- **Firmware facts that are guesses** say so in a word ("probably",
-  "unconfirmed"). Don't record the method.
-- **Known faults a musician can hit** are stated as what happens and what
-  to avoid, without the test tallies behind them.
-- **Lead with what it does**, then how to use it, then how it works. Define
-  a term the first time a page uses it (`docs/GLOSSARY.md`). One idea per
-  sentence; a parenthesis is for an aside, not the main point.
-- **One home per fact.** Link to it rather than repeating it.
+So: **separate measured from inferred.** `docs/firmware/CHIP.md` marks every number with
+a confidence marker and keeps retracted values beside current ones. Do the
+same. Say what would falsify a claim. Do not write "found it" for something
+you have inferred, and when a retraction lands, propagate it to every document
+that repeated the old number — not just the one you were editing.
 
-`TRAPS.md` and `FAILURE_MODES.md` are working registers: symptom, cause,
-fix and the gate that now catches it. Keep entries to those four.
+## Removed files stay cited
 
-## Removed files
+The tree was pruned hard in the octabam refactor (~350 files of ColdFire
+archaeology, emulator scratch, voicing snapshots) and `docs/history/` (18
+closed records) was removed 16 Sep 2026; all are still reachable in git.
+Comments cite removed probes (`dsp/baseprobe.asm`, `dsp/ymemprobe.asm`) as
+the provenance of a measurement, and those statements remain true. Recover
+one with:
 
-The tree was pruned hard in the octabam refactor and `docs/history/` was
-removed 16 Sep 2026; all of it is reachable in git
-(`git log --all --oneline -- <path>`, then `git show <sha>:<path>`; the
-`docs/history/` records are at sha `3ceba41`). Existing citations of removed
-files may stay where they explain a number in code; don't add new ones to docs.
+```bash
+git log --all --oneline -- dsp/baseprobe.asm
+git show <sha>:dsp/baseprobe.asm
+```
+
+Leave those citations alone — rewriting one to remove a filename erases
+how the number was obtained. A citation of a removed file uses the form
+`git show <sha>:<path>` (`docs/history/` records: sha `3ceba41`).
+
+- [A byte read from a saved long takes the high byte](docs/contributing/TRAPS.md#trap-midi-stack-byte). Restore the long before storing a MIDI lock byte.
+
+- [The free-rhythm reader overwrites the MIDI writer's destination](docs/contributing/TRAPS.md#trap-midi-free-mask-pointer). Preserve the record pointer across the rhythm reader.
+
+- [MIDI confirmation filled the pattern and immediately relocked editing](docs/contributing/TRAPS.md#trap-midi-confirmation-fill). Confirmation unlocks the preview; explicit fill writes only the selected destination.
+
+- [SEQ's MIDI clear menu was explicitly disabled](docs/contributing/TRAPS.md#trap-midi-seq-clear-menu). MIDI clear actions use their own records and recipe tables.

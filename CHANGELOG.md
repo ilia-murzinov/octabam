@@ -47,6 +47,20 @@ The full text before this rewrite: `git show 666b6154:CHANGELOG.md`.
 - Artifact SHA-256:
   `c5efe642cab1de0d71d5ba8f5abb619147c8ea13877cc506bf21ad6bf14e086b`.
 
+## CX M8, 14 Nov 2026, CX remix
+
+- SEQ edits MIDI note trigs and parameter locks with separate TRIG/PLOCK
+  settings. NOTE, NOT2-4, velocity, length, LFO, ARP, pitch bend, channel
+  pressure and CC destinations are available. Confirmation YES unlocks
+  the preview; the next explicit YES writes the selected destination.
+- MIDI FUNC+BANK offers CLEAR DEST, CLEAR ALL DEST and CLEAR ALL+TRIGS.
+  Actions update the focused track and its battery mirror. Panel gates
+  verify other destinations, tracks, steps beyond LEN and adjacent patterns.
+- The author confirmed MIDI behavior on his MKII. USB MIDI captures showed
+  channel-2 notes and note-offs. An initially fixed C3 was caused by an
+  unwritten NOTE fill; the author confirmed variation after explicit YES.
+  Artifact SHA-256: `b6722704137567abf1ac82a6d71e3d6faaf7de915c8b3357d837675ef330f3c3`.
+
 ## Unreleased
 
 - **USB: USB and DIN MIDI input together** (#1248; `modules/usb`). A USB message arriving between a DIN sender's running-status bytes replaced DIN's running status in the one stock framer both inputs share: after a USB program change, every later DIN data byte parsed as a program change, each a pattern change (the reporter's DAW program changes over USB, with the Octatrack's own MIDI out looped into DIN). The decoder now frames DIN's bytes first, saves the framer's state, parses the USB channel or system common message and puts DIN's state back, half-received message included. Realtime bytes and USB SysEx are unchanged. Gate: `verify_usb_midi_din_mix` (v0.5 fails all four checks); `verify_usbmidi_isr` stubs the framer, whose `rte` unicorn does not run. Not flashed.
