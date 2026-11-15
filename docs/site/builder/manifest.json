@@ -1,9 +1,9 @@
 {
  "version": "v0.4",
- "commit": "54150166c5e6ec5da45cc0b07978a0b8bb605855",
+ "commit": "222f9a68f1fdb3433dd90da3d02f82974e8efa83",
  "dev": true,
- "build": "J8",
- "date": "2026-11-14",
+ "build": "J9",
+ "date": "2026-11-15",
  "alwaysOn": [
   "SCOPE",
   "COPY PROJECT",
@@ -36,11 +36,11 @@
   {
    "name": "cx",
    "title": "cx",
-   "version": "OCTABAMJ8",
-   "imageName": "CX J8",
+   "version": "OCTABAMJ9",
+   "imageName": "CX J9",
    "patch": "patches/cx.obp",
-   "patchBytes": 128175,
-   "sha256": "f31b0db0fb54b4e64e959a12bc8f9d102c77fe16f0b3de9605250db3f6e7f1cf",
+   "patchBytes": 130499,
+   "sha256": "676e91ca3998f83a3ce50fa03e92d23620e5aef7138bd55b8dcaa04f98107d24",
    "features": [
     "SHATTER",
     "VOID"
@@ -49,11 +49,11 @@
   {
    "name": "cx-reson",
    "title": "cx-reson",
-   "version": "OCTABAMJ8",
-   "imageName": "CX-RESON J8",
+   "version": "OCTABAMJ9",
+   "imageName": "CX-RESON J9",
    "patch": "patches/cx-reson.obp",
-   "patchBytes": 126766,
-   "sha256": "50ec790d5f3876a6d79d7c5402c46c8f147435f107c8999313229f87e2582641",
+   "patchBytes": 129031,
+   "sha256": "e3f8ea79ce4ab7d04a98c10b4337ad9a7f5a329140f552af4bbc03f7c7781230",
    "features": [
     "RESONATOR",
     "SHATTER"
@@ -62,11 +62,11 @@
   {
    "name": "cx-vres",
    "title": "cx-vres",
-   "version": "OCTABAMJ8",
-   "imageName": "CX-VRES J8",
+   "version": "OCTABAMJ9",
+   "imageName": "CX-VRES J9",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 127418,
-   "sha256": "34bb61604c3b75562b89d1b98a5419a4127a471f499b5cec9464577e8a3050ad",
+   "patchBytes": 129681,
+   "sha256": "57dd04a543739c68df8a8fb8b4507a66b27087af290dad40c29610bc768a7b3e",
    "features": [
     "RESONATOR",
     "VOID"
