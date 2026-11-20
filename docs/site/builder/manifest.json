@@ -1,6 +1,6 @@
 {
  "version": "v0.4",
- "commit": "343b90eddc8cbfbeade342834a7cc49212f30ce7",
+ "commit": "fa632c69227a30dd79ae4dac486967127c3ad1bf",
  "dev": true,
  "build": "K4",
  "date": "2026-11-20",
@@ -43,8 +43,8 @@
    "version": "OCTABAMK4",
    "imageName": "CX K4",
    "patch": "patches/cx.obp",
-   "patchBytes": 139827,
-   "sha256": "f24cab6a741b98f22e4c2a5b2bfcf53653a8173bd30ed72f4a70f827cdbe7fc2",
+   "patchBytes": 139911,
+   "sha256": "51d7677b63c5c4e380e1aa7224b1699d51f5a192792031fe04ba2688321de191",
    "features": [
     "SHATTER",
     "VOID"
@@ -69,8 +69,8 @@
    "version": "OCTABAMK4",
    "imageName": "CX-VRES K4",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 138911,
-   "sha256": "38e91d23adaed5e76709b8b68ad5038e102ec25598d5fe0a77715241a2618840",
+   "patchBytes": 139075,
+   "sha256": "77cb7406bb38e69e2b15d0febfde1bdb2437b4061f21ea48d9e755ade75c5997",
    "features": [
     "RESONATOR",
     "VOID"
