@@ -1,9 +1,9 @@
 {
  "version": "v0.4",
- "commit": "fa632c69227a30dd79ae4dac486967127c3ad1bf",
+ "commit": "3f76eba6f827a3142a823eadc5138fd2e2813b9a",
  "dev": true,
  "build": "K4",
- "date": "2026-11-20",
+ "date": "2026-11-21",
  "alwaysOn": [
   "PATTERN MUTE",
   "LOAD METER",
@@ -56,8 +56,8 @@
    "version": "OCTABAMK4",
    "imageName": "CX-RESON K4",
    "patch": "patches/cx-reson.obp",
-   "patchBytes": 138309,
-   "sha256": "2f9556f2707c8f1e7bdf9af8ce06a1576f83caf495fa65efd73c4d94b1fe81f5",
+   "patchBytes": 138298,
+   "sha256": "6b8c5013d3eefc446c22bd75e957daeaafcb11427475248e809883e687025238",
    "features": [
     "RESONATOR",
     "SHATTER"
@@ -69,8 +69,8 @@
    "version": "OCTABAMK4",
    "imageName": "CX-VRES K4",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 139075,
-   "sha256": "77cb7406bb38e69e2b15d0febfde1bdb2437b4061f21ea48d9e755ade75c5997",
+   "patchBytes": 139080,
+   "sha256": "08faa16505228611244a359c5401057ecd9a278d5dfeb1e121754dcdb3609dcb",
    "features": [
     "RESONATOR",
     "VOID"
