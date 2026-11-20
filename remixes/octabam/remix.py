@@ -1,13 +1,7 @@
 """octabam -- the core ColdFire modules, SCOPE and TUNER, every other ColdFire module that fits, all 14 stock effects, and MODULATION, SPECTRUM, CHARACTER and SHATTER loaded on demand, with COMPRESSOR's side-chain (SIDECHAIN_COMPRESSOR) loaded the same way. TRANSIENT and DISTORX are not in this remix."""
 from remix.schema import Pin, Evidence, Level, Remix
+from remix.personal import OCTABAM_CORE as CORE
 
-CORE = ("BRAIN", "STORE", "KITS", "MIDI SCENES", "SCENES P2", "PLOCKS P2",
-        "CC MAP", "CC FEEDBACK", "USB",
-        "RECORDER LOOP FIX", "BATCH_BUGFIXES", "ERASE_EMPTY_TRIGLESS_LOCKS",
-        "QUANTIZE_LIVE_REC_TOGGLE", "REC_TRIG_MUTE", "MUTE_MODES", "PATTERN MUTE",
-        "SCALE QUANTIZER", "TUNER", "SCOPE", "DIRECT_JUMP_KYOTI", "RELOAD_FROM_PROJECT", "RLEN PLEN",
-        "ATA WRITE GUARD", "EVENTS",
-        "LOAD METER", "FRAME GUARD", "REMOTE")
 # COMPRESSOR's row is SIDECHAIN_COMPRESSOR's: stock COMPRESSOR with a side-chain KEY on page 2, its DSP
 # loaded on demand while a track uses COMPRESSOR (docs/contributing/DEMAND_LOADER.md). Out 1 Nov 2026 (433e22e)
 # with TRANSIENT and DISTORX, back 4 Nov 2026: KEY reads "--" while the side-chain is not loaded (#934).

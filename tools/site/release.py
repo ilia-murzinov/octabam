@@ -29,6 +29,10 @@ SITE_MODULES = (
 
 # Every BUILDER_REMIXES image has these; the matrix does not repeat them.
 BUILDER_ALWAYS_ON = (
+    "PATTERN MUTE",
+    "LOAD METER",
+    "FRAME GUARD",
+    "REMOTE",
     "SCOPE",
     "COPY PROJECT",
     "DARK REV",
