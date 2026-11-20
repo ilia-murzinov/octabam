@@ -7,23 +7,7 @@ PLATE / SPRING harvested so VOID fits; DARK REV kept. SCOPE: DOWN+TEMPO
 """
 
 from remix.schema import Pin, Proof, Remix
-
-CORE = (
-    "BRAIN", "STORE", "KITS", "MIDI SCENES", "SCENES P2", "PLOCKS P2",
-    "CC MAP", "CC FEEDBACK", "USB",
-    "RECORDER LOOP FIX", "BATCH_BUGFIXES", "ERASE_EMPTY_TRIGLESS_LOCKS",
-    "QUANTIZE_LIVE_REC_TOGGLE", "REC_TRIG_MUTE", "MUTE_MODES",
-    "SCALE QUANTIZER", "TUNER", "DIRECT_JUMP_KYOTI", "RELOAD_FROM_PROJECT",
-    "RLEN PLEN",
-    "ATA WRITE GUARD", "EVENTS",
-    "RND NAME",
-    "SEQ",
-    "COPY PROJECT",
-    "PERSISTENT BUFFERS",
-    "REMIX SWITCH",
-    "SCOPE",
-    "SCREEN",
-)
+from remix.personal import personal_modules
 
 REMIX = Remix(
     name="cx",
@@ -31,24 +15,8 @@ REMIX = Remix(
     proof=Proof.RENDER,
     proof_note="CX OSC + SHATTER + VOID + SCOPE + SCREEN + DARK + COPY; stock DELAY; stock COMP; no SC / RESONATOR / SYNTH / STUTTR.",
     doc="CORE + STEM REC + CX OSC + SHATTER + VOID + SCOPE + SCREEN + DARK REV + DELAY + COPY PROJECT + stock COMP.",
-    modules=CORE + (
-        "MEMORY",
-        "STEM REC",
-        "CX OSC",
-        "SHATTER",
-        "VOID",
-        "LOFI AMF FIX",
-        "FILTER",
-        "EQUALIZER",
-        "DJ EQ",
-        "PHASER",
-        "FLANGER",
-        "CHORUS",
-        "SPATIALIZER",
-        "COMPRESSOR",
-        "LO-FI",
-        "DELAY",
-        "DARK REV",
+    modules=personal_modules(
+        "CX OSC", before_fx=("SHATTER", "VOID"), core_extra=("SCREEN",)
     ),
     fx1=(
         "FILTER",

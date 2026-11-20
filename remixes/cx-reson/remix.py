@@ -5,22 +5,7 @@ No VOID / SIDECHAIN / STUTTR / SYNTH / TAPE. Stock DELAY kept. PLATE / SPRING ha
 """
 
 from remix.schema import Pin, Proof, Remix
-
-CORE = (
-    "BRAIN", "STORE", "KITS", "MIDI SCENES", "SCENES P2", "PLOCKS P2",
-    "CC MAP", "CC FEEDBACK", "USB",
-    "RECORDER LOOP FIX", "BATCH_BUGFIXES", "ERASE_EMPTY_TRIGLESS_LOCKS",
-    "QUANTIZE_LIVE_REC_TOGGLE", "REC_TRIG_MUTE", "MUTE_MODES",
-    "SCALE QUANTIZER", "TUNER", "DIRECT_JUMP_KYOTI", "RELOAD_FROM_PROJECT",
-    "RLEN PLEN",
-    "ATA WRITE GUARD", "EVENTS",
-    "RND NAME",
-    "SEQ",
-    "COPY PROJECT",
-    "PERSISTENT BUFFERS",
-    "REMIX SWITCH",
-    "SCOPE",
-)
+from remix.personal import personal_modules
 
 REMIX = Remix(
     name="cx-reson",
@@ -28,25 +13,10 @@ REMIX = Remix(
     proof=Proof.RENDER,
     proof_note="CX OSC + RESONATOR + SHATTER + SCOPE + DARK + COPY; stock DELAY; stock COMP; no VOID / SC / STUTTR / SYNTH.",
     doc="CORE + STEM REC + CX OSC + RESONATOR + SHATTER + SCOPE + DARK REV + DELAY + COPY PROJECT + stock COMP.",
-    modules=CORE + (
-        "MEMORY",
-        "STEM REC",
+    modules=personal_modules(
         "CX OSC",
-        "SHATTER",
-        "RESONATOR",
-        "LOFI AMF FIX",
-        "FILTER",
-        "EQUALIZER",
-        "DJ EQ",
-        "PHASER",
-        "FLANGER",
-        "CHORUS",
-        "SPATIALIZER",
-        "COMB FILTER",
-        "COMPRESSOR",
-        "LO-FI",
-        "DELAY",
-        "DARK REV",
+        before_fx=("SHATTER", "RESONATOR"),
+        after_fx=("COMB FILTER",),
     ),
     fx1=(
         "FILTER",
