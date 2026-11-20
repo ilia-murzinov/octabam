@@ -1,6 +1,6 @@
 # cx-vres
 
 Same as `cx` but RESONATOR instead of SHATTER. CX OSC + VOID + SCOPE + COPY +
-DARK + stock COMP.
+DARK + stock COMP. PHASER harvested.
 
 Shared with octabam: PATTERN MUTE, LOAD METER, FRAME GUARD and REMOTE.

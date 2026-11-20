@@ -10,9 +10,11 @@ Every build includes [Scope](reference/modules/scope.md),
 [Complex Oscillator](reference/modules/cxosc.md),
 [SEQ](reference/modules/seq.md),
 [Persistent Buffers](reference/modules/persistent-buffers.md),
-[Rnd Name](reference/modules/rnd-name.md), and stock COMPRESSOR. PLATE and
-SPRING are harvested so the inserts fit. The matrix below only shows what
-differs: VOID / SHATTER / RESONATOR.
+[Rnd Name](reference/modules/rnd-name.md), PATTERN MUTE, LOAD METER,
+FRAME GUARD and REMOTE. Stock COMPRESSOR stays available. PLATE and SPRING
+are harvested in every remix. PHASER is also harvested in `cx-vres` so
+RESONATOR fits. The matrix below shows the insert choices: VOID / SHATTER /
+RESONATOR.
 
 General install, safety and FAQ:
 [upstream Build and Install](https://sambanks.github.io/octabam/web-builder.html),
