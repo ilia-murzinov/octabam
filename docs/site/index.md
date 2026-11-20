@@ -31,8 +31,9 @@ Unofficial community firmware. Not made, endorsed or supported by Elektron.
 | **cx-vres** | Void + Resonator | — |
 
 Always on: Scope, Copy Project, DARK REV, CX OSC, SEQ, Persistent Buffers,
-Rnd Name, stock COMPRESSOR. PLATE and SPRING are harvested so the inserts
-fit.
+Rnd Name, PATTERN MUTE, LOAD METER, FRAME GUARD, REMOTE and stock COMPRESSOR.
+PLATE and SPRING are harvested in every remix. PHASER is also harvested in
+`cx-vres` so RESONATOR fits.
 
 [Build](web-builder.md) flashes a `.bin` / `.syx`, or boots an `.RMX` on a
 unit that already runs octabam.
