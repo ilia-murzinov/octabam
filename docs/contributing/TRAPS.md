@@ -2054,3 +2054,13 @@ three YES rows on T2. It verifies exact preservation outside each action's
 scope in RAM and CS1, including audio data, other MIDI tracks, steps beyond
 LEN, the next pattern, and other tracks' MIDI recipes. CLEAR ALL+TRIGS
 checks the remaining outside-LEN trig and TRIG recipe defaults.
+
+<a name="trap-seq-fx-context"></a>
+### A byte read from a long track index selects T1
+
+SEQ stores its zero-based track index in a big-endian long. Reading the
+first byte for an FX descriptor lookup always selected T1. The lookup now
+reads the full long and uses the selected Part. PLOCKS P2 stores generated
+locks by bank and pattern, so SEQ passes the bank index separately. The SEQ
+scenario puts effects on T1 and T3, leaves T2 empty, and checks both
+destination selection and the live parameter during playback.
