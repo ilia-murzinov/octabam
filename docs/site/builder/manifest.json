@@ -1,6 +1,6 @@
 {
  "version": "v0.4",
- "commit": "d0956a354daa9016b68fa4cf3ce73efa2ed9da7d",
+ "commit": "a7a96aad7fa2dc536889b12db9a6904dbdcfbd4a",
  "dev": true,
  "build": "K5",
  "date": "2026-11-24",
@@ -43,8 +43,8 @@
    "version": "OCTABAMK5",
    "imageName": "CX K5",
    "patch": "patches/cx.obp",
-   "patchBytes": 140846,
-   "sha256": "35686c96297ab0ba9cba0f2c7567d66b054a8bf8baeb49548d66b9a86063be7e",
+   "patchBytes": 142058,
+   "sha256": "f03ff5b3ed156f55168eb041b0953da966a4e532db92482066dd9cee2da1b78b",
    "features": [
     "SHATTER",
     "VOID"
@@ -56,8 +56,8 @@
    "version": "OCTABAMK5",
    "imageName": "CX-RESON K5",
    "patch": "patches/cx-reson.obp",
-   "patchBytes": 139423,
-   "sha256": "53ef295bead0092c29378f436b5fd652c8166c89bdb08ea7de14b50439a5aabb",
+   "patchBytes": 140625,
+   "sha256": "8f1c9c1f8589c3d44ec6aa6731dddf8afa6d1d834cd965c76dea58e4d10511fb",
    "features": [
     "RESONATOR",
     "SHATTER"
@@ -69,8 +69,8 @@
    "version": "OCTABAMK5",
    "imageName": "CX-VRES K5",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 140178,
-   "sha256": "d853d0fcc9a8964a1c9fe7ed2ef3f8c8d129287bfa69ed41018b31f34302dcca",
+   "patchBytes": 140901,
+   "sha256": "6f2095f5552c5f3266ab6220a7609e12a92246c23f9986c51f560734954391ea",
    "features": [
     "RESONATOR",
     "VOID"
