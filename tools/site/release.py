@@ -25,6 +25,7 @@ SITE_MODULES = (
     "SEQ",
     "PERSISTENT BUFFERS",
     "RND NAME",
+    "TUNER",
 )
 
 # Every BUILDER_REMIXES image has these; the matrix does not repeat them.

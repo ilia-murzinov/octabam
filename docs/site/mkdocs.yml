@@ -46,6 +46,7 @@ nav:
       - Persistent Buffers: reference/modules/persistent-buffers.md
       - Random Naming: reference/modules/rnd-name.md
       - Scope: reference/modules/scope.md
+      - Tuner: reference/modules/tuner.md
 markdown_extensions:
   - admonition
   - pymdownx.details
