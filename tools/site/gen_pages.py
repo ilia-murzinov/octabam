@@ -104,6 +104,41 @@ def _label(m) -> str:
     return title_case(" ".join(word if word in acronyms else word.lower() for word in words))
 
 
+def _account(url: str | None) -> str | None:
+    """Return the GitHub account named by an author URL."""
+    mt = re.match(r"https://github\.com/([^/]+)", url or "")
+    return mt.group(1).lower() if mt else None
+
+
+def _clean(name: str) -> str:
+    return re.sub(r",\s*ported here$", "", name.strip())
+
+
+_NAMES: dict[str, str] = {}
+
+
+def who(m) -> tuple[str, str | None, tuple[str, str] | None]:
+    """Return an author's display name, profile, and optional repository."""
+    acc = _account(m.author_url)
+    if acc is None:
+        return (_clean(m.author or "?"), m.author_url, None)
+    if not _NAMES:
+        spellings: dict[str, set] = {}
+        for module in registry.modules().values():
+            account = _account(module.author_url)
+            if account and module.author and not module.is_stock:
+                spellings.setdefault(account, set()).add(_clean(module.author))
+        for account, names in spellings.items():
+            plain = sorted(name for name in names if "/" not in name)
+            _NAMES[account] = next((name for name in plain if " " in name), plain[0] if plain else account)
+    handle = re.match(r"https://github\.com/([^/]+)", m.author_url).group(1)
+    name = _NAMES.get(acc, handle)
+    profile = f"https://github.com/{handle}"
+    rest = m.author_url[len(profile):].strip("/")
+    repo = (rest.split("/")[0], m.author_url) if rest else None
+    return (name, profile, repo)
+
+
 def _author(m) -> str:
     if m.is_stock:
         return "stock"
