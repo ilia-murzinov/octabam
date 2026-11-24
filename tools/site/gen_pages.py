@@ -354,7 +354,8 @@ def main(quiet: bool = False) -> int:
             shutil.rmtree(OUT)
         OUT.mkdir(parents=True, exist_ok=True)
         jobs = {}
-        manual_page = gen_manual.published_pages(mods, official)
+        book = gen_manual.Book(mods, official)
+        manual_page = gen_manual.published_pages(book)
         site_keys = _site_keys()
         jobs["modules.md"] = directory_page(mods, manual_page)
         jobs["_credits-shipped.md"] = shipped_credits_page(mods)
@@ -363,7 +364,7 @@ def main(quiet: bool = False) -> int:
                 continue
             jobs[f"modules/{m.name}.md"] = module_page(m, mods, manual_page)
         for name, r in official:
-            jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, r, mods)) + "\n"
+            jobs[f"_remix-{name}.md"] = "\n".join(gen_manual.remix_table(name, book)) + "\n"
         if official:
             jobs.update(gen_manual.main(mods, official))
         for name, text in sorted(jobs.items()):
