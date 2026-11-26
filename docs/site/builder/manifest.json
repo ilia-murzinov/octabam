@@ -1,9 +1,9 @@
 {
  "version": "v0.4",
- "commit": "bc65dd52c43bae3084e988b79d9ad1d772d7b3e3",
+ "commit": "838284a61e9074ec4f57752f3e640573423c0917",
  "dev": true,
- "build": "K6",
- "date": "2026-11-25",
+ "build": "K7",
+ "date": "2026-11-26",
  "alwaysOn": [
   "PATTERN MUTE",
   "LOAD METER",
@@ -40,11 +40,11 @@
   {
    "name": "cx",
    "title": "cx",
-   "version": "OCTABAMK6",
-   "imageName": "CX K6",
+   "version": "OCTABAMK7",
+   "imageName": "CX K7",
    "patch": "patches/cx.obp",
-   "patchBytes": 142139,
-   "sha256": "a47a82a2ae5a7bce32c17c6d3e0242d986ae52c4eef5cc78a8ade1e184d08525",
+   "patchBytes": 141623,
+   "sha256": "e44102b42f333bfb88aa5dd86857d4c4eca64674e6e179b36ff2c8881d61802f",
    "features": [
     "SHATTER",
     "VOID"
@@ -53,11 +53,11 @@
   {
    "name": "cx-reson",
    "title": "cx-reson",
-   "version": "OCTABAMK6",
-   "imageName": "CX-RESON K6",
+   "version": "OCTABAMK7",
+   "imageName": "CX-RESON K7",
    "patch": "patches/cx-reson.obp",
-   "patchBytes": 140768,
-   "sha256": "cf83e4aa122ab49a590d72324264a7894235832ca2b99ab9751daa25ab53919d",
+   "patchBytes": 140208,
+   "sha256": "ec049cd4e3f533ea20234b118b714b7a3b5624eb391f3841d627b3c7173305d0",
    "features": [
     "RESONATOR",
     "SHATTER"
@@ -66,11 +66,11 @@
   {
    "name": "cx-vres",
    "title": "cx-vres",
-   "version": "OCTABAMK6",
-   "imageName": "CX-VRES K6",
+   "version": "OCTABAMK7",
+   "imageName": "CX-VRES K7",
    "patch": "patches/cx-vres.obp",
-   "patchBytes": 141023,
-   "sha256": "69615c83e7978f4a8c987dcf9432333964b7b6536606899b9f4539f5cc5f76e8",
+   "patchBytes": 140514,
+   "sha256": "0fd2b179713ba80efbedb81f235a8076405a3294a1f15e414331203115ae3382",
    "features": [
     "RESONATOR",
     "VOID"
